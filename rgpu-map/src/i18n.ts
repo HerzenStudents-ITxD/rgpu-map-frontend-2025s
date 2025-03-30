@@ -2,7 +2,6 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-// Определяем типы для переводов
 interface TranslationResources {
   settings: {
     title: string;
@@ -16,12 +15,23 @@ interface TranslationResources {
     schedule: string;
     settings: string;
   };
+  news: {
+    title: string;
+    publish: string;
+    createPost: string;
+    titlePlaceholder: string;
+    description: string;
+    addImage: string;
+    imageAdded: string;
+    routePoint: string;
+    cancel: string;
+    participate: string;
+    buildRoute: string;
+  };
 }
 
-// Определяем поддерживаемые языки
 type SupportedLanguages = 'en' | 'ru' | 'cn';
 
-// Ресурсы переводов
 const resources: Record<SupportedLanguages, { translation: TranslationResources }> = {
   en: {
     translation: {
@@ -36,6 +46,19 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         routes: 'Routes',
         schedule: 'Schedule',
         settings: 'Settings',
+      },
+      news: {
+        title: 'News',
+        publish: 'Publish',
+        createPost: 'Create Post',
+        titlePlaceholder: 'Title',
+        description: 'Description',
+        addImage: 'Add Image',
+        imageAdded: 'Image Added',
+        routePoint: 'Route Point',
+        cancel: 'Cancel',
+        participate: 'Participate',
+        buildRoute: 'Build Route',
       },
     },
   },
@@ -53,6 +76,19 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         schedule: 'Расписание',
         settings: 'Настройки',
       },
+      news: {
+        title: 'Новости',
+        publish: 'Опубликовать',
+        createPost: 'Создать пост',
+        titlePlaceholder: 'Заголовок',
+        description: 'Описание',
+        addImage: 'Добавить картинку',
+        imageAdded: 'Картинка добавлена',
+        routePoint: 'Точка маршрута',
+        cancel: 'Отменить',
+        participate: 'Участвую',
+        buildRoute: 'Проложить маршрут',
+      },
     },
   },
   cn: {
@@ -68,6 +104,19 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         routes: '路线',
         schedule: '课程表',
         settings: '设置',
+      },
+      news: {
+        title: '新闻',
+        publish: '发布',
+        createPost: '创建帖子',
+        titlePlaceholder: '标题',
+        description: '描述',
+        addImage: '添加图片',
+        imageAdded: '图片已添加',
+        routePoint: '路线点',
+        cancel: '取消',
+        participate: '参与',
+        buildRoute: '建立路线',
       },
     },
   },
@@ -88,10 +137,8 @@ i18n
     },
   });
 
-// Экспортируем i18n для использования в других местах
 export default i18n;
 
-// Экспортируем типы для использования в хуке useTranslation
 declare module 'react-i18next' {
   interface CustomTypeOptions {
     defaultNS: 'translation';
