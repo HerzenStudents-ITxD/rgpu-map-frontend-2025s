@@ -4,7 +4,14 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { Routes, Route, BrowserRouter, Router } from 'react-router-dom';
 import theme from './theme';
-import App from './App';
+import Settings from './pages/Settings';
+import './i18n';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import News from './pages/News';
+import RoutesList from './pages/RoutesList';
+import RouteBuilder from './pages/RouteBuilder';
+import Schedule from './pages/Schedule';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -12,8 +19,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <CssBaseline />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element= {<App />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/routes" element={<RoutesList />} />
+            <Route path="/route-builder" element={<RouteBuilder />} />
+            <Route path="/schedule" element={<Schedule />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
+          <Navbar />
         </BrowserRouter>
     </ThemeProvider>
   </React.StrictMode>,
