@@ -22,7 +22,7 @@ const Navbar: React.FC = () => {
         label={t('navbar.home')}
         icon={<HomeIcon />}
         component={Link}
-        to="/"
+        to="/home" // Обновлено с "/" на "/home"
       />
       <BottomNavigationAction
         label={t('navbar.news')}

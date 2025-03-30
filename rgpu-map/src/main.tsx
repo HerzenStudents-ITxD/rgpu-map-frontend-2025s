@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import { Routes, Route, BrowserRouter, Router } from 'react-router-dom';
+import { Routes, Route, BrowserRouter, Router, Navigate } from 'react-router-dom';
 import theme from './theme';
 import Settings from './pages/Settings';
 import './i18n';
@@ -19,7 +19,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <CssBaseline />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/news" element={<News />} />
             <Route path="/routes" element={<RoutesList />} />
             <Route path="/route-builder" element={<RouteBuilder />} />
