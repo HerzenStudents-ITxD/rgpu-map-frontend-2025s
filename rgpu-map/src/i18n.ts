@@ -52,6 +52,12 @@ interface TranslationResources {
     coordinates: string;
     library: string;
   };
+  sidebar: {
+    pointDetails: string;
+    pointId: string;
+    coordinates: string;
+    createdBy: string;
+  };
 }
 
 type SupportedLanguages = 'en' | 'ru' | 'cn';
@@ -108,6 +114,12 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         coordinates: 'Coordinates',
         library: 'Library',
       },
+      sidebar: {
+        pointDetails: 'Point Details',
+        pointId: 'Point ID',
+        coordinates: 'Coordinates',
+        createdBy: 'Created By',
+      },
     },
   },
   ru: {
@@ -161,6 +173,12 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         coordinates: 'Координаты',
         library: 'Библиотека',
       },
+      sidebar: {
+        pointDetails: 'Информация о точке',
+        pointId: 'ID точки',
+        coordinates: 'Координаты',
+        createdBy: 'Создано пользователем',
+      },
     },
   },
   cn: {
@@ -213,6 +231,12 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         planets: '行星',
         coordinates: '坐标',
         library: '图书馆',
+      },
+      sidebar: {
+        pointDetails: '点详细信息',
+        pointId: '点ID',
+        coordinates: '坐标',
+        createdBy: '创建者',
       },
     },
   },

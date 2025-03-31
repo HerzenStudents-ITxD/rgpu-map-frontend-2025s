@@ -1,14 +1,27 @@
 import React, { useState } from 'react';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Typography, List, ListItem, ListItemText } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
-interface SidebarProps {
-  children?: React.ReactNode; // Явно указываем, что children опциональны
+interface Point {
+  point_id: string;
+  user_id: string;
+  x: number;
+  y: number;
+  z: number;
+  media?: string;
+  connections?: string[];
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ children }) => {
+interface SidebarProps {
+  children?: React.ReactNode;
+  selectedPoint: Point | null;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ children, selectedPoint }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(true);
 
   const toggleSidebar = () => {
@@ -37,7 +50,35 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
       </Box>
       {isOpen && (
         <Box sx={{ padding: '0 10px' }}>
-          {children || <Outlet />}
+          {selectedPoint ? (
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                {t('sidebar.pointDetails')}
+              </Typography>
+              <List>
+                <ListItem>
+                  <ListItemText
+                    primary={t('sidebar.pointId')}
+                    secondary={selectedPoint.point_id}
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText
+                    primary={t('sidebar.coordinates')}
+                    secondary={`X: ${selectedPoint.x}, Y: ${selectedPoint.y}, Z: ${selectedPoint.z}`}
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText
+                    primary={t('sidebar.createdBy')}
+                    secondary={selectedPoint.user_id}
+                  />
+                </ListItem>
+              </List>
+            </Box>
+          ) : (
+            children || <Outlet />
+          )}
         </Box>
       )}
     </Box>
