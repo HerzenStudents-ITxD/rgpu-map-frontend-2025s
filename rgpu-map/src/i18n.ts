@@ -34,6 +34,24 @@ interface TranslationResources {
     participate: string;
     buildRoute: string;
   };
+  schedule: {
+    title: string;
+    noEvents: string;
+  };
+  routes: {
+    title: string;
+  };
+  topBar: {
+    search: string;
+    locateMe: string;
+  };
+  rightBar: {
+    lectureBoard: string;
+    teachers: string;
+    planets: string;
+    coordinates: string;
+    library: string;
+  };
 }
 
 type SupportedLanguages = 'en' | 'ru' | 'cn';
@@ -72,6 +90,24 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         participate: 'Participate',
         buildRoute: 'Build Route',
       },
+      schedule: {
+        title: 'Schedule',
+        noEvents: 'No events for this day',
+      },
+      routes: {
+        title: 'Routes',
+      },
+      topBar: {
+        search: 'Search',
+        locateMe: 'Locate Me',
+      },
+      rightBar: {
+        lectureBoard: 'Lecture Board',
+        teachers: 'Teachers',
+        planets: 'Planets',
+        coordinates: 'Coordinates',
+        library: 'Library',
+      },
     },
   },
   ru: {
@@ -107,6 +143,24 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         participate: 'Участвую',
         buildRoute: 'Проложить маршрут',
       },
+      schedule: {
+        title: 'Расписание',
+        noEvents: 'Нет событий на этот день',
+      },
+      routes: {
+        title: 'Маршруты',
+      },
+      topBar: {
+        search: 'Поиск',
+        locateMe: 'Вы раз?',
+      },
+      rightBar: {
+        lectureBoard: 'Лекционная доска',
+        teachers: 'Учителя',
+        planets: 'Планеты',
+        coordinates: 'Координаты',
+        library: 'Библиотека',
+      },
     },
   },
   cn: {
@@ -141,6 +195,24 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         cancel: '取消',
         participate: '参与',
         buildRoute: '建立路线',
+      },
+      schedule: {
+        title: '课程表',
+        noEvents: '当天没有活动',
+      },
+      routes: {
+        title: '路线',
+      },
+      topBar: {
+        search: '搜索',
+        locateMe: '你在哪里？',
+      },
+      rightBar: {
+        lectureBoard: '讲义板',
+        teachers: '老师',
+        planets: '行星',
+        coordinates: '坐标',
+        library: '图书馆',
       },
     },
   },

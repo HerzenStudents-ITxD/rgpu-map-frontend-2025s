@@ -2,6 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
+import TopBar from './components/TopBar';
+import RightBar from './components/RightBar';
+import MapPlaceholder from './UI/MapPlaceholder';
 import Home from './pages/Home';
 import News from './pages/News';
 import RoutesList from './pages/RoutesList';
@@ -22,23 +26,26 @@ root.render(
     <CustomThemeProvider>
       <Router>
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-          <div style={{ flex: 1 }}>
-            <Routes>
-              {/* Перенаправление с корневого пути '/' на '/home' */}
-              <Route path="/" element={<Navigate to="/home" replace />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/news" element={<News />} />
-              <Route path="/routes" element={<RoutesList />} />
-              <Route path="/route-builder" element={<RouteBuilder />} />
-              <Route path="/schedule" element={<Schedule />} />
-              {/* Вложенные маршруты для настроек */}
-              <Route path="/settings" element={<Settings />}>
-                <Route index element={<Settings />} />
-                <Route path="language" element={<LanguageSelector />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="feedback" element={<Feedback />} />
-              </Route>
-            </Routes>
+          <div style={{ flex: 1, position: 'relative' }}>
+            <TopBar />
+            <RightBar />
+            <MapPlaceholder />
+            <Sidebar>
+              <Routes>
+                <Route path="/" element={<Navigate to="/home" replace />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/routes" element={<RoutesList />} />
+                <Route path="/route-builder" element={<RouteBuilder />} />
+                <Route path="/schedule" element={<Schedule />} />
+                <Route path="/settings" element={<Settings />}>
+                  <Route index element={<Settings />} />
+                  <Route path="language" element={<LanguageSelector />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="feedback" element={<Feedback />} />
+                </Route>
+              </Routes>
+            </Sidebar>
           </div>
           <Navbar />
         </div>
