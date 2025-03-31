@@ -1,34 +1,48 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom/client';
-import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline } from '@mui/material';
-import { Routes, Route, BrowserRouter, Router, Navigate } from 'react-router-dom';
-import theme from './theme';
-import Settings from './pages/Settings';
-import './i18n';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import News from './pages/News';
 import RoutesList from './pages/RoutesList';
 import RouteBuilder from './pages/RouteBuilder';
 import Schedule from './pages/Schedule';
+import Settings from './pages/Settings';
+import LanguageSelector from './modules/settings/LanguageSelector';
+import Profile from './pages/Profile';
+import Feedback from './pages/Feedback';
+import { CustomThemeProvider } from './theme';
+import './i18n';
+import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+
+root.render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/news" element={<News />} />
-            <Route path="/routes" element={<RoutesList />} />
-            <Route path="/route-builder" element={<RouteBuilder />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/settings" element={<Settings />} />
-          </Routes>
+    <CustomThemeProvider>
+      <Router>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+          <div style={{ flex: 1 }}>
+            <Routes>
+              {/* Перенаправление с корневого пути '/' на '/home' */}
+              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/routes" element={<RoutesList />} />
+              <Route path="/route-builder" element={<RouteBuilder />} />
+              <Route path="/schedule" element={<Schedule />} />
+              {/* Вложенные маршруты для настроек */}
+              <Route path="/settings" element={<Settings />}>
+                <Route index element={<Settings />} />
+                <Route path="language" element={<LanguageSelector />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="feedback" element={<Feedback />} />
+              </Route>
+            </Routes>
+          </div>
           <Navbar />
-        </BrowserRouter>
-    </ThemeProvider>
-  </React.StrictMode>,
+        </div>
+      </Router>
+    </CustomThemeProvider>
+  </React.StrictMode>
 );

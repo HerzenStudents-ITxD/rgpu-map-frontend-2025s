@@ -7,6 +7,12 @@ interface TranslationResources {
     title: string;
     language: string;
     save: string;
+    profile: string;
+    darkMode: string;
+    changeLanguage: string;
+    feedback: string;
+    collectStats: string;
+    collectStatsInfo: string;
   };
   navbar: {
     home: string;
@@ -39,6 +45,12 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         title: 'Settings',
         language: 'Select Language',
         save: 'Save',
+        profile: 'Profile',
+        darkMode: 'Dark Mode',
+        changeLanguage: 'Change Language',
+        feedback: 'Feedback',
+        collectStats: 'Collect Statistics',
+        collectStatsInfo: 'Why collect statistics?',
       },
       navbar: {
         home: 'Home',
@@ -68,6 +80,12 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         title: 'Настройки',
         language: 'Выбор языка',
         save: 'Сохранить',
+        profile: 'Профиль',
+        darkMode: 'Темная тема',
+        changeLanguage: 'Сменить язык',
+        feedback: 'Обратная связь',
+        collectStats: 'Сбор статистики',
+        collectStatsInfo: 'Зачем собирать статистику?',
       },
       navbar: {
         home: 'Главная',
@@ -97,6 +115,12 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         title: '设置',
         language: '选择语言',
         save: '保存',
+        profile: '个人资料',
+        darkMode: '深色模式',
+        changeLanguage: '更改语言',
+        feedback: '反馈',
+        collectStats: '收集统计数据',
+        collectStatsInfo: '为什么要收集统计数据？',
       },
       navbar: {
         home: '首页',
