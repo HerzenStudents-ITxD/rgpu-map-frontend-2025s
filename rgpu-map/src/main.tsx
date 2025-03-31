@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
@@ -16,6 +16,7 @@ import LanguageSelector from './modules/settings/LanguageSelector';
 import Profile from './pages/Profile';
 import Feedback from './pages/Feedback';
 import { CustomThemeProvider } from './theme';
+import { usePoints } from './modules/map/usePoints';
 import './i18n';
 import './index.css';
 
@@ -29,49 +30,72 @@ interface Point {
   connections?: string[];
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-
 const App: React.FC = () => {
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
+  const { points } = usePoints();
+  const navigate = useNavigate();
+  const { pointIndex } = useParams<{ pointIndex?: string }>();
+
+  // При загрузке страницы проверяем URL и выбираем точку, если есть pointIndex
+  useEffect(() => {
+    if (pointIndex && points.length > 0) {
+      const index = parseInt(pointIndex, 10);
+      if (!isNaN(index) && index >= 0 && index < points.length) {
+        setSelectedPoint(points[index]);
+      } else {
+        setSelectedPoint(null);
+        navigate('/home'); // Если индекс некорректен, перенаправляем на главную
+      }
+    } else {
+      setSelectedPoint(null);
+    }
+  }, [pointIndex, points, navigate]);
 
   const handlePointClick = (point: Point) => {
-    setSelectedPoint(point);
+    const index = points.findIndex((p) => p.point_id === point.point_id);
+    if (index !== -1) {
+      setSelectedPoint(point);
+      navigate(`/point/${index}`); // Обновляем URL с индексом точки
+    }
   };
 
   return (
     <CustomThemeProvider>
-      <Router>
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-          <div style={{ flex: 1, position: 'relative' }}>
-            <TopBar />
-            <RightBar />
-            <Map onPointClick={handlePointClick} />
-            <Sidebar selectedPoint={selectedPoint}>
-              <Routes>
-                <Route path="/" element={<Navigate to="/home" replace />} />
-                <Route path="/home" element={<Home />} />
-                <Route path="/news" element={<News />} />
-                <Route path="/routes" element={<RoutesList />} />
-                <Route path="/route-builder" element={<RouteBuilder />} />
-                <Route path="/schedule" element={<Schedule />} />
-                <Route path="/settings" element={<Settings />}>
-                  <Route index element={<Settings />} />
-                  <Route path="language" element={<LanguageSelector />} />
-                  <Route path="profile" element={<Profile />} />
-                  <Route path="feedback" element={<Feedback />} />
-                </Route>
-              </Routes>
-            </Sidebar>
-          </div>
-          <Navbar />
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <div style={{ flex: 1, position: 'relative' }}>
+          <TopBar />
+          <RightBar />
+          <Map onPointClick={handlePointClick} />
+          <Sidebar selectedPoint={selectedPoint}>
+            <Routes>
+              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/routes" element={<RoutesList />} />
+              <Route path="/route-builder" element={<RouteBuilder />} />
+              <Route path="/schedule" element={<Schedule />} />
+              <Route path="/settings" element={<Settings />}>
+                <Route index element={<Settings />} />
+                <Route path="language" element={<LanguageSelector />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="feedback" element={<Feedback />} />
+              </Route>
+              <Route path="/point/:pointIndex" element={<div />} /> {/* Пустой компонент для маршрута */}
+            </Routes>
+          </Sidebar>
         </div>
-      </Router>
+        <Navbar />
+      </div>
     </CustomThemeProvider>
   );
 };
 
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+
 root.render(
   <React.StrictMode>
-    <App />
+    <Router>
+      <App />
+    </Router>
   </React.StrictMode>
 );

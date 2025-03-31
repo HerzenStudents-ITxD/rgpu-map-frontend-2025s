@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Box, IconButton, Typography, List, ListItem, ListItemText } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Outlet } from 'react-router-dom';
+import CloseIcon from '@mui/icons-material/Close';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 interface Point {
@@ -22,10 +23,15 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ children, selectedPoint }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState<boolean>(true);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleClosePoint = () => {
+    navigate('/home'); // Перенаправляем на главную страницу, что сбрасывает selectedPoint
   };
 
   return (
@@ -52,9 +58,14 @@ const Sidebar: React.FC<SidebarProps> = ({ children, selectedPoint }) => {
         <Box sx={{ padding: '0 10px' }}>
           {selectedPoint ? (
             <Box>
-              <Typography variant="h6" gutterBottom>
-                {t('sidebar.pointDetails')}
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h6" gutterBottom>
+                  {t('sidebar.pointDetails')}
+                </Typography>
+                <IconButton onClick={handleClosePoint}>
+                  <CloseIcon />
+                </IconButton>
+              </Box>
               <List>
                 <ListItem>
                   <ListItemText

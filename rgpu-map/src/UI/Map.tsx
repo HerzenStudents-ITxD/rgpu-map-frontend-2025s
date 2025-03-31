@@ -35,7 +35,7 @@ const Map: React.FC<MapProps> = ({ onPointClick }) => {
     );
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    rendererRef.current = renderer; // Сохраняем renderer в ref
+    rendererRef.current = renderer;
     containerRef.current.appendChild(renderer.domElement);
     setIsMounted(true);
 
@@ -53,7 +53,7 @@ const Map: React.FC<MapProps> = ({ onPointClick }) => {
       const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
       const sphere = new THREE.Mesh(geometry, material);
       sphere.position.set(point.x, point.y, point.z);
-      (sphere as any).pointData = point; // Сохраняем данные точки в объекте
+      (sphere as any).pointData = point;
       scene.add(sphere);
       pointMeshes.push(sphere);
     });
@@ -66,14 +66,9 @@ const Map: React.FC<MapProps> = ({ onPointClick }) => {
     const mouse = new THREE.Vector2();
 
     const onMouseClick = (event: MouseEvent) => {
-      // Преобразуем координаты клика в нормализованные координаты
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-      // Обновляем Raycaster
       raycaster.setFromCamera(mouse, camera);
-
-      // Проверяем пересечения с точками
       const intersects = raycaster.intersectObjects(pointMeshes);
       if (intersects.length > 0) {
         const clickedPoint = (intersects[0].object as any).pointData as Point;
@@ -85,7 +80,7 @@ const Map: React.FC<MapProps> = ({ onPointClick }) => {
 
     // Анимация
     const animate = () => {
-      if (!isMounted) return; // Прекращаем анимацию, если компонент размонтирован
+      if (!isMounted) return;
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
     };
