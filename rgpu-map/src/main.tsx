@@ -15,31 +15,22 @@ import Settings from './pages/Settings';
 import LanguageSelector from './modules/settings/LanguageSelector';
 import Profile from './pages/Profile';
 import Feedback from './pages/Feedback';
+import AdminPanel from './admin/AdminPanel';
 import { CustomThemeProvider } from './theme';
 import { usePoints } from './modules/map/usePoints';
+import { Point } from './types/points'; // Импортируем Point
 import './i18n';
 import './index.css';
-
-interface Point {
-  point_id: string;
-  user_id: string;
-  x: number;
-  y: number;
-  z: number;
-  media?: string;
-  connections?: string[];
-}
 
 type View = 'home' | 'news' | 'routes' | 'route-builder' | 'schedule' | 'settings' | 'language' | 'profile' | 'feedback';
 
 const App: React.FC = () => {
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
-  const [currentView, setCurrentView] = useState<View>('home'); // Состояние для текущей сущности
+  const [currentView, setCurrentView] = useState<View>('home');
   const { points } = usePoints();
   const navigate = useNavigate();
   const { pointIndex } = useParams<{ pointIndex?: string }>();
 
-  // При загрузке страницы проверяем URL и выбираем точку, если есть pointIndex
   useEffect(() => {
     if (pointIndex && points.length > 0) {
       const index = parseInt(pointIndex, 10);
@@ -47,7 +38,7 @@ const App: React.FC = () => {
         setSelectedPoint(points[index]);
       } else {
         setSelectedPoint(null);
-        navigate('/'); // Если индекс некорректен, перенаправляем на главную
+        navigate('/');
       }
     } else {
       setSelectedPoint(null);
@@ -58,7 +49,7 @@ const App: React.FC = () => {
     const index = points.findIndex((p) => p.point_id === point.point_id);
     if (index !== -1) {
       setSelectedPoint(point);
-      navigate(`/point/${index}`); // Обновляем URL с индексом точки
+      navigate(`/point/${index}`);
     }
   };
 
@@ -66,7 +57,6 @@ const App: React.FC = () => {
     setCurrentView(view);
   };
 
-  // Компонент для отображения текущей сущности
   const renderView = () => {
     switch (currentView) {
       case 'home':
@@ -82,11 +72,11 @@ const App: React.FC = () => {
       case 'settings':
         return <Settings onViewChange={(view) => setCurrentView(view)} />;
       case 'language':
-        return <LanguageSelector />;
+        return <LanguageSelector onBack={() => setCurrentView('settings')} />;
       case 'profile':
-        return <Profile />;
+        return <Profile onBack={() => setCurrentView('settings')} />;
       case 'feedback':
-        return <Feedback />;
+        return <Feedback onBack={() => setCurrentView('settings')} />;
       default:
         return <Home />;
     }
@@ -94,17 +84,22 @@ const App: React.FC = () => {
 
   return (
     <CustomThemeProvider>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <TopBar />
-          <RightBar />
-          <Map onPointClick={handlePointClick} />
-          <Sidebar selectedPoint={selectedPoint}>
-            {renderView()}
-          </Sidebar>
-        </div>
-        <Navbar onViewChange={handleViewChange} currentView={currentView} />
-      </div>
+      <Routes>
+        <Route path="/admin" element={<AdminPanel />} />
+        <Route path="*" element={
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+            <div style={{ flex: 1, position: 'relative' }}>
+              <TopBar />
+              <RightBar />
+              <Map onPointClick={handlePointClick} />
+              <Sidebar selectedPoint={selectedPoint}>
+                {renderView()}
+              </Sidebar>
+            </div>
+            <Navbar onViewChange={handleViewChange} currentView={currentView} />
+          </div>
+        } />
+      </Routes>
     </CustomThemeProvider>
   );
 };
@@ -114,10 +109,7 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <Router>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/point/:pointIndex" element={<App />} />
-      </Routes>
+      <App />
     </Router>
   </React.StrictMode>
 );

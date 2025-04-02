@@ -1,16 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { usePoints } from '../modules/map/usePoints';
-
-interface Point {
-  point_id: string;
-  user_id: string;
-  x: number;
-  y: number;
-  z: number;
-  media?: string;
-  connections?: string[];
-}
+import { Point } from '../types/points'; // Импортируем Point
 
 interface MapProps {
   onPointClick: (point: Point) => void;
@@ -25,7 +16,6 @@ const Map: React.FC<MapProps> = ({ onPointClick }) => {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Инициализация сцены, камеры и рендера
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -39,14 +29,12 @@ const Map: React.FC<MapProps> = ({ onPointClick }) => {
     containerRef.current.appendChild(renderer.domElement);
     setIsMounted(true);
 
-    // Добавление освещения
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
     directionalLight.position.set(0, 1, 1);
     scene.add(directionalLight);
 
-    // Создание точек
     const pointMeshes: THREE.Mesh[] = [];
     points.forEach((point) => {
       const geometry = new THREE.SphereGeometry(0.1, 32, 32);
@@ -58,10 +46,8 @@ const Map: React.FC<MapProps> = ({ onPointClick }) => {
       pointMeshes.push(sphere);
     });
 
-    // Настройка камеры
     camera.position.z = 5;
 
-    // Настройка Raycaster для кликов
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
@@ -78,7 +64,6 @@ const Map: React.FC<MapProps> = ({ onPointClick }) => {
 
     window.addEventListener('click', onMouseClick);
 
-    // Анимация
     const animate = () => {
       if (!isMounted) return;
       requestAnimationFrame(animate);
@@ -86,7 +71,6 @@ const Map: React.FC<MapProps> = ({ onPointClick }) => {
     };
     animate();
 
-    // Обработка изменения размера окна
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -94,7 +78,6 @@ const Map: React.FC<MapProps> = ({ onPointClick }) => {
     };
     window.addEventListener('resize', handleResize);
 
-    // Очистка при размонтировании
     return () => {
       setIsMounted(false);
       window.removeEventListener('click', onMouseClick);

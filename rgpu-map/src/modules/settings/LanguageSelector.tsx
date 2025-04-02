@@ -1,46 +1,45 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Container, Typography, List, ListItem, ListItemText, IconButton, Box } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useTranslation } from 'react-i18next';
 import FlagCard from '../../UI/FlagCard';
-import PrimaryButton from '../../UI/PrimaryButton';
-import ukFlag from '../../assets/images/uk-flag.svg';
-import ruFlag from '../../assets/images/ru-flag.svg';
-import cnFlag from '../../assets/images/cn-flag.svg';
 
-const LanguageSelector: React.FC = () => {
+interface LanguageSelectorProps {
+  onBack: () => void;
+}
+
+const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onBack }) => {
   const { t, i18n } = useTranslation();
-  const [selectedLanguage, setSelectedLanguage] = useState<string>(i18n.language || 'ru');
 
-  const handleLanguageSelect = (language: string) => {
-    setSelectedLanguage(language);
-  };
-
-  const handleSave = () => {
-    i18n.changeLanguage(selectedLanguage);
-    console.log('Selected language:', selectedLanguage);
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
   };
 
   return (
-    <div>
-      <FlagCard
-        flagImage={ukFlag}
-        alt="UK Flag"
-        selected={selectedLanguage === 'en'}
-        onClick={() => handleLanguageSelect('en')}
-      />
-      <FlagCard
-        flagImage={ruFlag}
-        alt="Russia Flag"
-        selected={selectedLanguage === 'ru'}
-        onClick={() => handleLanguageSelect('ru')}
-      />
-      <FlagCard
-        flagImage={cnFlag}
-        alt="China Flag"
-        selected={selectedLanguage === 'cn'}
-        onClick={() => handleLanguageSelect('cn')}
-      />
-      <PrimaryButton label={t('settings.save')} onClick={handleSave} />
-    </div>
+    <Container maxWidth="sm" sx={{ padding: '20px' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <IconButton onClick={onBack}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h5" sx={{ ml: 1 }}>
+          {t('settings.language')}
+        </Typography>
+      </Box>
+      <List>
+        <ListItem onClick={() => changeLanguage('en')}>
+          <FlagCard flag="uk-flag.png" />
+          <ListItemText primary="English" sx={{ ml: 2 }} />
+        </ListItem>
+        <ListItem onClick={() => changeLanguage('ru')}>
+          <FlagCard flag="ru-flag.png" />
+          <ListItemText primary="Русский" sx={{ ml: 2 }} />
+        </ListItem>
+        <ListItem onClick={() => changeLanguage('cn')}>
+          <FlagCard flag="cn-flag.png" />
+          <ListItemText primary="中文" sx={{ ml: 2 }} />
+        </ListItem>
+      </List>
+    </Container>
   );
 };
 

@@ -5,16 +5,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
-interface Point {
-  point_id: string;
-  user_id: string;
-  x: number;
-  y: number;
-  z: number;
-  media?: string;
-  connections?: string[];
-}
+import { Point } from '../types/points'; // Импортируем Point
 
 interface SidebarProps {
   children: React.ReactNode;
@@ -31,7 +22,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children, selectedPoint }) => {
   };
 
   const handleClosePoint = () => {
-    navigate('/'); // Перенаправляем на главную страницу, что сбрасывает selectedPoint
+    navigate('/');
   };
 
   return (

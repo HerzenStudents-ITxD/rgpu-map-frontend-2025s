@@ -58,6 +58,22 @@ interface TranslationResources {
     coordinates: string;
     createdBy: string;
   };
+  admin: {
+    title: string;
+    points: string;
+    users: string;
+    addPoint: string;
+    pointsList: string;
+    usersList: string;
+    add: string;
+    editPoint: string;
+    save: string;
+    cancel: string;
+    role: string;
+    guest: string;
+    moderator: string;
+    admin: string;
+  };
 }
 
 type SupportedLanguages = 'en' | 'ru' | 'cn';
@@ -120,6 +136,22 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         coordinates: 'Coordinates',
         createdBy: 'Created By',
       },
+      admin: {
+        title: 'Admin Panel',
+        points: 'Points',
+        users: 'Users',
+        addPoint: 'Add New Point',
+        pointsList: 'Points List',
+        usersList: 'Users List',
+        add: 'Add',
+        editPoint: 'Edit Point',
+        save: 'Save',
+        cancel: 'Cancel',
+        role: 'Role',
+        guest: 'Guest',
+        moderator: 'Moderator',
+        admin: 'Admin',
+      },
     },
   },
   ru: {
@@ -179,6 +211,22 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         coordinates: 'Координаты',
         createdBy: 'Создано пользователем',
       },
+      admin: {
+        title: 'Панель администратора',
+        points: 'Точки',
+        users: 'Пользователи',
+        addPoint: 'Добавить новую точку',
+        pointsList: 'Список точек',
+        usersList: 'Список пользователей',
+        add: 'Добавить',
+        editPoint: 'Редактировать точку',
+        save: 'Сохранить',
+        cancel: 'Отменить',
+        role: 'Роль',
+        guest: 'Гость',
+        moderator: 'Модератор',
+        admin: 'Админ',
+      },
     },
   },
   cn: {
@@ -237,6 +285,22 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         pointId: '点ID',
         coordinates: '坐标',
         createdBy: '创建者',
+      },
+      admin: {
+        title: '管理员面板',
+        points: '点',
+        users: '用户',
+        addPoint: '添加新点',
+        pointsList: '点列表',
+        usersList: '用户列表',
+        add: '添加',
+        editPoint: '编辑点',
+        save: '保存',
+        cancel: '取消',
+        role: '角色',
+        guest: '访客',
+        moderator: '版主',
+        admin: '管理员',
       },
     },
   },
