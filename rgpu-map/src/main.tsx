@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
@@ -30,8 +30,11 @@ interface Point {
   connections?: string[];
 }
 
+type View = 'home' | 'news' | 'routes' | 'route-builder' | 'schedule' | 'settings' | 'language' | 'profile' | 'feedback';
+
 const App: React.FC = () => {
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
+  const [currentView, setCurrentView] = useState<View>('home'); // Состояние для текущей сущности
   const { points } = usePoints();
   const navigate = useNavigate();
   const { pointIndex } = useParams<{ pointIndex?: string }>();
@@ -44,7 +47,7 @@ const App: React.FC = () => {
         setSelectedPoint(points[index]);
       } else {
         setSelectedPoint(null);
-        navigate('/home'); // Если индекс некорректен, перенаправляем на главную
+        navigate('/'); // Если индекс некорректен, перенаправляем на главную
       }
     } else {
       setSelectedPoint(null);
@@ -59,6 +62,36 @@ const App: React.FC = () => {
     }
   };
 
+  const handleViewChange = (view: View) => {
+    setCurrentView(view);
+  };
+
+  // Компонент для отображения текущей сущности
+  const renderView = () => {
+    switch (currentView) {
+      case 'home':
+        return <Home />;
+      case 'news':
+        return <News />;
+      case 'routes':
+        return <RoutesList />;
+      case 'route-builder':
+        return <RouteBuilder />;
+      case 'schedule':
+        return <Schedule />;
+      case 'settings':
+        return <Settings onViewChange={(view) => setCurrentView(view)} />;
+      case 'language':
+        return <LanguageSelector />;
+      case 'profile':
+        return <Profile />;
+      case 'feedback':
+        return <Feedback />;
+      default:
+        return <Home />;
+    }
+  };
+
   return (
     <CustomThemeProvider>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -67,24 +100,10 @@ const App: React.FC = () => {
           <RightBar />
           <Map onPointClick={handlePointClick} />
           <Sidebar selectedPoint={selectedPoint}>
-            <Routes>
-              <Route path="/" element={<Navigate to="/home" replace />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/news" element={<News />} />
-              <Route path="/routes" element={<RoutesList />} />
-              <Route path="/route-builder" element={<RouteBuilder />} />
-              <Route path="/schedule" element={<Schedule />} />
-              <Route path="/settings" element={<Settings />}>
-                <Route index element={<Settings />} />
-                <Route path="language" element={<LanguageSelector />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="feedback" element={<Feedback />} />
-              </Route>
-              <Route path="/point/:pointIndex" element={<div />} /> {/* Пустой компонент для маршрута */}
-            </Routes>
+            {renderView()}
           </Sidebar>
         </div>
-        <Navbar />
+        <Navbar onViewChange={handleViewChange} currentView={currentView} />
       </div>
     </CustomThemeProvider>
   );
@@ -95,7 +114,10 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <Router>
-      <App />
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/point/:pointIndex" element={<App />} />
+      </Routes>
     </Router>
   </React.StrictMode>
 );

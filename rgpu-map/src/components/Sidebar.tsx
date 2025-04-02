@@ -3,7 +3,7 @@ import { Box, IconButton, Typography, List, ListItem, ListItemText } from '@mui/
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CloseIcon from '@mui/icons-material/Close';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 interface Point {
@@ -17,7 +17,7 @@ interface Point {
 }
 
 interface SidebarProps {
-  children?: React.ReactNode;
+  children: React.ReactNode;
   selectedPoint: Point | null;
 }
 
@@ -31,7 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children, selectedPoint }) => {
   };
 
   const handleClosePoint = () => {
-    navigate('/home'); // Перенаправляем на главную страницу, что сбрасывает selectedPoint
+    navigate('/'); // Перенаправляем на главную страницу, что сбрасывает selectedPoint
   };
 
   return (
@@ -88,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children, selectedPoint }) => {
               </List>
             </Box>
           ) : (
-            children || <Outlet />
+            children
           )}
         </Box>
       )}
