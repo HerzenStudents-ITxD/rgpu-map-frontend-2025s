@@ -5,7 +5,7 @@ import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
 import RightBar from './components/RightBar';
-import Map from './UI/Map';
+import { MapPage } from './pages/MapPage'
 import Home from './pages/Home';
 import News from './pages/News';
 import RoutesList from './pages/RoutesList';
@@ -91,7 +91,7 @@ const App: React.FC = () => {
             <div style={{ flex: 1, position: 'relative' }}>
               <TopBar />
               <RightBar />
-              <Map onPointClick={handlePointClick} />
+              <MapPage />
               <Sidebar selectedPoint={selectedPoint}>
                 {renderView()}
               </Sidebar>

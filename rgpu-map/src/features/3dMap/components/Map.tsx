@@ -3,10 +3,18 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Model } from './Building';
 import { useBuildings, useMapActions } from '../../../store/slices/mapSlice';
+import { useGLTF } from '@react-three/drei';
 
 interface MapProps {
   onBuildingClick?: (buildingId: string) => void;
 }
+
+const UniversityModel = () => {
+  const { scene } = useGLTF('/models/main-campus.glb') as GLTF;
+  return <primitive object={scene} position={[0, 0, 0]} />;
+};
+
+
 
 export const Map = ({ onBuildingClick }: MapProps) => {
   const buildings = useBuildings();
