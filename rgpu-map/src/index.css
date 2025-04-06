@@ -12,3 +12,159 @@ canvas {
   width: 100%;
   height: 100%;
 }
+
+.news-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.news-scroll-container {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.news-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.news-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.group-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.group-name {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.news-date {
+  font-size: 12px;
+  color: #888;
+}
+
+.news-title {
+  margin: 8px 0;
+  font-size: 18px;
+}
+
+.news-image {
+  width: 100%;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.participate-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.participate-btn span {
+  margin-left: 8px;
+  font-weight: bold;
+}
+
+.create-news-btn {
+  background: #2196F3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.create-news-form {
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Стили для скроллбара */
+.news-scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.news-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.news-scroll-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.news-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loading {
+  padding: 20px;
+  text-align: center;
+}
+
+.news-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.sidebar-container {
+  height: 100vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #3f51b5 #f5f5f5;
+}
+
+.sidebar-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-container::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.sidebar-container::-webkit-scrollbar-thumb {
+  background-color: #3f51b5;
+  border-radius: 4px;
+}
+
+.sidebar-container::-webkit-scrollbar-thumb:hover {
+  background-color: #303f9f;
+}

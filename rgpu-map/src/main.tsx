@@ -7,7 +7,7 @@ import TopBar from './components/TopBar';
 import RightBar from './components/RightBar';
 import { MapPage } from './pages/MapPage'
 import Home from './pages/Home';
-import News from './pages/News';
+import { NewsPage}  from './pages/NewsPage';
 import RoutesList from './pages/RoutesList';
 import RouteBuilder from './pages/RouteBuilder';
 import Schedule from './pages/Schedule';
@@ -62,7 +62,7 @@ const App: React.FC = () => {
       case 'home':
         return <Home />;
       case 'news':
-        return <News />;
+        return <NewsPage />;
       case 'routes':
         return <RoutesList />;
       case 'route-builder':
