@@ -1,32 +1,61 @@
+// src/features/news/components/NewsCard.tsx
 import { NewsItem } from '../types';
+import { 
+  Card, 
+  CardContent, 
+  Typography, 
+  Stack, 
+  Chip, 
+  SxProps, 
+  Theme 
+} from '@mui/material';
 import { AvatarBox } from './AvatarBox';
 
-export const NewsCard = ({ item }: { item: NewsItem }) => (
-  <div className="news-card">
-    <div className="news-header">
-      <AvatarBox 
-        imageUrl={item.group.avatar}
-        name={item.group.name}
-        color="#3f51b5"
-      />
-      <img 
-        src={item.group.avatar} 
-        alt={item.group.name}
-        className="group-avatar"
-      />
-      <div>
-        <h3 className="group-name">{item.group.name}</h3>
-        <span className="news-date">
-          {new Date(item.date).toLocaleDateString('ru-RU', {
-            day: 'numeric',
-            month: 'long',
-            hour: '2-digit',
-            minute: '2-digit'
-          })}
-        </span>
-      </div>
-    </div>
+interface NewsCardProps {
+  item: NewsItem;
+  sx?: SxProps<Theme>; // Явно объявляем пропс
+}
 
-    {/* Остальной код остаётся без изменений */}
-  </div>
+export const NewsCard = ({ item, sx }: NewsCardProps) => (
+  <Card sx={{ 
+    mb: 3, 
+    boxShadow: 3, 
+    ...sx // Применяем переданные стили
+  }}>
+    <CardContent>
+      <Stack direction="row" spacing={2} alignItems="center">
+        <AvatarBox 
+          imageUrl={item.group.avatar}
+          name={item.group.name}
+          color="#3f51b5"
+        />
+        <div>
+          <Typography variant="h6">{item.group.name}</Typography>
+          <Typography variant="body2" color="text.secondary">
+            {new Date(item.date).toLocaleDateString('ru-RU', {
+              day: 'numeric',
+              month: 'long',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </Typography>
+        </div>
+      </Stack>
+
+      <Typography variant="h5" sx={{ mt: 2 }}>
+        {item.title}
+      </Typography>
+      
+      {item.location && (
+        <Chip 
+          label={item.location} 
+          sx={{ mt: 1, mr: 1 }}
+        />
+      )}
+      
+      <Typography variant="body1" sx={{ mt: 2 }}>
+        {item.content}
+      </Typography>
+    </CardContent>
+  </Card>
 );

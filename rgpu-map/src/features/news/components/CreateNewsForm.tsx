@@ -1,15 +1,35 @@
 // src/features/news/components/CreateNewsForm.tsx
 import { useState } from 'react';
+import {
+  Box,
+  Button,
+  TextField,
+  Select,
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControl,
+  InputLabel,
+  Typography,
+  SxProps,
+  Theme
+} from '@mui/material';
 import { createNews } from '../api/fakeApi';
 import { NewsGroup } from '../types';
 
-export const CreateNewsForm = ({ 
-  groups,
-  onClose 
-}: {
+interface CreateNewsFormProps {
   groups: NewsGroup[];
   onClose: () => void;
-}) => {
+  sx?: SxProps<Theme>;
+}
+
+export const CreateNewsForm = ({ 
+  groups,
+  onClose,
+  sx 
+}: CreateNewsFormProps) => {
   const [form, setForm] = useState({
     title: '',
     content: '',
@@ -20,57 +40,107 @@ export const CreateNewsForm = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const group = groups.find(g => g.id === form.groupId);
-    if (!group || !form.title) return;
-
-    await createNews({
-      title: form.title,
-      content: form.content,
-      group,
-      date: new Date().toISOString(),
-      location: form.location || undefined
-    });
     
-    onClose();
+    if (!group || !form.title) {
+      alert('Заполните обязательные поля');
+      return;
+    }
+
+    try {
+      await createNews({
+        title: form.title,
+        content: form.content,
+        group,
+        date: new Date().toISOString(),
+        location: form.location || undefined
+      });
+      onClose();
+    } catch (error) {
+      alert('Ошибка при создании новости');
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="news-form">
-      <select
-        value={form.groupId}
-        onChange={(e) => setForm({...form, groupId: e.target.value})}
-        required
-      >
-        <option value="">Выберите группу</option>
-        {groups.map(g => (
-          <option key={g.id} value={g.id}>{g.name}</option>
-        ))}
-      </select>
+    <Dialog 
+      open 
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      sx={{
+        '& .MuiDialog-paper': {
+          ...(sx as any), // Каст для совместимости стилей
+          borderRadius: 3,
+          p: 3
+        }
+      }}
+    >
+      <DialogTitle>
+        <Typography variant="h5">Новая новость</Typography>
+      </DialogTitle>
 
-      <input
-        type="text"
-        placeholder="Заголовок"
-        value={form.title}
-        onChange={(e) => setForm({...form, title: e.target.value})}
-        required
-      />
+      <DialogContent dividers>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+          <FormControl fullWidth sx={{ mb: 3 }}>
+            <InputLabel>Группа *</InputLabel>
+            <Select
+              value={form.groupId}
+              onChange={(e) => setForm({...form, groupId: e.target.value})}
+              required
+              label="Группа *"
+            >
+              {groups.map(g => (
+                <MenuItem key={g.id} value={g.id}>
+                  {g.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-      <textarea
-        placeholder="Текст новости"
-        value={form.content}
-        onChange={(e) => setForm({...form, content: e.target.value})}
-      />
+          <TextField
+            fullWidth
+            label="Заголовок *"
+            value={form.title}
+            onChange={(e) => setForm({...form, title: e.target.value})}
+            sx={{ mb: 3 }}
+            required
+          />
 
-      <input
-        type="text"
-        placeholder="Местоположение (необязательно)"
-        value={form.location}
-        onChange={(e) => setForm({...form, location: e.target.value})}
-      />
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            label="Текст новости"
+            value={form.content}
+            onChange={(e) => setForm({...form, content: e.target.value})}
+            sx={{ mb: 3 }}
+          />
 
-      <div className="form-actions">
-        <button type="button" onClick={onClose}>Отменить</button>
-        <button type="submit">Опубликовать</button>
-      </div>
-    </form>
+          <TextField
+            fullWidth
+            label="Местоположение"
+            value={form.location}
+            onChange={(e) => setForm({...form, location: e.target.value})}
+            placeholder="Например: 20а корпус"
+          />
+        </Box>
+      </DialogContent>
+
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button 
+          onClick={onClose} 
+          variant="outlined"
+          sx={{ mr: 2 }}
+        >
+          Отменить
+        </Button>
+        <Button 
+          type="submit" 
+          variant="contained"
+          onClick={handleSubmit}
+        >
+          Опубликовать
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };

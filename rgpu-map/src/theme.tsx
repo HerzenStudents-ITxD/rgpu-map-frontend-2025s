@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { PaletteMode } from '@mui/material';
 
 interface ThemeContextType {
   darkMode: boolean;
@@ -21,35 +22,40 @@ interface ThemeProviderProps {
 }
 
 export const CustomThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+  // Используем единое состояние для управления темой
   const [darkMode, setDarkMode] = useState<boolean>(() => {
+    // Проверяем локальное хранилище и системные настройки
     const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : false;
+    if (saved !== null) return JSON.parse(saved);
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
+  // Синхронизируем с localStorage
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
+
+  // Создаём тему на основе darkMode
+  const theme = useMemo(() => 
+    createTheme({
+      palette: {
+        mode: darkMode ? 'dark' : 'light',
+        primary: {
+          main: '#3f51b5',
+        },
+      },
+    })
+  , [darkMode]); // Зависимость от darkMode
 
   const toggleDarkMode = () => {
     setDarkMode((prev) => !prev);
   };
 
-  const theme = createTheme({
-    palette: {
-      mode: darkMode ? 'dark' : 'light',
-      primary: {
-        main: '#1976d2',
-      },
-      background: {
-        default: darkMode ? '#121212' : '#fff',
-        paper: darkMode ? '#1e1e1e' : '#fff',
-      },
-    },
-  });
-
   return (
     <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      <ThemeProvider theme={theme}>
+        {children}
+      </ThemeProvider>
     </ThemeContext.Provider>
   );
 };

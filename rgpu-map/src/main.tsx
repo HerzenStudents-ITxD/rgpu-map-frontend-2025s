@@ -1,3 +1,4 @@
+//src/main.tsx
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route, useParams, useNavigate } from 'react-router-dom';

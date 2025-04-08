@@ -1,3 +1,4 @@
+//src/pages/Settings.tsx
 import React, { useState } from 'react';
 import { Container, Typography, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Switch } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';

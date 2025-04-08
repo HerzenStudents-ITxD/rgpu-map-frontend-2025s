@@ -4,6 +4,7 @@ import { NewsCard } from './NewsCard';
 import { fetchNews } from '../api/fakeApi';
 import { NewsItem } from '../types';
 
+
 export const NewsList = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +23,11 @@ export const NewsList = () => {
   return (
     <div className="news-list">
       {news.map(item => (
-        <NewsCard key={item.id} item={item} />
+        <NewsCard 
+          key={item.id} 
+          item={item} 
+          sx={{ mb: 3 }} // Добавляем sx пропс
+        />
       ))}
     </div>
   );
