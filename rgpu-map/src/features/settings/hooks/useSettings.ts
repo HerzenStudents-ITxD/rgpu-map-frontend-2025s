@@ -36,11 +36,14 @@ export const useSettings = () => {
     setSettings(updated);
   };
 
-  const updateUserProfile = async (newProfile: Partial<UserProfile>) => {
-    if(!profile) return;
+
+  const updateUserProfile = async (newProfile: Partial<UserProfile>): Promise<UserProfile> => {
+    if (!profile) throw new Error("Profile not loaded"); // Убираем undefined из возврата
     const updated = await updateProfile(newProfile);
     setProfile(updated);
+    return updated;
   };
+
 
   return {
     settings,

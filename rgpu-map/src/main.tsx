@@ -1,8 +1,15 @@
 //src/main.tsx
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter as Router, Routes, Route, useParams, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import { 
+  BrowserRouter as Router, 
+  Routes, 
+  Route, 
+  useParams, 
+  useNavigate,
+  Navigate 
+} from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
 import RightBar from './components/RightBar';
@@ -16,12 +23,14 @@ import Settings from './pages/Settings';
 import LanguageSelector from './modules/settings/LanguageSelector';
 import Profile from './pages/Profile';
 import Feedback from './pages/Feedback';
-import AdminPanel from './admin/AdminPanel';
 import { CustomThemeProvider } from './theme';
 import { usePoints } from './modules/map/usePoints';
-import { Point } from './types/points'; // Импортируем Point
+import { Point } from './types/points'; 
 import './i18n';
 import './index.css';
+import AdminPanel from './pages/admin/AdminPanel';
+import PointsAdmin from './pages/admin/PointsAdmin';
+import UsersAdmin from './pages/admin/UsersAdmin';
 
 type View = 'home' | 'news' | 'routes' | 'route-builder' | 'schedule' | 'settings' | 'language' | 'profile' | 'feedback';
 
@@ -71,7 +80,9 @@ const App: React.FC = () => {
       case 'schedule':
         return <Schedule />;
       case 'settings':
-        return <Settings onViewChange={(view) => setCurrentView(view)} />;
+        return <Settings onViewChange={(view) => setCurrentView(view)} onThemeChange={function (theme: 'light' | 'dark'): void {
+          throw new Error('Function not implemented.');
+        } } />;
       case 'language':
         return <LanguageSelector onBack={() => setCurrentView('settings')} />;
       case 'profile':
@@ -86,7 +97,11 @@ const App: React.FC = () => {
   return (
     <CustomThemeProvider>
       <Routes>
-        <Route path="/admin" element={<AdminPanel />} />
+      <Route path="/admin" element={<AdminPanel />}>
+        <Route index element={<Navigate to="points" replace />} />
+        <Route path="points" element={<PointsAdmin />} />
+        <Route path="users" element={<UsersAdmin />} />
+      </Route>
         <Route path="*" element={
           <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <div style={{ flex: 1, position: 'relative' }}>

@@ -17,3 +17,12 @@ export interface UserSettings {
     message: string;
     contact?: string;
   }
+
+  export interface UserProfile {
+    id: string;
+    name: string;
+    email: string;
+    group: string;
+    avatar?: string;
+
+  }
