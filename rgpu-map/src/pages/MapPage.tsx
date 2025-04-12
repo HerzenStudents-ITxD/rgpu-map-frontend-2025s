@@ -1,21 +1,21 @@
 import { useEffect } from 'react';
 import { Map } from '../features/3dMap/components/Map';
-import { useMapActions } from '../store/slices/mapSlice';
+import { useMapStore } from '../store/slices/mapSlice';
 import { mockBuildings } from '../features/3dMap/api/mockBuildings';
+import { mockPoints } from '../modules/map/mockPoints';
 import { useNavigate } from 'react-router-dom';
 
 export const MapPage = () => {
-  const { addBuilding, selectBuilding } = useMapActions();
+  const { addBuilding, addPoint, selectItem } = useMapStore((state) => state.actions);
   const navigate = useNavigate();
 
   useEffect(() => {
-    mockBuildings.forEach(building => {
-      addBuilding(building);
-    });
-  }, [addBuilding]);
+    mockBuildings.forEach(addBuilding);
+    mockPoints.forEach(addPoint);
+  }, [addBuilding, addPoint]);
 
   const handleBuildingClick = (id: number) => {
-    selectBuilding(id);
+    selectItem(id);
     navigate(`/point/${id}`);
   };
 

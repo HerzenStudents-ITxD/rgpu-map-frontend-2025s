@@ -4,11 +4,9 @@ import { OrbitControls } from '@react-three/drei';
 import { Model } from './Building';
 import { useBuildings, useMapActions } from '../../../store/slices/mapSlice';
 import { useGLTF } from '@react-three/drei';
-import { Outlines} from '@react-three/drei';
 import type { GLTF } from 'three-stdlib';
 import * as THREE from 'three';
 import { useNavigate } from 'react-router-dom';
-import { MapPoint3D } from '../api/types';
 
 
 interface MapProps {

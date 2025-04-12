@@ -1,16 +1,14 @@
 // src/features/3dMap/api/types.ts
 export interface Building {
-    id: number;
-    name: string;
-    model: string;
-    position: [number, number, number];
-    rotation?: [number, number, number];
-    metadata?: {
-      floors?: number;
-      isInteractive?: boolean;
-      url?: string;
-    };
-  }
+  id: number;
+  name: string;
+  position: [number, number, number];
+  model: string;
+  metadata: {
+    floors?: number;
+    isInteractive: boolean;
+  };
+}
   
   export interface MapState {
     buildings: Building[];
@@ -26,17 +24,14 @@ export interface Building {
 
   // src/features/3dMap/api/types.ts
   
-  export interface MapPoint3D {
+  export interface Building {
     id: number;
     name: string;
     position: [number, number, number];
-    rotation?: [number, number, number];
     model: string;
     metadata: {
       floors?: number;
       isInteractive: boolean;
-      url: string;
-      type: number; 
     };
   }
 

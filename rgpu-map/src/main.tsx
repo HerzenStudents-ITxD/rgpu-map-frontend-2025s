@@ -16,7 +16,6 @@ import RightBar from './components/RightBar';
 import { MapPage } from './pages/MapPage'
 import Home from './pages/Home';
 import { NewsPage}  from './pages/NewsPage';
-import RoutesList from './pages/RoutesList';
 import RouteBuilder from './pages/RouteBuilder';
 import Schedule from './pages/Schedule';
 import Settings from './pages/Settings';
@@ -32,40 +31,46 @@ import AdminPanel from './pages/admin/AdminPanel';
 import PointsAdmin from './pages/admin/PointsAdmin';
 import UsersAdmin from './pages/admin/UsersAdmin';
 import PointDetails from './pages/PointDetails';
+import { View } from './types/navigation';
 
-type View = 'home' | 'news' | 'routes' | 'route-builder' | 'schedule' | 'settings' | 'language' | 'profile' | 'feedback';
+
 
 const App: React.FC = () => {
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
   const [currentView, setCurrentView] = useState<View>('home');
   const { points } = usePoints();
   const navigate = useNavigate();
-  const { pointIndex } = useParams<{ pointIndex?: string }>();
+  const { id } = useParams<{ id?: string }>();
 
   useEffect(() => {
-    if (pointIndex && points.length > 0) {
-      const index = parseInt(pointIndex, 10);
-      if (!isNaN(index) && index >= 0 && index < points.length) {
-        setSelectedPoint(points[index]);
+    const path = location.pathname;
+    if (path.startsWith('/point/')) {
+      setCurrentView('point');
+    } else {
+      const view = path.split('/')[1] as View;
+      if (view && view !== currentView) {
+        setCurrentView(view);
+      }
+    }
+  }, [location]);
+
+  // Загрузка данных точки
+  useEffect(() => {
+    if (currentView === 'point' && id) {
+      const point = points.find(p => p.point_id === id);
+      if (point) {
+        setSelectedPoint(point);
       } else {
-        setSelectedPoint(null);
         navigate('/');
       }
     } else {
       setSelectedPoint(null);
     }
-  }, [pointIndex, points, navigate]);
-
-  const handlePointClick = (point: Point) => {
-    const index = points.findIndex((p) => p.point_id === point.point_id);
-    if (index !== -1) {
-      setSelectedPoint(point);
-      navigate(`/point/${index}`);
-    }
-  };
+  }, [currentView, id, points, navigate]);
 
   const handleViewChange = (view: View) => {
     setCurrentView(view);
+    navigate(`/${view === 'home' ? '' : view}`);
   };
 
   const renderView = () => {
@@ -75,7 +80,7 @@ const App: React.FC = () => {
       case 'news':
         return <NewsPage />;
       case 'routes':
-        return <RoutesList />;
+        return <RouteBuilder />;
       case 'route-builder':
         return <RouteBuilder />;
       case 'schedule':
@@ -90,8 +95,13 @@ const App: React.FC = () => {
         return <Profile onBack={() => setCurrentView('settings')} />;
       case 'feedback':
         return <Feedback onBack={() => setCurrentView('settings')} />;
-      default:
-        return <Home />;
+      case 'point':
+          // Проверка типа точки
+          if (selectedPoint?.type && selectedPoint.type > 3) {
+            return <PointDetails />;
+          }
+        default:
+          return <Home />;
     }
   };
 

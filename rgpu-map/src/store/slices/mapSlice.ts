@@ -1,26 +1,34 @@
 // src/store/slices/mapSlice.ts
 import { create } from 'zustand';
-import type { MapPoint3D } from '../../features/3dMap/api/types';
+import { Building } from '../../features/3dMap/api/types';
+import { Point } from '../../types/points';
 
 interface MapState {
-  buildings: MapPoint3D[];
-  selectedBuilding: number | null;
+  buildings: Building[];
+  points: Point[];
+  selectedId: string | number | null;
   actions: {
-    selectBuilding: (id: number | null) => void;
-    addBuilding: (building: MapPoint3D) => void;
+    selectItem: (id: string | number | null) => void;
+    addBuilding: (building: Building) => void;
+    addPoint: (point: Point) => void;
   };
 }
 
 export const useMapStore = create<MapState>((set) => ({
   buildings: [],
-  selectedBuilding: null,
+  points: [],
+  selectedId: null,
   actions: {
-    selectBuilding: (id) => set({ selectedBuilding: id }),
+    selectItem: (id) => set({ selectedId: id }),
     addBuilding: (building) => 
       set((state) => ({ buildings: [...state.buildings, building] })),
+    addPoint: (point) => 
+      set((state) => ({ points: [...state.points, point] })),
   },
 }));
 
+// Экспорт хуков для удобного использования
 export const useMapActions = () => useMapStore((state) => state.actions);
 export const useBuildings = () => useMapStore((state) => state.buildings);
-export const useSelectedBuilding = () => useMapStore((state) => state.selectedBuilding);
+export const usePoints = () => useMapStore((state) => state.points);
+export const useSelectedId = () => useMapStore((state) => state.selectedId);

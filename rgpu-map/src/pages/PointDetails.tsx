@@ -1,19 +1,31 @@
-// src/pages/PointDetails.tsx
 import { useParams } from 'react-router-dom';
-import { useBuildings } from '../store/slices/mapSlice';
+import { useMapStore } from '../store/slices/mapSlice';
+import { Point } from '../types/points'; // Добавляем импорт типа
 
-const PointDetails = () => {
+interface PointDetailsProps {
+  point?: Point;
+}
+
+const PointDetails: React.FC<PointDetailsProps> = ({ point }) => {
   const { id } = useParams();
-  const buildings = useBuildings();
-  const point = buildings.find(b => b.id === Number(id));
+  const { buildings, points } = useMapStore();
+  
+  const item = buildings.find(b => b.id === Number(id)) || 
+              points.find(p => p.point_id === id);
 
   return (
     <div className="point-details">
-      <h2>{point?.name}</h2>
-      {point?.metadata.floors && (
-        <p>Этажность: {point.metadata.floors}</p>
+      {item && 'name' in item ? (
+        <>
+          <h2>{item.name}</h2>
+          <p>Этажность: {item.metadata.floors}</p>
+        </>
+      ) : (
+        <>
+          <h2>Точка {id}</h2>
+          <p>Координаты: ({item?.x}, {item?.y}, {item?.z})</p>
+        </>
       )}
-      {/* Дополнительная информация о точке */}
     </div>
   );
 };
