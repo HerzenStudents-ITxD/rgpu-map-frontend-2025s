@@ -31,6 +31,7 @@ import './index.css';
 import AdminPanel from './pages/admin/AdminPanel';
 import PointsAdmin from './pages/admin/PointsAdmin';
 import UsersAdmin from './pages/admin/UsersAdmin';
+import PointDetails from './pages/PointDetails';
 
 type View = 'home' | 'news' | 'routes' | 'route-builder' | 'schedule' | 'settings' | 'language' | 'profile' | 'feedback';
 
@@ -97,11 +98,29 @@ const App: React.FC = () => {
   return (
     <CustomThemeProvider>
       <Routes>
-      <Route path="/admin" element={<AdminPanel />}>
-        <Route index element={<Navigate to="points" replace />} />
-        <Route path="points" element={<PointsAdmin />} />
-        <Route path="users" element={<UsersAdmin />} />
-      </Route>
+        {/* Маршруты админ-панели */}
+        <Route path="/admin" element={<AdminPanel />}>
+          <Route index element={<Navigate to="points" replace />} />
+          <Route path="points" element={<PointsAdmin />} />
+          <Route path="users" element={<UsersAdmin />} />
+        </Route>
+
+        {/* Маршрут для деталей точки */}
+        <Route 
+          path="/point/:id" 
+          element={
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+              <TopBar />
+              <RightBar />
+              <MapPage />
+              <Sidebar selectedPoint={selectedPoint}>
+                <PointDetails />
+              </Sidebar>
+              <Navbar onViewChange={handleViewChange} currentView={currentView} />
+            </div>
+          } 
+        />
+      
         <Route path="*" element={
           <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <div style={{ flex: 1, position: 'relative' }}>

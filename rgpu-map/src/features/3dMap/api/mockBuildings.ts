@@ -3,7 +3,7 @@ import { Building } from './types';
 
 export const mockBuildings: Building[] = [
   {
-    id: 'main-campus',
+    id: 1,
     name: 'Главный корпус',
     model: '/models/main-campus.glb',
     position: [0, 0, 0],

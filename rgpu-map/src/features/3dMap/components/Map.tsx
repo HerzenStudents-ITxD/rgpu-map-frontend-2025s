@@ -7,9 +7,12 @@ import { useGLTF } from '@react-three/drei';
 import { Outlines} from '@react-three/drei';
 import type { GLTF } from 'three-stdlib';
 import * as THREE from 'three';
+import { useNavigate } from 'react-router-dom';
+import { MapPoint3D } from '../api/types';
+
 
 interface MapProps {
-  onBuildingClick?: (buildingId: string) => void;
+  onBuildingClick?: (buildingId: number) => void;
 }
 
 const UniversityModel = () => {
@@ -31,9 +34,11 @@ const UniversityModel = () => {
 export const Map = ({ onBuildingClick }: MapProps) => {
   const buildings = useBuildings();
   const { selectBuilding } = useMapActions();
+  const navigate = useNavigate();
 
-  const handleBuildingClick = (id: string) => {
+  const handleBuildingClick = (id: number) => { // Меняем тип параметра на number
     selectBuilding(id);
+    navigate(`/point/${id}`);
     onBuildingClick?.(id);
   };
 
@@ -58,6 +63,7 @@ export const Map = ({ onBuildingClick }: MapProps) => {
         intensity={0.2}
       />
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} castShadow />
+
       {buildings.map((building) => (
         <Model
           key={building.id}
@@ -65,6 +71,7 @@ export const Map = ({ onBuildingClick }: MapProps) => {
           onClick={() => handleBuildingClick(building.id)}
         />
       ))}
+
       <OrbitControls enableZoom={true} />
       <UniversityModel />
     </Canvas>

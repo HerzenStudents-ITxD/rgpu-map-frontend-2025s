@@ -1,21 +1,22 @@
-// src/pages/MapPage.tsx
 import { useEffect } from 'react';
 import { Map } from '../features/3dMap/components/Map';
 import { useMapActions } from '../store/slices/mapSlice';
 import { mockBuildings } from '../features/3dMap/api/mockBuildings';
+import { useNavigate } from 'react-router-dom';
 
 export const MapPage = () => {
-  const { addBuilding } = useMapActions();
+  const { addBuilding, selectBuilding } = useMapActions();
+  const navigate = useNavigate();
 
   useEffect(() => {
     mockBuildings.forEach(building => {
       addBuilding(building);
     });
-  }, []);
+  }, [addBuilding]);
 
-  const handleBuildingClick = (buildingId: string) => {
-    console.log('Selected building:', buildingId);
-    // Дополнительная логика при клике
+  const handleBuildingClick = (id: number) => {
+    selectBuilding(id);
+    navigate(`/point/${id}`);
   };
 
   return (
