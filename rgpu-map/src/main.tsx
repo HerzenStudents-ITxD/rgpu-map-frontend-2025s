@@ -11,6 +11,8 @@ import {
   useNavigate,
   Navigate 
 } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
 import RightBar from './components/RightBar';
@@ -42,7 +44,8 @@ import BuildingDetails from './features/3dMap/components/BuildingDetails';
 type View = 'home' | 'news' | 'routes' | 'route-builder' | 'schedule' | 'settings' | 'language' | 'profile' | 'feedback';
 
 const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<View>('home');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentView = searchParams.get('view') as View || 'home'; // Значение по умолчанию
   const { buildings, points, actions } = useMapStore();
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
@@ -64,35 +67,9 @@ const App: React.FC = () => {
 
 
   const handleViewChange = (view: View) => {
-    setCurrentView(view);
+    setSearchParams({ view });
   };
 
-  const renderView = (currentView: string) => {
-    switch (currentView) {
-      case 'home':
-        return <Home />;
-      case 'news':
-        return <NewsPage />;
-      case 'routes':
-        return <RoutesList />;
-      case 'route-builder':
-        return <RouteBuilder />;
-      case 'schedule':
-        return <Schedule />;
-      case 'settings':
-        return <Settings onViewChange={(view) => setCurrentView(view)} onThemeChange={function (theme: 'light' | 'dark'): void {
-          throw new Error('Function not implemented.');
-        } } />;
-      case 'language':
-        return <LanguageSelector onBack={() => setCurrentView('settings')} />;
-      case 'profile':
-        return <Profile onBack={() => setCurrentView('settings')} />;
-      case 'feedback':
-        return <Feedback onBack={() => setCurrentView('settings')} />;
-      default:
-        return <Home />;
-    }
-  };
 
   return (
     <CustomThemeProvider>
@@ -123,13 +100,11 @@ const App: React.FC = () => {
         } />
         
         <Route path="/*" element={
-          <MainLayout 
-          onViewChange={handleViewChange} 
-          currentView={currentView}
-        >
-          {renderView(currentView)}
-        </MainLayout>
-      } />
+        <MainLayout 
+            onViewChange={handleViewChange}
+            currentView={currentView} children={undefined}          />
+        } />
+
       </Routes>
     </CustomThemeProvider>
   );
@@ -150,7 +125,7 @@ const MainLayout = ({
     <TopBar />
     <RightBar />
     <MapPage />
-    <Sidebar>{children}</Sidebar>
+    <Sidebar selectedPoint={null} />
     <Navbar 
       onViewChange={onViewChange} 
       currentView={currentView} 
