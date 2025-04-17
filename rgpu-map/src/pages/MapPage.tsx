@@ -2,26 +2,30 @@ import { useEffect } from 'react';
 import { Map } from '../features/3dMap/components/Map';
 import { useMapStore } from '../store/slices/mapSlice';
 import { mockBuildings } from '../features/3dMap/api/mockBuildings';
-import { mockPoints } from '../modules/map/mockPoints';
+import { mock3DPoints } from '../features/3dMap/api/mockPoints';
 import { useNavigate } from 'react-router-dom';
 
 export const MapPage = () => {
-  const { addBuilding, addPoint, selectItem } = useMapStore((state) => state.actions);
+  const { actions } = useMapStore();
   const navigate = useNavigate();
 
   useEffect(() => {
-    mockBuildings.forEach(addBuilding);
-    mockPoints.forEach(addPoint);
-  }, [addBuilding, addPoint]);
+    // Загрузка данных
+    mockBuildings.forEach(actions.addBuilding);
+    mock3DPoints.forEach(actions.addPoint);
+  }, []);
 
-  const handleBuildingClick = (id: number) => {
-    selectItem(id);
-    navigate(`/point/${id}`);
+  const handleObjectClick = (id: number, type: 'building' | 'point') => {
+    actions.selectItem(id);
+    navigate(`/${type}/${id}`);
   };
 
   return (
-    <div className="map-container" style={{ width: '100vw', height: '100vh' }}>
-      <Map onBuildingClick={handleBuildingClick} />
+    <div className="map-container">
+      <Map 
+        onBuildingClick={(id) => handleObjectClick(id, 'building')}
+        onPointClick={(id) => handleObjectClick(id, 'point')}
+      />
     </div>
   );
 };

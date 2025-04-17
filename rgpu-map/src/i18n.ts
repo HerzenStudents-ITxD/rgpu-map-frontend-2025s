@@ -17,7 +17,7 @@ interface TranslationResources {
   navbar: {
     home: string;
     news: string;
-    routes: string;
+    routebuilder: string;
     schedule: string;
     settings: string;
   };
@@ -95,7 +95,7 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
       navbar: {
         home: 'Home',
         news: 'News',
-        routes: 'Routes',
+        routebuilder: 'Routes',
         schedule: 'Schedule',
         settings: 'Settings',
       },
@@ -170,7 +170,7 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
       navbar: {
         home: 'Главная',
         news: 'Новости',
-        routes: 'Маршруты',
+        routebuilder: 'Маршруты',
         schedule: 'Расписание',
         settings: 'Настройки',
       },
@@ -245,7 +245,7 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
       navbar: {
         home: '首页',
         news: '新闻',
-        routes: '路线',
+        routebuilder: '路线',
         schedule: '课程表',
         settings: '设置',
       },

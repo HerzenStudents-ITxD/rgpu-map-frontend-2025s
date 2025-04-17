@@ -1,6 +1,6 @@
 // src/features/3dMap/api/loadModels.ts
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { mockBuildings } from './mockPoints';
+import { mockBuildings } from './mockBuildings';
 
 export const loadAllModels = async () => {
   const loader = new GLTFLoader();

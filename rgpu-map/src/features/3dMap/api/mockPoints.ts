@@ -3,38 +3,49 @@ import { MapPoint3D } from './types';
 
 export const mock3DPoints: MapPoint3D[] = [
   {
-    id: 1, // Конвертируем point_id из строки в число
-    name: 'Главная аудитория',
-    position: [1, 1, 1], // Используем x, y, z из исходных данных
-    model: '/models/main-auditory.glb',
+    id: 1,
+    name: "Главный вход",
+    type: "point",
+    position: [10.5, 0, 8.2],
+    rotation: [0, Math.PI / 4, 0],
     metadata: {
-      floors: 2,
       isInteractive: true,
-      url: '/point/1',
-      type: 1 // Сохраняем исходный тип
+      description: "Центральный вход в университетский комплекс",
+      type_lvl: 1
     }
   },
   {
     id: 2,
-    name: 'Спортивный комплекс',
-    position: [-1, -1, 1],
-    model: '/models/sport-complex.glb',
+    name: "Студенческое кафе",
+    type: "point",
+    position: [-5.3, 0, 15.7],
     metadata: {
       isInteractive: true,
-      url: '/point/2',
-      type: 1
+      description: "Кафетерий с зоной отдыха",
+      type_lvl: 2
     }
   },
   {
     id: 3,
-    name: 'Научная библиотека',
-    position: [2, -2, 0],
-    model: '/models/library.glb',
+    name: "Научная библиотека",
+    type: "point",
+    position: [20.1, 0, -3.8],
+    rotation: [0, Math.PI / 2, 0],
     metadata: {
-      floors: 4,
       isInteractive: true,
-      url: '/point/3',
-      type: 1
+      description: "Основное книгохранилище с читальными залами",
+      type_lvl: 3
+    }
+  },
+  {
+    id: 4,
+    name: "Спортивный комплекс",
+    type: "point",
+    position: [-15.2, 0, 12.4],
+    metadata: {
+      isInteractive: true,
+      description: "Закрытый стадион и тренажерные залы",
+      type_lvl: 2
     }
   }
 ];

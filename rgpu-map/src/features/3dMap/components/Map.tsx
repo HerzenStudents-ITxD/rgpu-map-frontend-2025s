@@ -4,13 +4,16 @@ import { OrbitControls } from '@react-three/drei';
 import { Model } from './Building';
 import { useBuildings, useMapActions } from '../../../store/slices/mapSlice';
 import { useGLTF } from '@react-three/drei';
+import { Outlines} from '@react-three/drei';
 import type { GLTF } from 'three-stdlib';
 import * as THREE from 'three';
 import { useNavigate } from 'react-router-dom';
+import { MapPoint3D } from '../api/types';
 
 
 interface MapProps {
   onBuildingClick?: (buildingId: number) => void;
+  onPointClick?: (buildingId: number) => void;
 }
 
 const UniversityModel = () => {
@@ -31,15 +34,13 @@ const UniversityModel = () => {
 
 export const Map = ({ onBuildingClick }: MapProps) => {
   const buildings = useBuildings();
-  const { selectBuilding } = useMapActions();
+  const { selectItem  } = useMapActions();
   const navigate = useNavigate();
 
-  const handleBuildingClick = (id: number) => { // Меняем тип параметра на number
-    selectBuilding(id);
-    navigate(`/point/${id}`);
+  const handleBuildingClick = (id: number) => {
+    selectItem(id); // Правильный вызов
     onBuildingClick?.(id);
   };
-
   return (
     <Canvas shadows ={{ type: THREE.PCFSoftShadowMap }}>
     <ambientLight intensity={0.5} />
@@ -69,6 +70,7 @@ export const Map = ({ onBuildingClick }: MapProps) => {
           onClick={() => handleBuildingClick(building.id)}
         />
       ))}
+      
 
       <OrbitControls enableZoom={true} />
       <UniversityModel />

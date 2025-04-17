@@ -1,16 +1,15 @@
 // src/store/slices/mapSlice.ts
 import { create } from 'zustand';
-import { Building } from '../../features/3dMap/api/types';
-import { Point } from '../../types/points';
+import type { Building, MapPoint3D } from '../../features/3dMap/api/types';
 
 interface MapState {
   buildings: Building[];
-  points: Point[];
-  selectedId: string | number | null;
+  points: MapPoint3D[];
+  selectedId: number | null;
   actions: {
-    selectItem: (id: string | number | null) => void;
+    selectItem: (id: number | null) => void;
     addBuilding: (building: Building) => void;
-    addPoint: (point: Point) => void;
+    addPoint: (point: MapPoint3D) => void;
   };
 }
 
@@ -27,8 +26,11 @@ export const useMapStore = create<MapState>((set) => ({
   },
 }));
 
-// Экспорт хуков для удобного использования
+export const useSelectedBuilding = () => 
+  useMapStore((state) => {
+    if (state.selectedId === null) return null;
+    return state.buildings.find(b => b.id === state.selectedId);
+  });
+
 export const useMapActions = () => useMapStore((state) => state.actions);
 export const useBuildings = () => useMapStore((state) => state.buildings);
-export const usePoints = () => useMapStore((state) => state.points);
-export const useSelectedId = () => useMapStore((state) => state.selectedId);

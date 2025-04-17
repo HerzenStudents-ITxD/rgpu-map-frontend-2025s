@@ -1,6 +1,7 @@
 //src/main.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, ReactNode } from 'react';
 import ReactDOM from 'react-dom/client';
+
 import Navbar from './components/Navbar';
 import { 
   BrowserRouter as Router, 
@@ -13,74 +14,67 @@ import {
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
 import RightBar from './components/RightBar';
+
 import { MapPage } from './pages/MapPage'
 import Home from './pages/Home';
 import { NewsPage}  from './pages/NewsPage';
+import RoutesList from './pages/RoutesList';
 import RouteBuilder from './pages/RouteBuilder';
 import Schedule from './pages/Schedule';
 import Settings from './pages/Settings';
+
 import LanguageSelector from './modules/settings/LanguageSelector';
 import Profile from './pages/Profile';
 import Feedback from './pages/Feedback';
 import { CustomThemeProvider } from './theme';
-import { usePoints } from './modules/map/usePoints';
-import { Point } from './types/points'; 
+import { useMapStore } from './store/slices/mapSlice';
+
 import './i18n';
 import './index.css';
+
 import AdminPanel from './pages/admin/AdminPanel';
 import PointsAdmin from './pages/admin/PointsAdmin';
 import UsersAdmin from './pages/admin/UsersAdmin';
-import PointDetails from './pages/PointDetails';
-import { View } from './types/navigation';
 
+import PointDetails from './features/3dMap/components/PointDetails'; 
+import BuildingDetails from './features/3dMap/components/BuildingDetails';
 
+type View = 'home' | 'news' | 'routes' | 'route-builder' | 'schedule' | 'settings' | 'language' | 'profile' | 'feedback';
 
 const App: React.FC = () => {
-  const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
   const [currentView, setCurrentView] = useState<View>('home');
-  const { points } = usePoints();
-  const navigate = useNavigate();
+  const { buildings, points, actions } = useMapStore();
   const { id } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const path = location.pathname;
-    if (path.startsWith('/point/')) {
-      setCurrentView('point');
-    } else {
-      const view = path.split('/')[1] as View;
-      if (view && view !== currentView) {
-        setCurrentView(view);
-      }
+    if (!id) {
+      actions.selectItem(null);
+      return;
     }
-  }, [location]);
+    
+    const itemId = parseInt(id, 10);
+    const item = [
+      ...buildings,
+      ...points
+    ].find(item => item.id === itemId);
 
-  // Загрузка данных точки
-  useEffect(() => {
-    if (currentView === 'point' && id) {
-      const point = points.find(p => p.point_id === id);
-      if (point) {
-        setSelectedPoint(point);
-      } else {
-        navigate('/');
-      }
-    } else {
-      setSelectedPoint(null);
-    }
-  }, [currentView, id, points, navigate]);
+    actions.selectItem(item?.id || null);
+  }, [id, buildings, points]);
+
 
   const handleViewChange = (view: View) => {
     setCurrentView(view);
-    navigate(`/${view === 'home' ? '' : view}`);
   };
 
-  const renderView = () => {
+  const renderView = (currentView: string) => {
     switch (currentView) {
       case 'home':
         return <Home />;
       case 'news':
         return <NewsPage />;
       case 'routes':
-        return <RouteBuilder />;
+        return <RoutesList />;
       case 'route-builder':
         return <RouteBuilder />;
       case 'schedule':
@@ -95,13 +89,8 @@ const App: React.FC = () => {
         return <Profile onBack={() => setCurrentView('settings')} />;
       case 'feedback':
         return <Feedback onBack={() => setCurrentView('settings')} />;
-      case 'point':
-          // Проверка типа точки
-          if (selectedPoint?.type && selectedPoint.type > 3) {
-            return <PointDetails />;
-          }
-        default:
-          return <Home />;
+      default:
+        return <Home />;
     }
   };
 
@@ -114,40 +103,60 @@ const App: React.FC = () => {
           <Route path="points" element={<PointsAdmin />} />
           <Route path="users" element={<UsersAdmin />} />
         </Route>
-
-        {/* Маршрут для деталей точки */}
-        <Route 
-          path="/point/:id" 
-          element={
-            <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-              <TopBar />
-              <RightBar />
-              <MapPage />
-              <Sidebar selectedPoint={selectedPoint}>
-                <PointDetails />
-              </Sidebar>
-              <Navbar onViewChange={handleViewChange} currentView={currentView} />
-            </div>
-          } 
-        />
       
-        <Route path="*" element={
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-            <div style={{ flex: 1, position: 'relative' }}>
-              <TopBar />
-              <RightBar />
-              <MapPage />
-              <Sidebar selectedPoint={selectedPoint}>
-                {renderView()}
-              </Sidebar>
-            </div>
-            <Navbar onViewChange={handleViewChange} currentView={currentView} />
-          </div>
+        <Route path="/point/:id" element={
+          <MainLayout 
+          onViewChange={handleViewChange} 
+          currentView={currentView}
+        >
+          <PointDetails />
+        </MainLayout>
         } />
+        
+        <Route path="/building/:id" element={
+          <MainLayout 
+          onViewChange={handleViewChange} 
+          currentView={currentView}
+        >
+          <BuildingDetails />
+        </MainLayout>
+        } />
+        
+        <Route path="/*" element={
+          <MainLayout 
+          onViewChange={handleViewChange} 
+          currentView={currentView}
+        >
+          {renderView(currentView)}
+        </MainLayout>
+      } />
       </Routes>
     </CustomThemeProvider>
   );
 };
+
+interface MainLayoutProps {
+  children: ReactNode;
+  onViewChange: (view: View) => void;
+  currentView: View;
+}
+
+const MainLayout = ({ 
+  children, 
+  onViewChange, 
+  currentView 
+}: MainLayoutProps) => (
+  <div className="main-layout">
+    <TopBar />
+    <RightBar />
+    <MapPage />
+    <Sidebar>{children}</Sidebar>
+    <Navbar 
+      onViewChange={onViewChange} 
+      currentView={currentView} 
+    />
+  </div>
+);
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 

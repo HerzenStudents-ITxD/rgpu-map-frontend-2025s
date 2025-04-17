@@ -7,24 +7,20 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useTranslation } from 'react-i18next';
 
-import { View } from '../types/navigation'
+type View = 'home' | 'news' | 'routes' | 'route-builder' | 'schedule' | 'settings' | 'language' | 'profile' | 'feedback';
 
 interface NavbarProps {
   onViewChange: (view: View) => void;
   currentView: View;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onViewChange, currentView }) => {
+const Navbar = ({ onViewChange, currentView }: NavbarProps) => {
   const { t } = useTranslation();
-
-  const handleChange = (event: React.SyntheticEvent, newValue: View) => {
-    onViewChange(newValue);
-  };
 
   return (
     <BottomNavigation
       value={currentView}
-      onChange={handleChange}
+      onChange={(_, newValue) => onViewChange(newValue)}
       showLabels
       sx={{ width: '100%', position: 'fixed', bottom: 0 }}
     >
@@ -39,8 +35,8 @@ const Navbar: React.FC<NavbarProps> = ({ onViewChange, currentView }) => {
         icon={<NewsIcon />}
       />
       <BottomNavigationAction
-        label={t('navbar.routes')}
-        value="routes"
+        label={t('navbar.routebuilder')}
+        value="route-builder"
         icon={<RoutesIcon />}
       />
       <BottomNavigationAction

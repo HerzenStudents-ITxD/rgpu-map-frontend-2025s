@@ -10,6 +10,7 @@ export const mockBuildings: Building[] = [
     metadata: {
       floors: 5,
       isInteractive: true
-    }
+    },
+    type: 'building'
   }
 ];
