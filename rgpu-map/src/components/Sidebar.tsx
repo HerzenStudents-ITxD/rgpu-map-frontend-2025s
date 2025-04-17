@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { Box, IconButton, Typography, List, ListItem, ListItemText } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Point } from '../types/points';
 import './Sidebar.css';
 
-// Импортируем компоненты для вкладок
+// Импортируем компоненты
 import Home from '../pages/Home';
 import { NewsPage } from '../pages/NewsPage';
 import RoutesList from '../pages/RoutesList';
@@ -18,28 +16,30 @@ import Settings from '../pages/Settings';
 import Profile from '../pages/Profile';
 import Feedback from '../pages/Feedback';
 import LanguageSelector from '../modules/settings/LanguageSelector';
-
-interface SidebarProps {
-  selectedPoint: Point | null;
-}
+import PointDetails from '../features/3dMap/components/PointDetails';
+import BuildingDetails from '../features/3dMap/components/BuildingDetails';
 
 type View = 'home' | 'news' | 'routes' | 'route-builder' | 'schedule' | 'settings' | 'profile' | 'feedback' | 'language';
 
-const Sidebar: React.FC<SidebarProps> = ({ selectedPoint }) => {
+const Sidebar: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState<boolean>(true);
+  const [isOpen, setIsOpen] = useState(true);
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const { id } = useParams<{ id?: string }>();
+  
   const view = searchParams.get('view') as View | null;
+  const isPoint = location.pathname.startsWith('/point/');
+  const isBuilding = location.pathname.startsWith('/building/');
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
-  const handleClosePoint = () => navigate('/');
-
-  /**
-   * Рендерит контент в зависимости от параметра `view` в URL
-   */
   const renderContentView = () => {
+    // Рендерим детали точки/здания если URL соответствует
+
+
+    // Рендерим вкладки через параметр view
     switch (view) {
       case 'home':
         return <Home />;
@@ -51,32 +51,27 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedPoint }) => {
         return <RouteBuilder />;
       case 'schedule':
         return <Schedule />;
-        case 'settings':
-          return (
-            <Settings 
-              onViewChange={(view) => {
-                const newParams = new URLSearchParams(searchParams);
-                newParams.set('view', view);
-                navigate({ search: newParams.toString() });
-              }} 
-              onThemeChange={(theme) => { /* Реализуйте смену темы */ }} 
-            />
-          );
-        case 'language':
-          return <LanguageSelector onBack={() => navigate({ search: 'view=settings' })} />;
-        case 'profile':
-          return <Profile onBack={() => navigate({ search: 'view=settings' })} />;
-        case 'feedback':
-          return <Feedback onBack={() => navigate({ search: 'view=settings' })} />;
-      default:
-        // Если view не указан, показываем детали точки или домашнюю страницу
-        return selectedPoint ? null : <Home />;
+      case 'settings':
+        return (
+          <Settings 
+            onViewChange={(view) => navigate({ search: `view=${view}` })} 
+            onThemeChange={(theme) => {/* ... */}} 
+          />
+        );
+      case 'language':
+        return <LanguageSelector onBack={() => navigate({ search: 'view=settings' })} />;
+      case 'profile':
+        return <Profile onBack={() => navigate({ search: 'view=settings' })} />;
+      case 'feedback':
+        return <Feedback onBack={() => navigate({ search: 'view=settings' })} />;
     }
+    if (isPoint && id) return <PointDetails />;
+    if (isBuilding && id) return <BuildingDetails />;
+    return <Home />;
   };
 
   return (
     <>
-      {/* Кнопка открытия sidebar */}
       {!isOpen && (
         <IconButton
           sx={{
@@ -94,7 +89,6 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedPoint }) => {
         </IconButton>
       )}
 
-      {/* Основной контейнер sidebar */}
       <Box
         sx={{
           position: 'absolute',
@@ -110,48 +104,19 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedPoint }) => {
           transform: isOpen ? 'translateX(0)' : 'translateX(-100%)'
         }}
       >
-        {/* Заголовок и кнопки */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2 }}>
-          <Box>
-            {selectedPoint && (
-              <IconButton onClick={handleClosePoint} size="small">
-                <CloseIcon />
-              </IconButton>
-            )}
-            <IconButton onClick={toggleSidebar} size="small">
-              <ChevronLeftIcon />
-            </IconButton>
-          </Box>
+          <Typography variant="h6">
+            {isPoint && t('sidebar.pointDetails')}
+            {isBuilding && t('sidebar.buildingDetails')}
+            {view && t(`views.${view}`)}
+          </Typography>
+          <IconButton onClick={toggleSidebar} size="small">
+            <ChevronLeftIcon />
+          </IconButton>
         </Box>
 
-        {/* Контент */}
         <Box sx={{ p: 2 }}>
-          {selectedPoint && !view ? (
-            // Детали точки/здания
-            <List>
-              <ListItem>
-                <ListItemText
-                  primary={t('sidebar.pointId')}
-                  secondary={selectedPoint.point_id}
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemText
-                  primary={t('sidebar.coordinates')}
-                  secondary={`X: ${selectedPoint.x}, Y: ${selectedPoint.y}, Z: ${selectedPoint.z}`}
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemText
-                  primary={t('sidebar.createdBy')}
-                  secondary={selectedPoint.user_id}
-                />
-              </ListItem>
-            </List>
-          ) : (
-            // Контент вкладок (home/news/routes и т.д.)
-            renderContentView()
-          )}
+          {renderContentView()}
         </Box>
       </Box>
     </>

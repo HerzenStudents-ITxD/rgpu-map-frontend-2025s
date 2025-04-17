@@ -125,7 +125,7 @@ const MainLayout = ({
     <TopBar />
     <RightBar />
     <MapPage />
-    <Sidebar selectedPoint={null} />
+    <Sidebar />
     <Navbar 
       onViewChange={onViewChange} 
       currentView={currentView} 
