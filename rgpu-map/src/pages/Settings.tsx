@@ -6,6 +6,13 @@ import FeedbackIcon from '@mui/icons-material/Feedback';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import InfoIcon from '@mui/icons-material/Info';
 import { useTranslation } from 'react-i18next';
+<<<<<<< Updated upstream
+=======
+import { useSettings } from '../features/settings/hooks/useSettings';
+import { FeedbackForm } from '../features/settings/components/FeedbackForm';
+import { ProfileForm } from '../features/settings/components/ProfileForm';
+import {ThemeSelector} from '../features/settings/components/ThemeSelector';
+>>>>>>> Stashed changes
 
 interface SettingsProps {
   onViewChange: (view: 'language' | 'profile' | 'feedback') => void;
