@@ -1,5 +1,5 @@
 //src/pages/NewsPage
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Button, 
   Container, 
@@ -19,25 +19,20 @@ export const NewsPage = () => {
   const [groups, setGroups] = useState<NewsGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [newsUpdated, setNewsUpdated] = useState(0); // Счётчик для обновления новостей
-
-  const loadGroups = async () => {
-    try {
-      const data = await fetchGroups();
-      setGroups(data);
-    } catch (err) {
-      setError('Ошибка загрузки групп новостей');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
+    const loadGroups = async () => {
+      try {
+        const data = await fetchGroups();
+        setGroups(data);
+      } catch (err) {
+        setError('Ошибка загрузки групп новостей');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     loadGroups();
-  }, []);
-
-  const refreshNews = useCallback(() => {
-    setNewsUpdated((prev) => prev + 1); // Увеличиваем счётчик для перезапроса новостей
   }, []);
 
   return (
@@ -73,7 +68,6 @@ export const NewsPage = () => {
           <CreateNewsForm 
             groups={groups} 
             onClose={() => setShowForm(false)}
-            onNewsCreated={refreshNews} // Передаём callback
             sx={{ 
               boxShadow: 3,
               borderRadius: 2,
@@ -83,7 +77,7 @@ export const NewsPage = () => {
           />
         )}
 
-        <NewsList key={newsUpdated} /> {/* Перерисовываем NewsList при изменении newsUpdated */}
+        <NewsList />
       </Stack>
     </Container>
   );

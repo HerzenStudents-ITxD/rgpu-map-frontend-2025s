@@ -1,33 +1,62 @@
+// src/modules/map/usePoints.ts
 import { useState, useEffect } from 'react';
-import { mockPoints } from './mockPoints';
 import { Point } from '../../types/points';
+import { v4 as uuidv4 } from 'uuid';
 
-interface PointsResponse {
-  points: Point[];
-}
+const STORAGE_KEY = 'university_map_points';
 
 export const usePoints = () => {
   const [points, setPoints] = useState<Point[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Загрузка точек из localStorage
   useEffect(() => {
-    const fetchPoints = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const response: PointsResponse = { points: mockPoints };
-        setPoints(response.points);
-      } catch (e) {
-        setError('Failed to load points');
-      } finally {
-        setLoading(false);
+    try {
+      const savedPoints = localStorage.getItem(STORAGE_KEY);
+      if (savedPoints) {
+        setPoints(JSON.parse(savedPoints));
       }
-    };
-
-    fetchPoints();
+      setLoading(false);
+    } catch (err) {
+      setError('Ошибка загрузки точек');
+      setLoading(false);
+    }
   }, []);
 
-  return { points, loading, error };
+  // Обновление localStorage при изменении точек
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
+  }, [points]);
+
+  const addPoint = async (point: Omit<Point, 'point_id'>) => {
+    const newPoint: Point = {
+      ...point,
+      point_id: uuidv4(),
+    };
+    setPoints(prev => [...prev, newPoint]);
+  };
+
+  const editPoint = async (id: string, updates: Partial<Point>) => {
+    setPoints(prev =>
+      prev.map(p => 
+        p.point_id === id ? { ...p, ...updates } : p
+      )
+    );
+  };
+
+  const deletePoint = async (id: string) => {
+    setPoints(prev => 
+      prev.filter(p => p.point_id !== id)
+    );
+  };
+
+  return {
+    points,
+    loading,
+    error,
+    addPoint,
+    editPoint,
+    deletePoint,
+  };
 };

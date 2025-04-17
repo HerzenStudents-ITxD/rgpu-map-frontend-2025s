@@ -16,6 +16,4 @@ export interface NewsGroup {
     participants?: number;
     location?: string;
     isFeatured?: boolean;
-    hasParticipateButton?: boolean; // Добавляем поле для кнопки "Участвую"
-    image?: string; // Добавляем поле для изображения
   }

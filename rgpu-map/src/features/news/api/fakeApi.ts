@@ -5,13 +5,13 @@ const mockGroups: NewsGroup[] = [
   {
     id: '1',
     name: 'Профком',
-    avatar: '/images/groups/profkom.jpg',
+    avatar: '/images/groups/profkom.jpg'
   },
   {
     id: '2',
     name: 'Студенческий совет ИИТТО',
-    avatar: '/images/groups/iitto.jpg',
-  },
+    avatar: '/images/groups/iitto.jpg'
+  }
 ];
 
 const mockNews: NewsItem[] = [
@@ -23,26 +23,12 @@ const mockNews: NewsItem[] = [
     group: mockGroups[0],
     participants: 24,
     location: '20а корпус',
-    isFeatured: true,
-    hasParticipateButton: true,
-    image: '/images/news/secret-herzen-2024.jpg',
-  },
-  {
-    id: '2',
-    title: 'Прогулка',
-    content: 'Прогулка 16:00, начиная терулен-мороз 2024! Наши обычные обмен подарками',
-    date: new Date().toISOString(),
-    group: mockGroups[1],
-    participants: 15,
-    location: '20а корпус',
-    isFeatured: false,
-    hasParticipateButton: false,
-    image: '/images/news/walk-2024.jpg',
-  },
+    isFeatured: true
+  }
 ];
 
 export const fetchNews = (): Promise<NewsItem[]> => {
-  return new Promise((resolve) => setTimeout(() => resolve(mockNews), 500));
+  return new Promise(resolve => setTimeout(() => resolve(mockNews), 500));
 };
 
 export const fetchGroups = (): Promise<NewsGroup[]> => {
