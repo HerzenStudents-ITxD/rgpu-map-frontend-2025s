@@ -74,6 +74,14 @@ interface TranslationResources {
     moderator: string;
     admin: string;
   };
+  login: {
+    title: string;
+    emailPlaceholder: string;
+    passwordPlaceholder: string;
+    button: string;
+    error: string;
+  };
+  save: string;
 }
 
 type SupportedLanguages = 'en' | 'ru' | 'cn';
@@ -152,6 +160,14 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         moderator: 'Moderator',
         admin: 'Admin',
       },
+      login: {
+        title: 'Authorization',
+        emailPlaceholder: 'Enter email or login',
+        passwordPlaceholder: 'Enter password',
+        button: 'Login',
+        error: 'Invalid email or password',
+      },
+      save: 'Save',
     },
   },
   ru: {
@@ -227,6 +243,14 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         moderator: 'Модератор',
         admin: 'Админ',
       },
+      login: {
+        title: 'Авторизация',
+        emailPlaceholder: 'Введите email или логин',
+        passwordPlaceholder: 'Введите пароль',
+        button: 'Войти',
+        error: 'Неверный email или пароль',
+      },
+      save: 'Сохранить',
     },
   },
   cn: {
@@ -302,6 +326,14 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         moderator: '版主',
         admin: '管理员',
       },
+      login: {
+        title: '授权',
+        emailPlaceholder: '输入电子邮件或登录名',
+        passwordPlaceholder: '输入密码',
+        button: '登录',
+        error: '电子邮件或密码无效',
+      },
+      save: '保存',
     },
   },
 };

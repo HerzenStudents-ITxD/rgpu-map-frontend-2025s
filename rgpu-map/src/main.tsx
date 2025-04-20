@@ -17,6 +17,8 @@ import Schedule from './pages/Schedule';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import Feedback from './pages/Feedback';
+import LanguageSelectorPage from './pages/LanguageSelectorPage'; // Добавлен импорт
+import LoginPage from './pages/LoginPage'; // Добавлен импорт
 
 import { CustomThemeProvider } from './theme';
 import { useMapStore } from './store/slices/mapSlice';
@@ -59,6 +61,12 @@ const App: React.FC = () => {
   return (
     <CustomThemeProvider>
       <Routes>
+        {/* Страница выбора языка */}
+        <Route path="/language-selector" element={<LanguageSelectorPage />} />
+
+        {/* Страница логина */}
+        <Route path="/login" element={<LoginPage />} />
+
         {/* Маршруты админ-панели */}
         <Route path="/admin" element={<AdminPanel />}>
           <Route index element={<Navigate to="points" replace />} />
