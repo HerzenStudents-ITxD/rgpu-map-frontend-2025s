@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useSettings } from '../features/settings/hooks/useSettings';
 import { FeedbackForm } from '../features/settings/components/FeedbackForm';
 import { ProfileForm } from '../features/settings/components/ProfileForm';
-import { useThemeContext } from '../theme'; // Импортируем новый хук темы
+import { useThemeContext } from '../theme';
 
 interface SettingsProps {
   onViewChange: (view: 'language' | 'profile' | 'feedback') => void;
@@ -28,13 +28,13 @@ interface SettingsProps {
 const Settings: React.FC<SettingsProps> = ({ onViewChange }) => {
   const { t } = useTranslation();
   const { settings, profile, loading, updateSettings, updateUserProfile } = useSettings();
-  const { themeMode, toggleTheme } = useThemeContext(); // Используем контекст темы
+  const { themeMode, toggleTheme } = useThemeContext();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
   const handleThemeChange = () => {
-    toggleTheme(); // Переключаем тему через контекст
-    updateSettings({ theme: themeMode === 'light' ? 'dark' : 'light' }); // Синхронизируем с настройками
+    toggleTheme();
+    updateSettings({ theme: themeMode === 'light' ? 'dark' : 'light' });
   };
 
   if (loading || !settings || !profile) {
@@ -88,7 +88,7 @@ const Settings: React.FC<SettingsProps> = ({ onViewChange }) => {
           </ListItemIcon>
           <ListItemText primary={t('settings.darkMode')} />
           <Switch
-            checked={themeMode === 'dark'} // Используем themeMode из контекста
+            checked={themeMode === 'dark'}
             onChange={handleThemeChange}
           />
         </ListItem>

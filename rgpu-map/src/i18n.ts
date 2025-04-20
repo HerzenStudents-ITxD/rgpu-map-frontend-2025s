@@ -82,6 +82,29 @@ interface TranslationResources {
     error: string;
   };
   save: string;
+  profile: {
+    name: string;
+    lastName: string;
+    email: string;
+    group: string;
+    faculty: string;
+    studyForm: string;
+    studyLevel: string;
+    studyYear: string;
+    subgroup: string;
+    editName: string; // Новый ключ для редактирования имени
+  };
+  feedback: {
+    selectSection: string;
+    section: string;
+    email: string;
+    emailPlaceholder: string;
+    uploadPhoto: string;
+    describeIssue: string;
+    messagePlaceholder: string;
+  };
+  cancel: string;
+  continue: string;
 }
 
 type SupportedLanguages = 'en' | 'ru' | 'cn';
@@ -168,6 +191,29 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         error: 'Invalid email or password',
       },
       save: 'Save',
+      profile: {
+        name: 'Name',
+        lastName: 'Last Name',
+        email: 'Email',
+        group: 'Group',
+        faculty: 'Faculty/Institute',
+        studyForm: 'Study Form',
+        studyLevel: 'Study Level',
+        studyYear: 'Study Year',
+        subgroup: 'Subgroup',
+        editName: 'Edit Name',
+      },
+      feedback: {
+        selectSection: 'Specify the section where the issue, question, or suggestion occurred',
+        section: 'Section',
+        email: 'Email',
+        emailPlaceholder: 'example@email.com',
+        uploadPhoto: 'Upload Photo',
+        describeIssue: 'Describe your issue, suggestion, or question in as much detail as possible',
+        messagePlaceholder: 'Your message',
+      },
+      cancel: 'Cancel',
+      continue: 'Continue',
     },
   },
   ru: {
@@ -251,6 +297,29 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         error: 'Неверный email или пароль',
       },
       save: 'Сохранить',
+      profile: {
+        name: 'Имя',
+        lastName: 'Фамилия',
+        email: 'Email',
+        group: 'Группа',
+        faculty: 'Факультет/институт',
+        studyForm: 'Форма обучения',
+        studyLevel: 'Ступень обучения',
+        studyYear: 'Год обучения',
+        subgroup: 'Подгруппа',
+        editName: 'Редактировать имя',
+      },
+      feedback: {
+        selectSection: 'Укажите раздел, в котором возникла проблема, вопрос или предложение',
+        section: 'Раздел',
+        email: 'Почта',
+        emailPlaceholder: 'example@email.com',
+        uploadPhoto: 'Загрузить фото',
+        describeIssue: 'Опишите вашу проблему, предложение или вопрос как можно подробнее',
+        messagePlaceholder: 'Ваше сообщение',
+      },
+      cancel: 'Отмена',
+      continue: 'Продолжить',
     },
   },
   cn: {
@@ -334,6 +403,29 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         error: '电子邮件或密码无效',
       },
       save: '保存',
+      profile: {
+        name: '名字',
+        lastName: '姓',
+        email: '电子邮件',
+        group: '小组',
+        faculty: '学院/研究所',
+        studyForm: '学习形式',
+        studyLevel: '学习阶段',
+        studyYear: '学习年份',
+        subgroup: '小组',
+        editName: '编辑姓名',
+      },
+      feedback: {
+        selectSection: '指定出现问题、疑问或建议的部分',
+        section: '部分',
+        email: '电子邮件',
+        emailPlaceholder: 'example@email.com',
+        uploadPhoto: '上传照片',
+        describeIssue: '尽可能详细地描述您的问题、建议或疑问',
+        messagePlaceholder: '您的消息',
+      },
+      cancel: '取消',
+      continue: '继续',
     },
   },
 };
