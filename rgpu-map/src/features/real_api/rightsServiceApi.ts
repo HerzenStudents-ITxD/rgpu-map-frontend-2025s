@@ -1,4 +1,4 @@
-const BASE_URL = 'http://http://localhost:81/';
+const BASE_URL = 'http://localhost:81/';
 
 // Common response types
 interface OperationResultResponse<T> {

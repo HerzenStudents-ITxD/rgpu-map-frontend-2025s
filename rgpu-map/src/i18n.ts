@@ -76,7 +76,7 @@ interface TranslationResources {
   };
   login: {
     title: string;
-    emailPlaceholder: string;
+    loginDataPlaceholder: string; // Изменено с emailPlaceholder на loginDataPlaceholder
     passwordPlaceholder: string;
     button: string;
     error: string;
@@ -92,7 +92,7 @@ interface TranslationResources {
     studyLevel: string;
     studyYear: string;
     subgroup: string;
-    editName: string; // Новый ключ для редактирования имени
+    editName: string;
   };
   feedback: {
     selectSection: string;
@@ -185,10 +185,10 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
       },
       login: {
         title: 'Authorization',
-        emailPlaceholder: 'Enter email or login',
+        loginDataPlaceholder: 'Enter login or email', // Обновлено
         passwordPlaceholder: 'Enter password',
         button: 'Login',
-        error: 'Invalid email or password',
+        error: 'Invalid login or password',
       },
       save: 'Save',
       profile: {
@@ -291,10 +291,10 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
       },
       login: {
         title: 'Авторизация',
-        emailPlaceholder: 'Введите email или логин',
+        loginDataPlaceholder: 'Введите логин или email', // Обновлено
         passwordPlaceholder: 'Введите пароль',
         button: 'Войти',
-        error: 'Неверный email или пароль',
+        error: 'Неверный логин или пароль',
       },
       save: 'Сохранить',
       profile: {
@@ -397,10 +397,10 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
       },
       login: {
         title: '授权',
-        emailPlaceholder: '输入电子邮件或登录名',
+        loginDataPlaceholder: '输入登录名或电子邮件', // Обновлено
         passwordPlaceholder: '输入密码',
         button: '登录',
-        error: '电子邮件或密码无效',
+        error: '登录名或密码无效',
       },
       save: '保存',
       profile: {

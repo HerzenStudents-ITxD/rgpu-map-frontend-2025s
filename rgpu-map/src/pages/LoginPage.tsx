@@ -7,18 +7,21 @@ import { loginUser } from '../features/real_api/authApi';
 const LoginPage: React.FC = () => {
   const { t } = useTranslation();
   const { themeMode } = useThemeContext();
-  const [email, setEmail] = React.useState('');
+  const [loginData, setLoginData] = React.useState(''); // Изменено с email на loginData
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
 
   const handleLogin = async () => {
     try {
-      const credentials = { email, password };
+      const credentials = { loginData, password }; // Изменено с email на loginData
       const result = await loginUser(credentials);
       console.log('Login successful:', result);
       // Здесь можно сохранить токены и перенаправить пользователя
-    } catch (err) {
-      setError(t('login.error'));
+    } catch (err: any) {
+      const errorMessage = err.message.includes('HTTP error')
+        ? err.message
+        : t('login.error');
+      setError(errorMessage);
     }
   };
 
@@ -51,16 +54,14 @@ const LoginPage: React.FC = () => {
             gap: 2,
           }}
         >
-          {/* Заголовок "Авторизация" */}
           <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
             {t('login.title')}
           </Typography>
 
-          {/* Поле для email */}
           <TextField
-            label={t('login.emailPlaceholder')}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            label={t('login.loginDataPlaceholder')} // Изменено с emailPlaceholder на loginDataPlaceholder
+            value={loginData}
+            onChange={(e) => setLoginData(e.target.value)}
             fullWidth
             variant="outlined"
             sx={{
@@ -70,7 +71,6 @@ const LoginPage: React.FC = () => {
             }}
           />
 
-          {/* Поле для пароля */}
           <TextField
             label={t('login.passwordPlaceholder')}
             type="password"
@@ -85,14 +85,12 @@ const LoginPage: React.FC = () => {
             }}
           />
 
-          {/* Сообщение об ошибке */}
           {error && (
             <Typography color="error" variant="body2">
               {error}
             </Typography>
           )}
 
-          {/* Кнопка "Войти" */}
           <Button
             variant="contained"
             onClick={handleLogin}

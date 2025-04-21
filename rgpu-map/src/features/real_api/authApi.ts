@@ -1,4 +1,4 @@
-const BASE_URL = 'http:/http://localhost:82/';
+const BASE_URL = 'http://localhost:82/';
 
 // Response types
 interface LoginResult {
@@ -9,7 +9,7 @@ interface LoginResult {
 
 // Request DTOs
 interface LoginRequest {
-    email: string;
+    loginData: string; // Изменено с email на loginData
     password: string;
 }
 
