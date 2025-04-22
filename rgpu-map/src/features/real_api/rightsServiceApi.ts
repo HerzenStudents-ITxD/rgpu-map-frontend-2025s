@@ -47,6 +47,21 @@ interface EditUserRoleRequest {
     roleId: string; // System.Guid
 }
 
+interface CreateRoleLocalizationRequest {
+    roleId: string; // System.Guid
+    locale: string;
+    name: string;
+}
+
+interface EditRoleLocalizationRequest {
+    name?: string;
+}
+
+interface UpdateRoleRightsRequest {
+    roleId: string; // System.Guid
+    rightIds: string[]; // Array of Right IDs (Guids)
+}
+
 // Utility function to handle responses
 const handleResponse = async <T>(response: Response): Promise<T> => {
     if (!response.ok) {
@@ -57,7 +72,7 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
 };
 
 // API Handlers
-export const getRights = async (locale?: string): Promise<RightInfo[]> => {
+export const get = async (locale?: string): Promise<RightInfo[]> => {
     try {
         const url = new URL(`${BASE_URL}Rights/get`);
         if (locale) url.searchParams.append('locale', locale);
@@ -111,7 +126,8 @@ export const findRoles = async ({
         url.searchParams.append('includedeactivated', includeDeactivated.toString());
         if (locale) url.searchParams.append('locale', locale);
         url.searchParams.append('skipcount', skipCount.toString());
-        url.searchParams.append('takecount', takeCount.to mutate);
+        url.searchParams.append('takecount', takeCount.toString());
+
         const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -151,18 +167,96 @@ export const getRole = async ({ roleId, locale }: { roleId?: string; locale?: st
     }
 };
 
-export const editUserRole = async (userRoleData: EditUserRoleRequest): Promise<boolean> => {
+export const changeRoleStatus = async (roleId: string, isActive: boolean): Promise<boolean> => {
+    try {
+        const url = new URL(`${BASE_URL}Roles/editstatus`);
+        url.searchParams.append('roleId', roleId);
+        url.searchParams.append('isActive', isActive.toString());
+
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await handleResponse<OperationResultResponse<boolean>>(response);
+        return data.result;
+    } catch (error) {
+        console.error('Error changing role status:', error);
+        throw error;
+    }
+};
+
+export const updateRoleRights = async (request: UpdateRoleRightsRequest): Promise<boolean> => {
+    try {
+        const response = await fetch(`${BASE_URL}Roles/updaterightsset`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(request),
+        });
+
+        const data = await handleResponse<OperationResultResponse<boolean>>(response);
+        return data.result;
+    } catch (error) {
+        console.error('Error updating role rights:', error);
+        throw error;
+    }
+};
+
+export const createRoleLocalization = async (request: CreateRoleLocalizationRequest): Promise<string> => {
+    try {
+        const response = await fetch(`${BASE_URL}RoleLocalization/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(request),
+        });
+
+        const data = await handleResponse<OperationResultResponse<string>>(response);
+        return data.result;
+    } catch (error) {
+        console.error('Error creating role localization:', error);
+        throw error;
+    }
+};
+
+export const editRoleLocalization = async (roleLocalizationId: string, request: EditRoleLocalizationRequest): Promise<boolean> => {
+    try {
+        const url = new URL(`${BASE_URL}RoleLocalization/edit`);
+        url.searchParams.append('roleLocalizationId', roleLocalizationId);
+
+        const response = await fetch(url, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(request),
+        });
+
+        const data = await handleResponse<OperationResultResponse<boolean>>(response);
+        return data.result;
+    } catch (error) {
+        console.error('Error editing role localization:', error);
+        throw error;
+    }
+};
+
+export const edit = async (request: EditUserRoleRequest): Promise<boolean> => {
     try {
         const response = await fetch(`${BASE_URL}User/edit`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(userRoleData),
+            body: JSON.stringify(request),
         });
 
         const data = await handleResponse<OperationResultResponse<boolean>>(response);
-        return data.result; // Returns boolean indicating success
+        return data.result;
     } catch (error) {
         console.error('Error editing user role:', error);
         throw error;
