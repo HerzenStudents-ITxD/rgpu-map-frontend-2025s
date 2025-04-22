@@ -39,7 +39,7 @@ export const NewsPage = () => {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Stack spacing={3}>
         <Typography variant="h4" component="h1">
-          Новости университета
+          Новости
         </Typography>
 
         {loading && <LinearProgress />}
@@ -61,7 +61,7 @@ export const NewsPage = () => {
             fontSize: '1.1rem'
           }}
         >
-          + Создать новость
+          + Опубликовать
         </Button>
 
         {showForm && (

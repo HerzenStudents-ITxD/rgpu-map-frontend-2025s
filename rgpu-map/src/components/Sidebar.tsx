@@ -55,7 +55,7 @@ const Sidebar: React.FC = () => {
         return (
           <Settings 
             onViewChange={(view) => navigate({ search: `view=${view}` })} 
-            onThemeChange={(theme) => {/* ... */}} 
+
           />
         );
       case 'language':

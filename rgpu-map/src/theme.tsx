@@ -49,34 +49,37 @@ export const CustomThemeProvider: React.FC<CustomThemeProviderProps> = ({ childr
         palette: {
           mode: themeMode,
           primary: {
-            main: themeMode === 'light' ? '#3f51b5' : '#90caf9',
+            main: themeMode === 'light' ? '#3f51b5' : '#FAAE5B',
             contrastText: '#ffffff',
           },
           secondary: {
-            main: themeMode === 'light' ? '#f50057' : '#ff4081',
+            main: themeMode === 'light' ? '#f50057' : '#FAAE5B',
           },
           background: {
-            default: themeMode === 'light' ? '#f5f5f5' : '#121212',
-            paper: themeMode === 'light' ? '#ffffff' : '#1e1e1e',
+            default: themeMode === 'light' ? '#f5f5f5' : '#252525',
+            paper: themeMode === 'light' ? '#ffffff' : '#252525',
           },
           text: {
-            primary: themeMode === 'light' ? '#212121' : '#e0e0e0',
-            secondary: themeMode === 'light' ? '#757575' : '#b0b0b0',
+            primary: themeMode === 'light' ? '#212121' : '#FFE7C6',
+            secondary: themeMode === 'light' ? '#757575' : '#FFE7C6',
+          },
+          icon: {
+            main: themeMode === 'light' ? '#212121' : '#FAAE5B',
           },
         },
         typography: {
           fontFamily: themeMode === 'light'
             ? '"Roboto", "Helvetica", "Arial", sans-serif'
-            : '"Inter", "Helvetica", "Arial", sans-serif', // Разные шрифты для тем
+            : '"Inter", "Helvetica", "Arial", sans-serif',
           h5: {
             fontWeight: themeMode === 'light' ? 600 : 500,
-            color: themeMode === 'light' ? '#212121' : '#e0e0e0',
+            color: themeMode === 'light' ? '#212121' : '#FFE7C6',
           },
           body1: {
-            color: themeMode === 'light' ? '#212121' : '#e0e0e0',
+            color: themeMode === 'light' ? '#212121' : '#FFE7C6',
           },
           body2: {
-            color: themeMode === 'light' ? '#757575' : '#b0b0b0',
+            color: themeMode === 'light' ? '#757575' : '#FFE7C6',
           },
         },
         components: {
@@ -85,6 +88,12 @@ export const CustomThemeProvider: React.FC<CustomThemeProviderProps> = ({ childr
               root: {
                 textTransform: 'none',
                 borderRadius: 8,
+                backgroundColor: themeMode === 'light' ? undefined : '#FAAE5B',
+                color: themeMode === 'light' ? undefined : '#252525',
+                '&:hover': {
+                  backgroundColor: themeMode === 'light' ? undefined : '#FAAE5B',
+                  opacity: 0.9,
+                },
               },
             },
           },
@@ -93,7 +102,8 @@ export const CustomThemeProvider: React.FC<CustomThemeProviderProps> = ({ childr
               root: {
                 borderRadius: 8,
                 '&:hover': {
-                  backgroundColor: themeMode === 'light' ? '#e8eaf6' : '#2c2c2c',
+                  backgroundColor: themeMode === 'light' ? '#e8eaf6' : '#FAAE5B',
+                  color: themeMode === 'light' ? undefined : '#252525',
                 },
               },
             },
@@ -101,27 +111,27 @@ export const CustomThemeProvider: React.FC<CustomThemeProviderProps> = ({ childr
           MuiTypography: {
             styleOverrides: {
               root: {
-                color: themeMode === 'light' ? '#212121' : '#e0e0e0', // Цвет текста по умолчанию
+                color: themeMode === 'light' ? '#212121' : '#FFE7C6',
               },
               h5: {
                 fontWeight: themeMode === 'light' ? 600 : 500,
               },
               body1: {
-                color: themeMode === 'light' ? '#212121' : '#e0e0e0',
+                color: themeMode === 'light' ? '#212121' : '#FFE7C6',
               },
               body2: {
-                color: themeMode === 'light' ? '#757575' : '#b0b0b0',
+                color: themeMode === 'light' ? '#757575' : '#FFE7C6',
               },
             },
           },
           MuiListItemText: {
             styleOverrides: {
               primary: {
-                color: themeMode === 'light' ? '#212121' : '#e0e0e0',
+                color: themeMode === 'light' ? '#212121' : '#FFE7C6',
                 fontWeight: themeMode === 'light' ? 500 : 400,
               },
               secondary: {
-                color: themeMode === 'light' ? '#757575' : '#b0b0b0',
+                color: themeMode === 'light' ? '#757575' : '#FFE7C6',
               },
             },
           },

@@ -10,11 +10,11 @@ import {
   Switch,
   CircularProgress,
 } from '@mui/material';
-import LanguageIcon from '@mui/icons-material/Language';
-import PersonIcon from '@mui/icons-material/Person';
-import FeedbackIcon from '@mui/icons-material/Feedback';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import InfoIcon from '@mui/icons-material/Info';
+import LanguageIcon from '../../public/svg/Settings-language.svg';
+import ProfileIcon from '../../public/svg/Settings-profile.svg';
+import FeedbackIcon from '../../public/svg/Settings-feedback.svg';
+import ThemeIcon from '../../public/svg/Settings-theme.svg';
+import StatsIcon from '../../public/svg/Settings-statistics.svg';
 import { useTranslation } from 'react-i18next';
 import { useSettings } from '../features/settings/hooks/useSettings';
 import { FeedbackForm } from '../features/settings/components/FeedbackForm';
@@ -55,7 +55,7 @@ const Settings: React.FC<SettingsProps> = ({ onViewChange }) => {
         <ListItem disablePadding>
           <ListItemButton onClick={() => onViewChange('language')} sx={{ borderRadius: '8px' }}>
             <ListItemIcon>
-              <LanguageIcon />
+              <img src={LanguageIcon} alt="Language" />
             </ListItemIcon>
             <ListItemText
               primary={t('settings.changeLanguage')}
@@ -67,7 +67,7 @@ const Settings: React.FC<SettingsProps> = ({ onViewChange }) => {
         <ListItem disablePadding>
           <ListItemButton onClick={() => setProfileOpen(true)} sx={{ borderRadius: '8px' }}>
             <ListItemIcon>
-              <PersonIcon />
+              <img src={ProfileIcon} alt="Profile" />
             </ListItemIcon>
             <ListItemText primary={t('settings.profile')} secondary={profile.group} />
           </ListItemButton>
@@ -76,7 +76,7 @@ const Settings: React.FC<SettingsProps> = ({ onViewChange }) => {
         <ListItem disablePadding>
           <ListItemButton onClick={() => setFeedbackOpen(true)} sx={{ borderRadius: '8px' }}>
             <ListItemIcon>
-              <FeedbackIcon />
+              <img src={FeedbackIcon} alt="Feedback" />
             </ListItemIcon>
             <ListItemText primary={t('settings.feedback')} />
           </ListItemButton>
@@ -84,7 +84,7 @@ const Settings: React.FC<SettingsProps> = ({ onViewChange }) => {
 
         <ListItem>
           <ListItemIcon>
-            <DarkModeIcon />
+            <img src={ThemeIcon} alt="Theme" />
           </ListItemIcon>
           <ListItemText primary={t('settings.darkMode')} />
           <Switch
@@ -95,7 +95,7 @@ const Settings: React.FC<SettingsProps> = ({ onViewChange }) => {
 
         <ListItem>
           <ListItemIcon>
-            <InfoIcon />
+            <img src={StatsIcon} alt="Statistics" />
           </ListItemIcon>
           <ListItemText
             primary={t('settings.collectStats')}

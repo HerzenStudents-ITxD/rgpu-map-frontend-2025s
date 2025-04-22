@@ -74,58 +74,54 @@ const App: React.FC = () => {
           <Route path="users" element={<UsersAdmin />} />
         </Route>
 
-        <Route
-          path="/point/:id"
-          element={
-            <MainLayout onViewChange={handleViewChange} currentView={currentView}>
-              <PointDetails />
-            </MainLayout>
-          }
-        />
+        <Route path="/point/:id" element={
+          <MainLayout 
+          onViewChange={handleViewChange} 
+          currentView={currentView}
+        >
+          <PointDetails />
+        </MainLayout>
+        } />
+        
+        <Route path="/building/:id" element={
+          <MainLayout 
+          onViewChange={handleViewChange} 
+          currentView={currentView}
+        >
+          <BuildingDetails />
+        </MainLayout>
+        } />
+        
+        <Route path="/*" element={
+        <MainLayout 
+            onViewChange={handleViewChange}
+            currentView={currentView} children={undefined}          />
+        } />
 
-        <Route
-          path="/building/:id"
-          element={
-            <MainLayout onViewChange={handleViewChange} currentView={currentView}>
-              <BuildingDetails />
-            </MainLayout>
-          }
-        />
-
-        <Route
-          path="/*"
-          element={
-            <MainLayout onViewChange={handleViewChange} currentView={currentView}>
-              {currentView === 'home' && <Home />}
-              {currentView === 'news' && <NewsPage />}
-              {currentView === 'routes' && <RoutesList />}
-              {currentView === 'route-builder' && <RouteBuilder />}
-              {currentView === 'schedule' && <Schedule />}
-              {currentView === 'settings' && <Settings onViewChange={handleViewChange} />}
-              {currentView === 'profile' && <Profile />}
-              {currentView === 'feedback' && <Feedback />}
-            </MainLayout>
-          }
-        />
       </Routes>
     </CustomThemeProvider>
   );
 };
 
 interface MainLayoutProps {
-  children?: ReactNode;
+  children: ReactNode;
   onViewChange: (view: View) => void;
   currentView: View;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children, onViewChange, currentView }) => (
+const MainLayout = ({ 
+  onViewChange, 
+  currentView 
+}: MainLayoutProps) => (
   <div className="main-layout">
     <TopBar />
     <RightBar />
     <MapPage />
     <Sidebar />
-    <Navbar onViewChange={onViewChange} currentView={currentView} />
-    {children}
+    <Navbar 
+      onViewChange={onViewChange} 
+      currentView={currentView} 
+    />
   </div>
 );
 
