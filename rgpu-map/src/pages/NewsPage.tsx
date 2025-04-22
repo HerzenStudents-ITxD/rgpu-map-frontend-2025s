@@ -58,10 +58,10 @@ export const NewsPage = () => {
             alignSelf: 'flex-start',
             px: 4,
             textTransform: 'none',
-            fontSize: '1.1rem'
+            fontSize: '1rem'
           }}
         >
-          + Опубликовать
+          +Опубликовать
         </Button>
 
         {showForm && (
