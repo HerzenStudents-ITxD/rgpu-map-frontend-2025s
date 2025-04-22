@@ -1,22 +1,61 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // Добавлено для навигации
 import { Container, Box, TextField, Button, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useThemeContext } from '../theme';
 import { loginUser } from '../features/real_api/authApi';
+import { setTokens, getAccessToken } from '../utils/tokenService'; // Импортируем утилиту для токенов
 
 const LoginPage: React.FC = () => {
   const { t } = useTranslation();
   const { themeMode } = useThemeContext();
-  const [loginData, setLoginData] = React.useState(''); // Изменено с email на loginData
+  const navigate = useNavigate(); // Хук для навигации
+  const [loginData, setLoginData] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
 
+  const checkAdminRights = async (token: string): Promise<boolean> => {
+    try {
+      const response = await fetch('http://localhost:5003/rights/get', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 403) {
+          return false; // Пользователь не администратор
+        }
+        throw new Error('Failed to check admin rights');
+      }
+
+      return true; // Пользователь администратор
+    } catch (err) {
+      console.error('Error checking admin rights:', err);
+      return false; // В случае ошибки считаем, что пользователь не администратор
+    }
+  };
+
   const handleLogin = async () => {
     try {
-      const credentials = { loginData, password }; // Изменено с email на loginData
+      const credentials = { loginData, password };
       const result = await loginUser(credentials);
       console.log('Login successful:', result);
-      // Здесь можно сохранить токены и перенаправить пользователя
+
+      // Сохраняем токены
+      setTokens(result.accessToken, result.refreshToken);
+
+      // Проверяем права администратора
+      const isAdmin = await checkAdminRights(result.accessToken);
+
+      // Перенаправляем в зависимости от прав
+      if (isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/map');
+      }
     } catch (err: any) {
       const errorMessage = err.message.includes('HTTP error')
         ? err.message
@@ -59,7 +98,7 @@ const LoginPage: React.FC = () => {
           </Typography>
 
           <TextField
-            label={t('login.loginDataPlaceholder')} // Изменено с emailPlaceholder на loginDataPlaceholder
+            label={t('login.loginDataPlaceholder')}
             value={loginData}
             onChange={(e) => setLoginData(e.target.value)}
             fullWidth
