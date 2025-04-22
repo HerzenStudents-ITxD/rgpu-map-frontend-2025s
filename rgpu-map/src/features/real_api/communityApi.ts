@@ -1,3 +1,5 @@
+import { getAccessToken } from '../../utils/tokenService';
+
 const BASE_URL = 'http://localhost:83/';
 
 // Common response types
@@ -57,9 +59,20 @@ interface CommunityFilter {
 // Utility function to handle responses
 const handleResponse = async <T>(response: Response): Promise<T> => {
     if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Request failed');
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Request failed';
+
+        if (contentType && contentType.includes('application/json')) {
+            const error = await response.json();
+            errorMessage = error.message || `HTTP error! status: ${response.status}`;
+        } else {
+            const errorText = await response.text();
+            errorMessage = errorText || `HTTP error! status: ${response.status}`;
+        }
+
+        throw new Error(errorMessage);
     }
+
     return response.json();
 };
 
@@ -71,11 +84,22 @@ export const fetchAllCommunities = async (filter: CommunityFilter = {}): Promise
             url.searchParams.append('search', filter.search);
         }
 
+        const token = getAccessToken();
+        console.log('Token being sent to CommunityService:', token); // Отладочный лог
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Используем заголовок 'token'
+        } else {
+            console.warn('No token found for CommunityService request');
+        }
+
+        console.log('Request headers:', headers); // Отладочный лог
+
         const response = await fetch(url, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
         });
 
         const data = await handleResponse<FindResultResponse<CommunityResponse>>(response);
@@ -112,11 +136,22 @@ export const fetchCommunityNews = async ({
         url.searchParams.append('page', page.toString());
         url.searchParams.append('pageSize', pageSize.toString());
 
+        const token = getAccessToken();
+        console.log('Token being sent to CommunityService:', token); // Отладочный лог
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Используем заголовок 'token'
+        } else {
+            console.warn('No token found for CommunityService request');
+        }
+
+        console.log('Request headers:', headers); // Отладочный лог
+
         const response = await fetch(url, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
         });
 
         const data = await handleResponse<FindResultResponse<NewsResponse>>(response);
@@ -132,11 +167,22 @@ export const fetchCommunityNews = async ({
 
 export const createCommunity = async (communityData: CreateCommunityRequest): Promise<string> => {
     try {
+        const token = getAccessToken();
+        console.log('Token being sent to CommunityService:', token); // Отладочный лог
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Используем заголовок 'token'
+        } else {
+            console.warn('No token found for CommunityService request');
+        }
+
+        console.log('Request headers:', headers); // Отладочный лог
+
         const response = await fetch(`${BASE_URL}Community/create`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify(communityData),
         });
 
@@ -150,11 +196,22 @@ export const createCommunity = async (communityData: CreateCommunityRequest): Pr
 
 export const createNews = async (newsData: CreateNewsRequest): Promise<string> => {
     try {
+        const token = getAccessToken();
+        console.log('Token being sent to CommunityService:', token); // Отладочный лог
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Используем заголовок 'token'
+        } else {
+            console.warn('No token found for CommunityService request');
+        }
+
+        console.log('Request headers:', headers); // Отладочный лог
+
         const response = await fetch(`${BASE_URL}Community/create-news`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify(newsData),
         });
 
@@ -168,11 +225,22 @@ export const createNews = async (newsData: CreateNewsRequest): Promise<string> =
 
 export const participateInCommunity = async (participationData: ParticipateRequest): Promise<boolean> => {
     try {
+        const token = getAccessToken();
+        console.log('Token being sent to CommunityService:', token); // Отладочный лог
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Используем заголовок 'token'
+        } else {
+            console.warn('No token found for CommunityService request');
+        }
+
+        console.log('Request headers:', headers); // Отладочный лог
+
         const response = await fetch(`${BASE_URL}Community/participate`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify(participationData),
         });
 

@@ -1,3 +1,5 @@
+import { getAccessToken } from '../../utils/tokenService';
+
 const BASE_URL = 'http://localhost:81/';
 
 // Common response types
@@ -65,9 +67,20 @@ interface UpdateRoleRightsRequest {
 // Utility function to handle responses
 const handleResponse = async <T>(response: Response): Promise<T> => {
     if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Request failed');
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Request failed';
+
+        if (contentType && contentType.includes('application/json')) {
+            const error = await response.json();
+            errorMessage = error.message || `HTTP error! status: ${response.status}`;
+        } else {
+            const errorText = await response.text();
+            errorMessage = errorText || `HTTP error! status: ${response.status}`;
+        }
+
+        throw new Error(errorMessage);
     }
+
     return response.json();
 };
 
@@ -77,11 +90,22 @@ export const get = async (locale?: string): Promise<RightInfo[]> => {
         const url = new URL(`${BASE_URL}Rights/get`);
         if (locale) url.searchParams.append('locale', locale);
 
+        const token = getAccessToken();
+        console.log('Token being sent to RightsService:', token); // Отладочный лог
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Изменено с 'Authorization' на 'token'
+        } else {
+            console.warn('No token found for RightsService request');
+        }
+
+        console.log('Request headers:', headers); // Отладочный лог
+
         const response = await fetch(url, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
         });
 
         const data = await handleResponse<OperationResultResponse<RightInfo[]>>(response);
@@ -94,16 +118,22 @@ export const get = async (locale?: string): Promise<RightInfo[]> => {
 
 export const createRole = async (roleData: CreateRoleRequest): Promise<string> => {
     try {
+        const token = getAccessToken();
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Изменено с 'Authorization' на 'token'
+        }
+
         const response = await fetch(`${BASE_URL}Roles/create`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify(roleData),
         });
 
         const data = await handleResponse<OperationResultResponse<string>>(response);
-        return data.result; // Returns the created role ID (Guid)
+        return data.result;
     } catch (error) {
         console.error('Error creating role:', error);
         throw error;
@@ -128,11 +158,17 @@ export const findRoles = async ({
         url.searchParams.append('skipcount', skipCount.toString());
         url.searchParams.append('takecount', takeCount.toString());
 
+        const token = getAccessToken();
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Изменено с 'Authorization' на 'token'
+        }
+
         const response = await fetch(url, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
         });
 
         const data = await handleResponse<FindResultResponse<RoleInfo>>(response);
@@ -152,11 +188,17 @@ export const getRole = async ({ roleId, locale }: { roleId?: string; locale?: st
         if (roleId) url.searchParams.append('roleid', roleId);
         if (locale) url.searchParams.append('locale', locale);
 
+        const token = getAccessToken();
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Изменено с 'Authorization' на 'token'
+        }
+
         const response = await fetch(url, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
         });
 
         const data = await handleResponse<OperationResultResponse<RoleResponse>>(response);
@@ -173,11 +215,17 @@ export const changeRoleStatus = async (roleId: string, isActive: boolean): Promi
         url.searchParams.append('roleId', roleId);
         url.searchParams.append('isActive', isActive.toString());
 
+        const token = getAccessToken();
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Изменено с 'Authorization' на 'token'
+        }
+
         const response = await fetch(url, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
         });
 
         const data = await handleResponse<OperationResultResponse<boolean>>(response);
@@ -190,11 +238,17 @@ export const changeRoleStatus = async (roleId: string, isActive: boolean): Promi
 
 export const updateRoleRights = async (request: UpdateRoleRightsRequest): Promise<boolean> => {
     try {
+        const token = getAccessToken();
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Изменено с 'Authorization' на 'token'
+        }
+
         const response = await fetch(`${BASE_URL}Roles/updaterightsset`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify(request),
         });
 
@@ -208,11 +262,17 @@ export const updateRoleRights = async (request: UpdateRoleRightsRequest): Promis
 
 export const createRoleLocalization = async (request: CreateRoleLocalizationRequest): Promise<string> => {
     try {
+        const token = getAccessToken();
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Изменено с 'Authorization' на 'token'
+        }
+
         const response = await fetch(`${BASE_URL}RoleLocalization/create`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify(request),
         });
 
@@ -229,11 +289,17 @@ export const editRoleLocalization = async (roleLocalizationId: string, request: 
         const url = new URL(`${BASE_URL}RoleLocalization/edit`);
         url.searchParams.append('roleLocalizationId', roleLocalizationId);
 
+        const token = getAccessToken();
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Изменено с 'Authorization' на 'token'
+        }
+
         const response = await fetch(url, {
             method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify(request),
         });
 
@@ -247,11 +313,17 @@ export const editRoleLocalization = async (roleLocalizationId: string, request: 
 
 export const edit = async (request: EditUserRoleRequest): Promise<boolean> => {
     try {
+        const token = getAccessToken();
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['token'] = token; // Изменено с 'Authorization' на 'token'
+        }
+
         const response = await fetch(`${BASE_URL}User/edit`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify(request),
         });
 
