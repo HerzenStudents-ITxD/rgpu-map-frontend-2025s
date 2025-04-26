@@ -1,25 +1,30 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Добавлено для навигации
+import { useNavigate } from 'react-router-dom';
 import { Container, Box, TextField, Button, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useThemeContext } from '../theme';
 import { loginUser } from '../features/real_api/authApi';
-import { setTokens, getAccessToken } from '../utils/tokenService'; // Импортируем утилиту для токенов
+import { setTokens, getAccessToken } from '../utils/tokenService';
 
 const LoginPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { themeMode } = useThemeContext();
-  const navigate = useNavigate(); // Хук для навигации
+  const navigate = useNavigate();
   const [loginData, setLoginData] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
 
-  const checkAdminRights = async (token: string): Promise<boolean> => {
+  const checkAdminRights = async (token: string, locale?: string): Promise<boolean> => {
     try {
-      const response = await fetch('http://localhost:5003/rights/get', {
+      const url = new URL('http://localhost:81/Rights/get');
+      if (locale) {
+        url.searchParams.append('locale', locale);
+      }
+
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Token': token, // Используем 'Token'
           'Content-Type': 'application/json',
         },
       });
@@ -28,13 +33,13 @@ const LoginPage: React.FC = () => {
         if (response.status === 403) {
           return false; // Пользователь не администратор
         }
-        throw new Error('Failed to check admin rights');
+        throw new Error(`Failed to check admin rights: HTTP status ${response.status}`);
       }
 
       return true; // Пользователь администратор
     } catch (err) {
       console.error('Error checking admin rights:', err);
-      return false; // В случае ошибки считаем, что пользователь не администратор
+      return false; // В случае любой ошибки считаем, что пользователь не администратор
     }
   };
 
@@ -47,8 +52,8 @@ const LoginPage: React.FC = () => {
       // Сохраняем токены
       setTokens(result.accessToken, result.refreshToken);
 
-      // Проверяем права администратора
-      const isAdmin = await checkAdminRights(result.accessToken);
+      // Проверяем права администратора, используя текущую локализацию
+      const isAdmin = await checkAdminRights(result.accessToken, i18n.language);
 
       // Перенаправляем в зависимости от прав
       if (isAdmin) {
