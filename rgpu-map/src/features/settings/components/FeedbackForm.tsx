@@ -57,27 +57,30 @@ export const FeedbackForm = ({ open, onClose }: FeedbackFormProps) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{t('settings.feedback')}</DialogTitle>
+      <DialogTitle sx={{ textAlign: 'center' }}>
+        <Typography variant="h5">{t('settings.feedback')}</Typography>
+      </DialogTitle>
       <DialogContent>
         {/* Пояснение для разделов */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <Typography color="error" sx={{ mr: 0.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, mb: 1 }}>
+          <Typography sx={{ color: '#f44336', mr: 0.5 }}>
             *
           </Typography>
-          <Typography>
+          <Typography sx={{ fontSize: '0.875rem', fontWeight: 400 }}>
             {t('feedback.selectSection')}
           </Typography>
         </Box>
 
         {/* Выпадающее меню с чекбоксами */}
-        <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel>{t('feedback.section')}</InputLabel>
+        <FormControl fullWidth sx={{ mt: 0, mb: 2 }}>
           <Select
             multiple
             value={selectedSections}
             onChange={handleSectionChange}
             renderValue={(selected) => (selected as string[]).join(', ')}
-            sx={{ height: '42px', borderRadius: '8px' }}
+            sx={{ height: '50px', borderRadius: '8px' }}
+            variant="outlined"
+            displayEmpty
           >
             {sections.map((section) => (
               <MenuItem key={section} value={section}>
@@ -89,40 +92,58 @@ export const FeedbackForm = ({ open, onClose }: FeedbackFormProps) => {
         </FormControl>
 
         {/* Поле для email */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <Typography color="error" sx={{ mr: 0.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mt: 0, mb: 0 }}>
+          <Typography sx={{ color: '#f44336', mr: 0.5 }}>
             *
           </Typography>
-          <Typography>{t('feedback.email')}</Typography>
+          <Typography sx={{ fontSize: '0.875rem', fontWeight: 400 }}>
+            {t('feedback.email')}
+          </Typography>
         </Box>
         <TextField
           fullWidth
           label={t('feedback.emailPlaceholder')}
           value={form.contact}
           onChange={(e) => setForm({ ...form, contact: e.target.value })}
-          margin="normal"
+          sx={{ mt: 1, mb: 1, '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
           required
           type="email"
+          InputLabelProps={{ required: false }}
         />
 
         {/* Поле для загрузки фото */}
-        <Box sx={{ mb: 1 }}>
-          <Typography>{t('feedback.uploadPhoto')}</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, mb: 0 }}>
+          <Typography sx={{ fontSize: '0.875rem', fontWeight: 400 }}>
+            {t('feedback.photoLabel')}
+          </Typography>
         </Box>
-        <TextField
-          fullWidth
-          type="file"
-          onChange={handleImageChange}
-          margin="normal"
-          inputProps={{ accept: 'image/*' }}
-        />
+        <Box sx={{ mt: 1, mb: 2 }}>
+          <Button
+            variant="outlined"
+            component="label"
+            sx={{ borderRadius: '8px' }}
+          >
+            {t('feedback.uploadButton')}
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleImageChange}
+            />
+          </Button>
+          {image && (
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              {t('feedback.selectedFile')}: {image.name}
+            </Typography>
+          )}
+        </Box>
 
         {/* Пояснение для сообщения */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <Typography color="error" sx={{ mr: 0.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, mb: 0 }}>
+          <Typography sx={{ color: '#f44336', mr: 0.5 }}>
             *
           </Typography>
-          <Typography>
+          <Typography sx={{ fontSize: '0.875rem', fontWeight: 400 }}>
             {t('feedback.describeIssue')}
           </Typography>
         </Box>
@@ -131,24 +152,23 @@ export const FeedbackForm = ({ open, onClose }: FeedbackFormProps) => {
           label={t('feedback.messagePlaceholder')}
           value={form.message}
           onChange={(e) => setForm({ ...form, message: e.target.value })}
-          margin="normal"
+          sx={{ mt: 1, mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
           multiline
           rows={4}
           required
+          InputLabelProps={{ required: false }}
         />
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{t('cancel')}</Button>
+      <DialogActions sx={{ justifyContent: 'space-between', px: 2 }}>
+        <Button onClick={onClose} variant="outlined" sx={{ borderRadius: '8px' }}>
+          {t('cancel')}
+        </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
           color="primary"
           disabled={!isFormValid()}
-          sx={{
-            bgcolor: '#616161',
-            '&:hover': { bgcolor: '#424242' },
-            '&.Mui-disabled': { bgcolor: '#e0e0e0', color: '#9e9e9e' },
-          }}
+          sx={{ borderRadius: '8px' }}
         >
           {t('continue')}
         </Button>

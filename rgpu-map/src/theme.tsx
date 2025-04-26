@@ -61,7 +61,7 @@ export const CustomThemeProvider: React.FC<CustomThemeProviderProps> = ({ childr
           },
           text: {
             primary: themeMode === 'light' ? '#212121' : '#FFE7C6',
-            secondary: themeMode === 'light' ? '#757575' : '#FFE7C6',
+            secondary: themeMode === 'light' ? '#757575' : '#6E6B62',
           },
           icon: {
             main: themeMode === 'light' ? '#212121' : '#FAAE5B',
@@ -79,7 +79,7 @@ export const CustomThemeProvider: React.FC<CustomThemeProviderProps> = ({ childr
             color: themeMode === 'light' ? '#212121' : '#FFE7C6',
           },
           body2: {
-            color: themeMode === 'light' ? '#757575' : '#FFE7C6',
+            color: themeMode === 'light' ? '#757575' : '#6E6B62',
           },
         },
         components: {
@@ -93,6 +93,15 @@ export const CustomThemeProvider: React.FC<CustomThemeProviderProps> = ({ childr
                 '&:hover': {
                   backgroundColor: themeMode === 'light' ? undefined : '#FAAE5B',
                   opacity: 0.9,
+                },
+              },
+              outlined: {
+                backgroundColor: 'transparent',
+                color: themeMode === 'light' ? '#212121' : '#FFE7C6',
+                borderColor: themeMode === 'light' ? '#e0e0e0' : '#6E6B62',
+                '&:hover': {
+                  backgroundColor: themeMode === 'light' ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.08)',
+                  borderColor: themeMode === 'light' ? '#bdbdbd' : '#8A877C',
                 },
               },
             },
@@ -120,7 +129,7 @@ export const CustomThemeProvider: React.FC<CustomThemeProviderProps> = ({ childr
                 color: themeMode === 'light' ? '#212121' : '#FFE7C6',
               },
               body2: {
-                color: themeMode === 'light' ? '#757575' : '#FFE7C6',
+                color: themeMode === 'light' ? '#757575' : '#6E6B62',
               },
             },
           },
@@ -131,7 +140,16 @@ export const CustomThemeProvider: React.FC<CustomThemeProviderProps> = ({ childr
                 fontWeight: themeMode === 'light' ? 500 : 400,
               },
               secondary: {
-                color: themeMode === 'light' ? '#757575' : '#FFE7C6',
+                color: themeMode === 'light' ? '#757575' : '#6E6B62',
+              },
+            },
+          },
+          MuiInputLabel: {
+            styleOverrides: {
+              root: {
+                fontSize: '1rem',
+                fontWeight: 400,
+                color: themeMode === 'light' ? '#212121' : '#FFE7C6',
               },
             },
           },

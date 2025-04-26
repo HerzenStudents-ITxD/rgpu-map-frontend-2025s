@@ -16,6 +16,29 @@ import { UserProfile } from '../types';
 import { useTranslation } from 'react-i18next';
 import { EditNameForm } from './EditNameForm';
 
+// Кастомный компонент для значка
+const CustomArrowIcon = (props: any) => (
+  <Box
+    component="img"
+    src="/svg/arrow-drop-down.svg"
+    alt="Custom Arrow Icon"
+    {...props}
+    sx={{
+      width: '36px',
+      height: '36px',
+      position: 'absolute',
+      right: '8px',
+      top: '50%', // Центрируем по вертикали относительно поля Select
+      transform: 'translateY(-30%)', // Точное центрирование по вертикали
+      pointerEvents: 'none', // Чтобы иконка не мешала кликам по Select
+      // Корректируем трансформацию при открытии списка
+      '&.MuiSelect-iconOpen': {
+        transform: 'translateY(-30%) rotate(180deg)', // Сначала центрируем, потом вращаем
+      },
+    }}
+  />
+);
+
 interface ProfileFormProps {
   open: boolean;
   onClose: () => void;
@@ -32,7 +55,7 @@ export const ProfileForm = ({ open, onClose, profile, onUpdate }: ProfileFormPro
   const faculties = ['Факультет ИТ', 'Факультет экономики', 'Факультет права'];
   const studyForms = ['Очная', 'Заочная', 'Очно-заочная'];
   const studyLevels = ['Бакалавриат', 'Магистратура', 'Аспирантура'];
-  const studyYears = ['1 курс', '2 курс', '3 курс', '4 курс'];
+  const studyYears = ['1 курс', "2 курс", '3 курс', '4 курс'];
   const groups = ['ИТ-21', 'ИТ-22', 'ЭК-21', 'ПР-21'];
   const subgroups = ['Подгруппа 1', 'Подгруппа 2'];
 
@@ -51,7 +74,7 @@ export const ProfileForm = ({ open, onClose, profile, onUpdate }: ProfileFormPro
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
+      <DialogTitle sx={{ textAlign: 'center' }}>
         <Typography variant="h5">{t('settings.profile')}</Typography>
       </DialogTitle>
       <DialogContent>
@@ -60,10 +83,10 @@ export const ProfileForm = ({ open, onClose, profile, onUpdate }: ProfileFormPro
           sx={{
             height: '60px',
             display: 'flex',
-            alignItems: 'center',
-            border: '1px solid #e0e0e0',
+            alignItems: 'flex-end', // Прижимаем содержимое к нижнему краю
+            border: '2px solid #6E6B62',
             borderRadius: '8px',
-            px: 2,
+            px: 0,
             mb: 2,
             cursor: 'pointer',
           }}
@@ -73,20 +96,32 @@ export const ProfileForm = ({ open, onClose, profile, onUpdate }: ProfileFormPro
             component="img"
             src="/svg/icon-man.svg"
             alt="User Icon"
-            sx={{ width: 24, height: 24, mr: 2 }}
+            sx={{ width: 50, height: 50, mr: 2, mb: -0.1 }} // Небольшой отступ снизу для выравнивания
           />
-          <Typography variant="body1">
+          <Typography
+            variant="body1"
+            sx={{
+              mb: 2,
+              fontSize: '1.125rem', // Увеличиваем размер текста до 18px
+              fontWeight: 500, // Делаем текст немного жирным
+            }}
+          >
             {formData.lastName} {formData.name}
           </Typography>
         </Box>
 
         {/* Выпадающие меню */}
-        <FormControl fullWidth sx={{ mt: 2 }}>
-          <InputLabel>{t('profile.faculty')}</InputLabel>
+        <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
+          <InputLabel shrink sx={{ top: -10, fontSize: '1rem' }}>
+            {t('profile.faculty')}
+          </InputLabel>
           <Select
             value={formData.faculty || ''}
             onChange={(e) => setFormData({ ...formData, faculty: e.target.value as string })}
-            sx={{ height: '42px', borderRadius: '8px' }}
+            sx={{ height: '50px', borderRadius: '8px' }}
+            variant="outlined"
+            displayEmpty
+            IconComponent={CustomArrowIcon} // Используем кастомный значок
           >
             {faculties.map((faculty) => (
               <MenuItem key={faculty} value={faculty}>
@@ -95,12 +130,18 @@ export const ProfileForm = ({ open, onClose, profile, onUpdate }: ProfileFormPro
             ))}
           </Select>
         </FormControl>
-        <FormControl fullWidth sx={{ mt: 2 }}>
-          <InputLabel>{t('profile.studyForm')}</InputLabel>
+
+        <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
+          <InputLabel shrink sx={{ top: -10, fontSize: '1rem' }}>
+            {t('profile.studyForm')}
+          </InputLabel>
           <Select
             value={formData.studyForm || ''}
             onChange={(e) => setFormData({ ...formData, studyForm: e.target.value as string })}
-            sx={{ height: '42px', borderRadius: '8px' }}
+            sx={{ height: '50px', borderRadius: '8px' }}
+            variant="outlined"
+            displayEmpty
+            IconComponent={CustomArrowIcon} // Используем кастомный значок
           >
             {studyForms.map((form) => (
               <MenuItem key={form} value={form}>
@@ -109,12 +150,18 @@ export const ProfileForm = ({ open, onClose, profile, onUpdate }: ProfileFormPro
             ))}
           </Select>
         </FormControl>
-        <FormControl fullWidth sx={{ mt: 2 }}>
-          <InputLabel>{t('profile.studyLevel')}</InputLabel>
+
+        <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
+          <InputLabel shrink sx={{ top: -10, fontSize: '1rem' }}>
+            {t('profile.studyLevel')}
+          </InputLabel>
           <Select
             value={formData.studyLevel || ''}
             onChange={(e) => setFormData({ ...formData, studyLevel: e.target.value as string })}
-            sx={{ height: '42px', borderRadius: '8px' }}
+            sx={{ height: '50px', borderRadius: '8px' }}
+            variant="outlined"
+            displayEmpty
+            IconComponent={CustomArrowIcon} // Используем кастомный значок
           >
             {studyLevels.map((level) => (
               <MenuItem key={level} value={level}>
@@ -123,12 +170,18 @@ export const ProfileForm = ({ open, onClose, profile, onUpdate }: ProfileFormPro
             ))}
           </Select>
         </FormControl>
-        <FormControl fullWidth sx={{ mt: 2 }}>
-          <InputLabel>{t('profile.studyYear')}</InputLabel>
+
+        <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
+          <InputLabel shrink sx={{ top: -10, fontSize: '1rem' }}>
+            {t('profile.studyYear')}
+          </InputLabel>
           <Select
             value={formData.studyYear || ''}
             onChange={(e) => setFormData({ ...formData, studyYear: e.target.value as string })}
-            sx={{ height: '42px', borderRadius: '8px' }}
+            sx={{ height: '50px', borderRadius: '8px' }}
+            variant="outlined"
+            displayEmpty
+            IconComponent={CustomArrowIcon} // Используем кастомный значок
           >
             {studyYears.map((year) => (
               <MenuItem key={year} value={year}>
@@ -137,12 +190,18 @@ export const ProfileForm = ({ open, onClose, profile, onUpdate }: ProfileFormPro
             ))}
           </Select>
         </FormControl>
-        <FormControl fullWidth sx={{ mt: 2 }}>
-          <InputLabel>{t('profile.group')}</InputLabel>
+
+        <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
+          <InputLabel shrink sx={{ top: -10, fontSize: '1rem' }}>
+            {t('profile.group')}
+          </InputLabel>
           <Select
             value={formData.group || ''}
             onChange={(e) => setFormData({ ...formData, group: e.target.value as string })}
-            sx={{ height: '42px', borderRadius: '8px' }}
+            sx={{ height: '50px', borderRadius: '8px' }}
+            variant="outlined"
+            displayEmpty
+            IconComponent={CustomArrowIcon} // Используем кастомный значок
           >
             {groups.map((group) => (
               <MenuItem key={group} value={group}>
@@ -151,12 +210,18 @@ export const ProfileForm = ({ open, onClose, profile, onUpdate }: ProfileFormPro
             ))}
           </Select>
         </FormControl>
+
         <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
-          <InputLabel>{t('profile.subgroup')}</InputLabel>
+          <InputLabel shrink sx={{ top: -10, fontSize: '1rem' }}>
+            {t('profile.subgroup')}
+          </InputLabel>
           <Select
             value={formData.subgroup || ''}
             onChange={(e) => setFormData({ ...formData, subgroup: e.target.value as string })}
-            sx={{ height: '42px', borderRadius: '8px' }}
+            sx={{ height: '50px', borderRadius: '8px' }}
+            variant="outlined"
+            displayEmpty
+            IconComponent={CustomArrowIcon} // Используем кастомный значок
           >
             {subgroups.map((subgroup) => (
               <MenuItem key={subgroup} value={subgroup}>
@@ -166,9 +231,11 @@ export const ProfileForm = ({ open, onClose, profile, onUpdate }: ProfileFormPro
           </Select>
         </FormControl>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{t('cancel')}</Button>
-        <Button onClick={handleSubmit} variant="contained" color="primary">
+      <DialogActions sx={{ justifyContent: 'space-between', px: 2 }}>
+        <Button onClick={onClose} variant="outlined" sx={{ borderRadius: '8px' }}>
+          {t('cancel')}
+        </Button>
+        <Button onClick={handleSubmit} variant="contained" color="primary" sx={{ borderRadius: '8px' }}>
           {t('save')}
         </Button>
       </DialogActions>

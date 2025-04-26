@@ -13,6 +13,7 @@ interface TranslationResources {
     feedback: string;
     collectStats: string;
     collectStatsInfo: string;
+    collectStatsExplanation: string; // Новый ключ для объяснения
   };
   navbar: {
     home: string;
@@ -76,7 +77,7 @@ interface TranslationResources {
   };
   login: {
     title: string;
-    loginDataPlaceholder: string; // Изменено с emailPlaceholder на loginDataPlaceholder
+    loginDataPlaceholder: string;
     passwordPlaceholder: string;
     button: string;
     error: string;
@@ -99,9 +100,11 @@ interface TranslationResources {
     section: string;
     email: string;
     emailPlaceholder: string;
-    uploadPhoto: string;
+    photoLabel: string;
+    uploadButton: string;
     describeIssue: string;
     messagePlaceholder: string;
+    selectedFile: string;
   };
   cancel: string;
   continue: string;
@@ -122,6 +125,7 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         feedback: 'Feedback',
         collectStats: 'Collect Statistics',
         collectStatsInfo: 'Why collect statistics?',
+        collectStatsExplanation: 'Collecting statistics helps us analyze app usage to improve its functionality and user experience.',
       },
       navbar: {
         home: 'Home',
@@ -185,7 +189,7 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
       },
       login: {
         title: 'Authorization',
-        loginDataPlaceholder: 'Enter login or email', // Обновлено
+        loginDataPlaceholder: 'Enter login or email',
         passwordPlaceholder: 'Enter password',
         button: 'Login',
         error: 'Invalid login or password',
@@ -208,9 +212,11 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         section: 'Section',
         email: 'Email',
         emailPlaceholder: 'example@email.com',
-        uploadPhoto: 'Upload Photo',
+        photoLabel: 'Photo',
+        uploadButton: 'Upload',
         describeIssue: 'Describe your issue, suggestion, or question in as much detail as possible',
         messagePlaceholder: 'Your message',
+        selectedFile: 'Selected file',
       },
       cancel: 'Cancel',
       continue: 'Continue',
@@ -228,6 +234,7 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         feedback: 'Обратная связь',
         collectStats: 'Сбор статистики',
         collectStatsInfo: 'Зачем собирать статистику?',
+        collectStatsExplanation: 'Сбор статистики помогает нам анализировать использование приложения, чтобы улучшать его функциональность и удобство для пользователей.',
       },
       navbar: {
         home: 'Главная',
@@ -291,7 +298,7 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
       },
       login: {
         title: 'Авторизация',
-        loginDataPlaceholder: 'Введите логин или email', // Обновлено
+        loginDataPlaceholder: 'Введите логин или email',
         passwordPlaceholder: 'Введите пароль',
         button: 'Войти',
         error: 'Неверный логин или пароль',
@@ -314,9 +321,11 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         section: 'Раздел',
         email: 'Почта',
         emailPlaceholder: 'example@email.com',
-        uploadPhoto: 'Загрузить фото',
+        photoLabel: 'Фото',
+        uploadButton: 'Загрузить',
         describeIssue: 'Опишите вашу проблему, предложение или вопрос как можно подробнее',
         messagePlaceholder: 'Ваше сообщение',
+        selectedFile: 'Выбранный файл',
       },
       cancel: 'Отмена',
       continue: 'Продолжить',
@@ -334,6 +343,7 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         feedback: '反馈',
         collectStats: '收集统计数据',
         collectStatsInfo: '为什么要收集统计数据？',
+        collectStatsExplanation: '收集统计数据有助于我们分析应用的使用情况，以改善其功能和用户体验。',
       },
       navbar: {
         home: '首页',
@@ -397,7 +407,7 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
       },
       login: {
         title: '授权',
-        loginDataPlaceholder: '输入登录名或电子邮件', // Обновлено
+        loginDataPlaceholder: '输入登录名或电子邮件',
         passwordPlaceholder: '输入密码',
         button: '登录',
         error: '登录名或密码无效',
@@ -420,9 +430,11 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         section: '部分',
         email: '电子邮件',
         emailPlaceholder: 'example@email.com',
-        uploadPhoto: '上传照片',
+        photoLabel: '照片',
+        uploadButton: '上传',
         describeIssue: '尽可能详细地描述您的问题、建议或疑问',
         messagePlaceholder: '您的消息',
+        selectedFile: '已选择的文件',
       },
       cancel: '取消',
       continue: '继续',

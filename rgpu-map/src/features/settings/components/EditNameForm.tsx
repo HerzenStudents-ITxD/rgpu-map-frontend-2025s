@@ -8,6 +8,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
@@ -32,34 +34,65 @@ export const EditNameForm: React.FC<EditNameFormProps> = ({ open, onClose, name,
     onClose();
   };
 
+  const isFormValid = () => {
+    return formData.name.trim() !== '' && formData.lastName.trim() !== '';
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        <Typography variant="h6">{t('profile.editName')}</Typography>
+      <DialogTitle sx={{ textAlign: 'center' }}>
+        <Typography variant="h5">{t('profile.editName')}</Typography>
       </DialogTitle>
       <DialogContent>
-        <Box sx={{ mt: 2 }}>
+        <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography sx={{ color: '#f44336', mr: 0.5 }}>
+              *
+            </Typography>
+            <InputLabel shrink sx={{ top: -10, fontSize: '1rem', position: 'static', transform: 'none' }}>
+              {t('profile.lastName')}
+            </InputLabel>
+          </Box>
           <TextField
             fullWidth
-            label={t('profile.lastName')}
             value={formData.lastName}
             onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-            margin="normal"
+            sx={{ mt: 0.5, '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
             required
+            InputLabelProps={{ required: false }}
           />
+        </FormControl>
+
+        <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography sx={{ color: '#f44336', mr: 0.5 }}>
+              *
+            </Typography>
+            <InputLabel shrink sx={{ top: -10, fontSize: '1rem', position: 'static', transform: 'none' }}>
+              {t('profile.name')}
+            </InputLabel>
+          </Box>
           <TextField
             fullWidth
-            label={t('profile.name')}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            margin="normal"
+            sx={{ mt: 0.5, '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
             required
+            InputLabelProps={{ required: false }}
           />
-        </Box>
+        </FormControl>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{t('cancel')}</Button>
-        <Button onClick={handleSubmit} variant="contained" color="primary">
+      <DialogActions sx={{ justifyContent: 'space-between', px: 2 }}>
+        <Button onClick={onClose} variant="outlined" sx={{ borderRadius: '8px' }}>
+          {t('cancel')}
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          color="primary"
+          sx={{ borderRadius: '8px' }}
+          disabled={!isFormValid()}
+        >
           {t('save')}
         </Button>
       </DialogActions>
