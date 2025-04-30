@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useBuildings } from '../../../store/slices/mapSlice';
+import { useBuildings } from '../slices/mapSlice';
 
 const PointDetails = () => {
   const { id } = useParams();

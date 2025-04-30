@@ -29,7 +29,7 @@ import LanguageSelector from './modules/settings/LanguageSelector';
 import Profile from './pages/Profile';
 import Feedback from './pages/Feedback';
 import { CustomThemeProvider } from './theme';
-import { useMapStore } from './store/slices/mapSlice';
+import { useMapStore } from './features/3dMap/slices/mapSlice';
 
 import './i18n';
 import './index.css';
@@ -117,7 +117,6 @@ interface MainLayoutProps {
 }
 
 const MainLayout = ({ 
-  children, 
   onViewChange, 
   currentView 
 }: MainLayoutProps) => (

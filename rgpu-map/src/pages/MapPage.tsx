@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Map } from '../features/3dMap/components/Map';
-import { useMapStore } from '../store/slices/mapSlice';
+import { useMapStore } from '../features/3dMap/slices/mapSlice';
 import { mockBuildings } from '../features/3dMap/api/mockBuildings';
 import { mock3DPoints } from '../features/3dMap/api/mockPoints';
 import { useNavigate } from 'react-router-dom';
