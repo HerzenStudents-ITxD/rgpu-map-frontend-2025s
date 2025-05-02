@@ -13,7 +13,7 @@ interface TranslationResources {
     feedback: string;
     collectStats: string;
     collectStatsInfo: string;
-    collectStatsExplanation: string; // Новый ключ для объяснения
+    collectStatsExplanation: string;
   };
   navbar: {
     home: string;
@@ -105,6 +105,8 @@ interface TranslationResources {
     describeIssue: string;
     messagePlaceholder: string;
     selectedFile: string;
+    other: string; // Новый ключ
+    wishes: string; // Новый ключ
   };
   cancel: string;
   continue: string;
@@ -217,6 +219,8 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         describeIssue: 'Describe your issue, suggestion, or question in as much detail as possible',
         messagePlaceholder: 'Your message',
         selectedFile: 'Selected file',
+        other: 'Other', // Новый перевод
+        wishes: 'Wishes', // Новый перевод
       },
       cancel: 'Cancel',
       continue: 'Continue',
@@ -326,6 +330,8 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         describeIssue: 'Опишите вашу проблему, предложение или вопрос как можно подробнее',
         messagePlaceholder: 'Ваше сообщение',
         selectedFile: 'Выбранный файл',
+        other: 'Другое', // Новый перевод
+        wishes: 'Пожелания', // Новый перевод
       },
       cancel: 'Отмена',
       continue: 'Продолжить',
@@ -435,6 +441,8 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         describeIssue: '尽可能详细地描述您的问题、建议或疑问',
         messagePlaceholder: '您的消息',
         selectedFile: '已选择的文件',
+        other: '其他', // Новый перевод
+        wishes: '愿望', // Новый перевод
       },
       cancel: '取消',
       continue: '继续',

@@ -29,6 +29,8 @@ import './index.css';
 import AdminPanel from './pages/admin/AdminPanel';
 import PointsAdmin from './pages/admin/PointsAdmin';
 import UsersAdmin from './pages/admin/UsersAdmin';
+import FeedbackAdmin from './pages/admin/FeedbackAdmin';
+import FeedbackTypesAdmin from './pages/admin/FeedbackTypesAdmin';
 
 import PointDetails from './features/3dMap/components/PointDetails';
 import BuildingDetails from './features/3dMap/components/BuildingDetails';
@@ -72,6 +74,8 @@ const App: React.FC = () => {
           <Route index element={<Navigate to="points" replace />} />
           <Route path="points" element={<PointsAdmin />} />
           <Route path="users" element={<UsersAdmin />} />
+          <Route path="feedback" element={<FeedbackAdmin />} />
+          <Route path="feedback-types" element={<FeedbackTypesAdmin />} />
         </Route>
 
         <Route path="/point/:id" element={
