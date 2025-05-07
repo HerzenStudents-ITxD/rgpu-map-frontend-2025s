@@ -1,4 +1,3 @@
-// src/features/news/components/CreateNewsForm.tsx
 import { useState } from 'react';
 import {
   Box,
@@ -18,8 +17,9 @@ import {
   Checkbox,
   FormControlLabel,
 } from '@mui/material';
-import { createNews } from '../api/fakeApi';
+import { CommunityServiceApi } from '../../real_api/communityServiceApi';
 import { NewsGroup } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface CreateNewsFormProps {
   groups: NewsGroup[];
@@ -32,6 +32,7 @@ export const CreateNewsForm = ({
   onClose,
   sx 
 }: CreateNewsFormProps) => {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     title: '',
     content: '',
@@ -40,29 +41,31 @@ export const CreateNewsForm = ({
     image: null as File | null,
     isFeatured: false,
   });
+  const [error, setError] = useState<string | null>(null);
+  const api = new CommunityServiceApi();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const group = groups.find(g => g.id === form.groupId);
-    
-    if (!group || !form.title || !form.content) {
-      alert('Заполните обязательные поля');
+    setError(null);
+
+    if (!form.groupId || !form.title || !form.content) {
+      setError(t('news.error') || 'Заполните обязательные поля');
       return;
     }
 
     try {
-      await createNews({
+      const images = form.image ? [URL.createObjectURL(form.image)] : undefined;
+      await api.community.createNewsCreate({
+        communityId: form.groupId,
         title: form.title,
         content: form.content,
-        group,
-        date: new Date().toISOString(),
+        images,
         location: form.location || undefined,
-        imageUrl: form.image ? URL.createObjectURL(form.image) : undefined,
         isFeatured: form.isFeatured,
       });
       onClose();
-    } catch (error) {
-      alert('Ошибка при создании новости');
+    } catch (error: any) {
+      setError(t('news.error') || 'Ошибка при создании новости');
     }
   };
 
@@ -86,18 +89,18 @@ export const CreateNewsForm = ({
       }}
     >
       <DialogTitle>
-        <Typography variant="h5">Новая новость</Typography>
+        <Typography variant="h5">{t('news.createPost')}</Typography>
       </DialogTitle>
 
       <DialogContent dividers>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
           <FormControl fullWidth sx={{ mb: 3 }}>
-            <InputLabel>Группа *</InputLabel>
+            <InputLabel>{t('news.routePoint')} *</InputLabel>
             <Select
               value={form.groupId}
               onChange={(e) => setForm({...form, groupId: e.target.value})}
               required
-              label="Группа *"
+              label={t('news.routePoint') + ' *'}
             >
               {groups.map(g => (
                 <MenuItem key={g.id} value={g.id}>
@@ -109,7 +112,7 @@ export const CreateNewsForm = ({
 
           <TextField
             fullWidth
-            label="Заголовок *"
+            label={t('news.titlePlaceholder') + ' *'}
             value={form.title}
             onChange={(e) => setForm({...form, title: e.target.value})}
             sx={{ mb: 3 }}
@@ -120,7 +123,7 @@ export const CreateNewsForm = ({
             fullWidth
             multiline
             rows={4}
-            label="Текст новости *"
+            label={t('news.description') + ' *'}
             value={form.content}
             onChange={(e) => setForm({...form, content: e.target.value})}
             sx={{ mb: 3 }}
@@ -129,10 +132,10 @@ export const CreateNewsForm = ({
 
           <TextField
             fullWidth
-            label="Местоположение"
+            label={t('news.routePoint')}
             value={form.location}
             onChange={(e) => setForm({...form, location: e.target.value})}
-            placeholder="Например: 20а корпус"
+            placeholder={t('news.routePoint')}
             sx={{ mb: 3 }}
           />
 
@@ -141,7 +144,7 @@ export const CreateNewsForm = ({
               variant="outlined"
               component="label"
             >
-              Загрузить фото
+              {t('news.addImage')}
               <input
                 type="file"
                 accept="image/*"
@@ -151,7 +154,7 @@ export const CreateNewsForm = ({
             </Button>
             {form.image && (
               <Typography variant="body2" sx={{ mt: 1 }}>
-                Выбрано: {form.image.name}
+                {t('feedback.selectedFile')}: {form.image.name}
               </Typography>
             )}
           </Box>
@@ -163,8 +166,14 @@ export const CreateNewsForm = ({
                 onChange={(e) => setForm({...form, isFeatured: e.target.checked})}
               />
             }
-            label="Добавить кнопку участвую"
+            label={t('news.participate')}
           />
+
+          {error && (
+            <Typography color="error" variant="body2" sx={{ mt: 2 }}>
+              {error}
+            </Typography>
+          )}
         </Box>
       </DialogContent>
 
@@ -174,14 +183,14 @@ export const CreateNewsForm = ({
           variant="outlined"
           sx={{ mr: 2 }}
         >
-          Отменить
+          {t('news.cancel')}
         </Button>
         <Button 
           type="submit" 
           variant="contained"
           onClick={handleSubmit}
         >
-          Опубликовать
+          {t('news.publish')}
         </Button>
       </DialogActions>
     </Dialog>

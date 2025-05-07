@@ -16,6 +16,7 @@ import {
   Typography,
   Paper,
   Pagination,
+  Alert
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -24,7 +25,7 @@ import {
   FeedbackStatusType,
   EditFeedbackStatusesRequest,
   TypeResponse,
-} from './../../features/real_api/feedbackServiceApi';
+} from '../../features/real_api/feedbackServiceApi';
 
 const feedbackApi = new FeedbackServiceApi();
 
@@ -82,7 +83,6 @@ export const FeedbackAdmin = () => {
       }
     } catch (err) {
       setError(t('feedback.fetchFailed') || 'Error fetching feedbacks');
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -109,7 +109,6 @@ export const FeedbackAdmin = () => {
       }
     } catch (err) {
       setError(t('feedback.statusUpdateFailed') || 'Error updating status');
-      console.error(err);
     }
   };
 
@@ -136,42 +135,41 @@ export const FeedbackAdmin = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom>
-        {t('feedback.admin.title') || 'Feedback Management'}
+        {t('feedback.admin.title')}
       </Typography>
       <Box sx={{ mb: 2 }}>
         <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>{t('feedback.status') || 'Status'}</InputLabel>
+          <InputLabel>{t('feedback.status')}</InputLabel>
           <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as FeedbackStatusType | '')}
-            label={t('feedback.status') || 'Status'}
+            label={t('feedback.status')}
           >
-            <MenuItem value="">{t('feedback.all') || 'All'}</MenuItem>
-            <MenuItem value={FeedbackStatusType.New}>{t('feedback.new') || 'New'}</MenuItem>
-            <MenuItem value={FeedbackStatusType.Archived}>{t('feedback.archived') || 'Archived'}</MenuItem>
+            <MenuItem value="">{t('feedback.all')}</MenuItem>
+            <MenuItem value={FeedbackStatusType.New}>{t('feedback.new')}</MenuItem>
+            <MenuItem value={FeedbackStatusType.Archived}>{t('feedback.archived')}</MenuItem>
           </Select>
         </FormControl>
       </Box>
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
           <CircularProgress />
         </Box>
-      ) : error ? (
-        <Typography color="error">{error}</Typography>
       ) : (
         <>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('feedback.id') || 'ID'}</TableCell>
-                  <TableCell>{t('feedback.content') || 'Content'}</TableCell>
-                  <TableCell>{t('feedback.email') || 'Email'}</TableCell>
-                  <TableCell>{t('feedback.types') || 'Types'}</TableCell>
-                  <TableCell>{t('feedback.status') || 'Status'}</TableCell>
-                  <TableCell>{t('feedback.createdAt') || 'Created At'}</TableCell>
-                  <TableCell>{t('feedback.imagesCount') || 'Images'}</TableCell>
-                  <TableCell>{t('feedback.actions') || 'Actions'}</TableCell>
+                  <TableCell>{t('feedback.id')}</TableCell>
+                  <TableCell>{t('feedback.content')}</TableCell>
+                  <TableCell>{t('feedback.email')}</TableCell>
+                  <TableCell>{t('feedback.types')}</TableCell>
+                  <TableCell>{t('feedback.status')}</TableCell>
+                  <TableCell>{t('feedback.createdAt')}</TableCell>
+                  <TableCell>{t('feedback.imagesCount')}</TableCell>
+                  <TableCell>{t('feedback.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -183,8 +181,8 @@ export const FeedbackAdmin = () => {
                     <TableCell>{getDisplayTypes(feedback.feedback.typeIds)}</TableCell>
                     <TableCell>
                       {feedback.feedback.status === FeedbackStatusType.New
-                        ? t('feedback.new') || 'New'
-                        : t('feedback.archived') || 'Archived'}
+                        ? t('feedback.new')
+                        : t('feedback.archived')}
                     </TableCell>
                     <TableCell>
                       {feedback.feedback.createdAtUtc
@@ -196,19 +194,12 @@ export const FeedbackAdmin = () => {
                       <Select
                         value={feedback.feedback.status || FeedbackStatusType.New}
                         onChange={(e) =>
-                          handleStatusChange(
-                            feedback.feedback.id!,
-                            e.target.value as FeedbackStatusType
-                          )
+                          handleStatusChange(feedback.feedback.id!, e.target.value as FeedbackStatusType)
                         }
                         size="small"
                       >
-                        <MenuItem value={FeedbackStatusType.New}>
-                          {t('feedback.new') || 'New'} (0)
-                        </MenuItem>
-                        <MenuItem value={FeedbackStatusType.Archived}>
-                          {t('feedback.archived') || 'Archived'} (1)
-                        </MenuItem>
+                        <MenuItem value={FeedbackStatusType.New}>{t('feedback.new')}</MenuItem>
+                        <MenuItem value={FeedbackStatusType.Archived}>{t('feedback.archived')}</MenuItem>
                       </Select>
                     </TableCell>
                   </TableRow>
@@ -217,12 +208,7 @@ export const FeedbackAdmin = () => {
             </Table>
           </TableContainer>
           <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-            <Pagination
-              count={totalPages}
-              page={page}
-              onChange={handlePageChange}
-              color="primary"
-            />
+            <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" />
           </Box>
         </>
       )}

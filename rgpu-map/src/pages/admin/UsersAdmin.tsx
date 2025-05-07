@@ -1,4 +1,3 @@
-// src/pages/admin/UsersAdmin.tsx
 import React, { useState } from 'react';
 import {
   Container,
@@ -13,45 +12,38 @@ import {
   Button,
   CircularProgress,
   Alert,
-  Box
+  Box,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useUsers, User } from './useUsers'; // Импортируем тип User
+import { useUsers, User } from './useUsers';
+
 const UsersAdmin: React.FC = () => {
   const { t } = useTranslation();
   const { users, loading, error, changeUserRole } = useUsers();
   const [selectedRole, setSelectedRole] = useState<{ [key: string]: string }>({});
 
   const handleRoleChange = (userId: string, newRole: User['role']) => {
-    setSelectedRole(prev => ({ ...prev, [userId]: newRole }));
+    setSelectedRole((prev) => ({ ...prev, [userId]: newRole }));
     changeUserRole(userId, newRole);
   };
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="md" sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4">{t('admin.usersManagement')}</Typography>
-        <Button
-          component={Link}
-          to="/admin/points"
-          variant="contained"
-          color="secondary"
-        >
-          {t('admin.managePoints')}
+        <Typography variant="h5">{t('admin.usersManagement')}</Typography>
+        <Button component={Link} to="/admin/points" variant="contained">
+          {t('admin.pointsManagement')}
         </Button>
       </Box>
 
-      {loading && <CircularProgress sx={{ display: 'block', mx: 'auto' }} />}
-      {error && <Alert severity="error">{error}</Alert>}
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {loading && <CircularProgress sx={{ display: 'block', mx: 'auto', my: 4 }} />}
 
-      <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
-        {users.map((user: User) => ( // Явно указываем тип
+      <List sx={{ bgcolor: 'background.paper', borderRadius: 2, boxShadow: 1 }}>
+        {users.map((user: User) => (
           <ListItem key={user.user_id}>
-            <ListItemText
-              primary={user.email}
-              secondary={`ID: ${user.user_id}`}
-            />
+            <ListItemText primary={user.email} secondary={`ID: ${user.user_id}`} />
             <FormControl sx={{ minWidth: 120 }}>
               <InputLabel>{t('admin.role')}</InputLabel>
               <Select

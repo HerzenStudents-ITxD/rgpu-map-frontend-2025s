@@ -7,7 +7,7 @@
  * ##                                                           ##
  * ## AUTHOR: acacode                                           ##
  * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ## MODIFIED: To align with feedbackService and add getAccessToken ##
+ * ## MODIFIED: To align with updated backend API specification ##
  * ---------------------------------------------------------------
  */
 
@@ -23,44 +23,90 @@ export enum OperationType {
   Invalid = "Invalid",
 }
 
+export interface AddAgentRequest {
+  /** @format uuid */
+  communityId: string;
+  /** @format uuid */
+  userId: string;
+  isModerator?: boolean;
+}
+
 export interface BooleanOperationResultResponse {
   body?: boolean;
   errors: string[];
 }
 
-export interface CreateRoleLocalizationRequest {
-  /** @format uuid */
-  roleId?: string | null;
-  /** @minLength 1 */
-  locale: string;
-  /** @minLength 1 */
-  name: string;
-  description?: string | null;
-}
-
-export interface CreateRoleRequest {
-  name?: string | null;
-  localizations: CreateRoleLocalizationRequest[];
-  rights?: number[] | null;
-  isActive?: boolean;
-}
-
-export interface EditUserRoleRequest {
+export interface CommunityAgentInfo {
   /** @format uuid */
   userId?: string;
+  userName?: string;
   /** @format uuid */
-  roleId?: string | null;
+  communityId?: string;
 }
 
-export interface GuidNullableOperationResultResponse {
+export interface CommunityInfo {
   /** @format uuid */
-  body?: string | null;
+  id?: string;
+  name?: string | null;
+  isHidden?: boolean;
+  avatar?: string | null;
+}
+
+export interface CommunityResponse {
+  community?: CommunityInfo;
+  agents?: CommunityAgentInfo[] | null;
+}
+
+export interface CommunityResponseFindResultResponse {
+  body?: CommunityResponse[] | null;
+  /** @format int32 */
+  totalCount: number;
   errors: string[];
+}
+
+export interface CreateCommunityRequest {
+  /** @minLength 1 */
+  name: string;
+  avatarImage?: string | null;
+}
+
+export interface CreateNewsRequest {
+  /** @format uuid */
+  communityId: string;
+  /** @minLength 1 */
+  title: string;
+  /** @minLength 1 */
+  content: string;
+  images?: string[] | null;
+  location?: string;
+  isFeatured?: boolean;
 }
 
 export interface GuidOperationResultResponse {
   /** @format uuid */
   body?: string;
+  errors: string[];
+}
+
+export interface NewsResponse {
+  /** @format uuid */
+  newsId?: string;
+  /** @format uuid */
+  communityId?: string;
+  title?: string | null;
+  content?: string | null;
+  photos?: string[] | null;
+  participants?: string[] | null;
+  location?: string | null;
+  isFeatured?: boolean;
+  /** @format date-time */
+  createdAt?: string;
+}
+
+export interface NewsResponseFindResultResponse {
+  body?: NewsResponse[] | null;
+  /** @format int32 */
+  totalCount: number;
   errors: string[];
 }
 
@@ -72,68 +118,9 @@ export interface Operation {
   value?: any;
 }
 
-export interface RightInfo {
-  /** @format int32 */
-  rightId?: number;
-  locale?: string | null;
-  name?: string | null;
-  description?: string | null;
-}
-
-export interface RightInfoListOperationResultResponse {
-  body?: RightInfo[] | null;
-  errors: string[];
-}
-
-export interface RoleInfo {
+export interface ParticipateRequest {
   /** @format uuid */
-  id?: string;
-  isActive?: boolean;
-  createdBy?: UserInfo;
-  rights?: RightInfo[] | null;
-  localizations?: RoleLocalizationInfo[] | null;
-}
-
-export interface RoleInfoFindResultResponse {
-  body?: RoleInfo[] | null;
-  /** @format int32 */
-  totalCount: number;
-  errors: string[];
-}
-
-export interface RoleLocalizationInfo {
-  /** @format uuid */
-  id?: string;
-  /** @format uuid */
-  roleId?: string;
-  locale?: string | null;
-  name?: string | null;
-  description?: string | null;
-  isActive?: boolean;
-}
-
-export interface RoleResponse {
-  role?: RoleInfo;
-  users?: UserInfo[] | null;
-}
-
-export interface RoleResponseOperationResultResponse {
-  body?: RoleResponse;
-  errors: string[];
-}
-
-export interface UpdateRoleRightsRequest {
-  /** @format uuid */
-  roleId?: string;
-  rights?: number[] | null;
-}
-
-export interface UserInfo {
-  /** @format uuid */
-  id?: string;
-  firstName?: string | null;
-  middleName?: string | null;
-  lastName?: string | null;
+  newsId: string;
 }
 
 export interface ProblemDetails {
@@ -145,6 +132,8 @@ export interface ProblemDetails {
   instance?: string | null;
   [key: string]: any;
 }
+
+export type IntPtr = object;
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
@@ -189,7 +178,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = "";
+  public baseUrl: string = "http://localhost:83";
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -389,51 +378,58 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title RightsService
+ * @title CommunityService
  * @version 2.0.2.0
  *
- * RightsService is an API intended to work with the user rights.
+ * CommunityService is an API intended to work with the communities.
  */
-export class RightsServiceApi<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
-  rights = {
+export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  community = {
     /**
-     * Retrieves all rights
+     * Retrieves all communities
      *
-     * @tags Rights
-     * @name GetRights
-     * @request GET:/Rights/get
+     * @tags Community
+     * @name GetCommunity
+     * @request GET:/Community/all
      * @secure
      */
-    getRights: (
-      query?: {
-        locale?: string;
-      },
-      params: RequestParams = {}
-    ) =>
-      this.request<RightInfoListOperationResultResponse, ProblemDetails>({
-        path: `/Rights/get`,
+    getCommunity: (params: RequestParams = {}) =>
+      this.request<CommunityResponseFindResultResponse, ProblemDetails>({
+        path: `/Community/all`,
         method: "GET",
-        query: query,
         secure: true,
         format: "json",
         ...params,
       }),
-  };
-  roleLocalization = {
+
     /**
-     * Creates a new role localization
+     * Retrieves user communities
      *
-     * @tags RoleLocalization
-     * @name CreateRoleLocalization
-     * @request POST:/RoleLocalization/create
+     * @tags Community
+     * @name UserList
+     * @request GET:/Community/user
      * @secure
      */
-    createRoleLocalization: (
-      data: CreateRoleLocalizationRequest,
-      params: RequestParams = {}
-    ) =>
-      this.request<GuidNullableOperationResultResponse, ProblemDetails>({
-        path: `/RoleLocalization/create`,
+    userList: (params: RequestParams = {}) =>
+      this.request<CommunityResponseFindResultResponse, ProblemDetails>({
+        path: `/Community/user`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Creates a new community
+     *
+     * @tags Community
+     * @name CreateCommunity
+     * @request POST:/Community/create
+     * @secure
+     */
+    createCommunity: (data: CreateCommunityRequest, params: RequestParams = {}) =>
+      this.request<GuidOperationResultResponse, ProblemDetails>({
+        path: `/Community/create`,
         method: "POST",
         body: data,
         secure: true,
@@ -443,23 +439,23 @@ export class RightsServiceApi<SecurityDataType extends unknown> extends HttpClie
       }),
 
     /**
-     * Partially edits a role localization
+     * Updates a community partially
      *
-     * @tags RoleLocalization
-     * @name EditRoleLocalization
-     * @request PATCH:/RoleLocalization/edit
+     * @tags Community
+     * @name EditPartialUpdate
+     * @request PATCH:/Community/edit
      * @secure
      */
-    editRoleLocalization: (
+    editPartialUpdate: (
       data: Operation[],
       query?: {
         /** @format uuid */
-        roleLocalizationId?: string;
+        communityId?: string;
       },
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<BooleanOperationResultResponse, ProblemDetails>({
-        path: `/RoleLocalization/edit`,
+        path: `/Community/edit`,
         method: "PATCH",
         query: query,
         body: data,
@@ -468,29 +464,95 @@ export class RightsServiceApi<SecurityDataType extends unknown> extends HttpClie
         format: "json",
         ...params,
       }),
-  };
-  roles = {
+
     /**
-     * Finds roles
+     * Soft deletes a community
      *
-     * @tags Roles
-     * @name FindRoles
-     * @request GET:/Roles/find
+     * @tags Community
+     * @name SoftdeleteDelete
+     * @request DELETE:/Community/softdelete
      * @secure
      */
-    findRoles: (
-      query: {
-        includedeactivated?: boolean;
-        locale?: string;
-        /** @format int32 */
-        skipcount: number;
-        /** @format int32 */
-        takecount: number;
+    softdeleteDelete: (
+      query?: {
+        /** @format uuid */
+        communityId?: string;
       },
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
-      this.request<RoleInfoFindResultResponse, ProblemDetails>({
-        path: `/Roles/find`,
+      this.request<BooleanOperationResultResponse, ProblemDetails>({
+        path: `/Community/softdelete`,
+        method: "DELETE",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Adds an agent to a community
+     *
+     * @tags Community
+     * @name AddAgentCreate
+     * @request POST:/Community/add-agent
+     * @secure
+     */
+    addAgentCreate: (data: AddAgentRequest, params: RequestParams = {}) =>
+      this.request<BooleanOperationResultResponse, ProblemDetails>({
+        path: `/Community/add-agent`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Removes an agent from a community
+     *
+     * @tags Community
+     * @name RemoveAgentDelete
+     * @request DELETE:/Community/remove-agent
+     * @secure
+     */
+    removeAgentDelete: (
+      query?: {
+        /** @format uuid */
+        communityId?: string;
+        /** @format uuid */
+        userId?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<BooleanOperationResultResponse, ProblemDetails>({
+        path: `/Community/remove-agent`,
+        method: "DELETE",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Retrieves all news
+     *
+     * @tags Community
+     * @name NewsList
+     * @request GET:/Community/news
+     * @secure
+     */
+    newsList: (
+      query?: {
+        /** @format int32 */
+        page?: number;
+        /** @format int32 */
+        pageSize?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<NewsResponseFindResultResponse, ProblemDetails>({
+        path: `/Community/news`,
         method: "GET",
         query: query,
         secure: true,
@@ -499,115 +561,131 @@ export class RightsServiceApi<SecurityDataType extends unknown> extends HttpClie
       }),
 
     /**
-     * Creates a new role
+     * Retrieves news for a specific community
      *
-     * @tags Roles
-     * @name CreateRole
-     * @request POST:/Roles/create
+     * @tags Community
+     * @name CommunityNewsList
+     * @request GET:/Community/community-news
      * @secure
      */
-    createRole: (
-      data: CreateRoleRequest,
-      params: RequestParams = {}
+    communityNewsList: (
+      query?: {
+        /** @format uuid */
+        communityId?: string;
+        /** @format int32 */
+        page?: number;
+        /** @format int32 */
+        pageSize?: number;
+      },
+      params: RequestParams = {},
     ) =>
+      this.request<NewsResponseFindResultResponse, ProblemDetails>({
+        path: `/Community/community-news`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Hides a community
+     *
+     * @tags Community
+     * @name HideCreate
+     * @request POST:/Community/hide
+     * @secure
+     */
+    hideCreate: (
+      query?: {
+        /** @format uuid */
+        communityId?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<BooleanOperationResultResponse, ProblemDetails>({
+        path: `/Community/hide`,
+        method: "POST",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Unhides a community
+     *
+     * @tags Community
+     * @name UnhideCreate
+     * @request POST:/Community/unhide
+     * @secure
+     */
+    unhideCreate: (
+      query?: {
+        /** @format uuid */
+        communityId?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<BooleanOperationResultResponse, ProblemDetails>({
+        path: `/Community/unhide`,
+        method: "POST",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Participates in a news event
+     *
+     * @tags Community
+     * @name ParticipateCreate
+     * @request POST:/Community/participate
+     * @secure
+     */
+    participateCreate: (data: ParticipateRequest, params: RequestParams = {}) =>
+      this.request<BooleanOperationResultResponse, ProblemDetails>({
+        path: `/Community/participate`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Unparticipates from a news event
+     *
+     * @tags Community
+     * @name UnparticipateCreate
+     * @request POST:/Community/unparticipate
+     * @secure
+     */
+    unparticipateCreate: (data: ParticipateRequest, params: RequestParams = {}) =>
+      this.request<BooleanOperationResultResponse, ProblemDetails>({
+        path: `/Community/unparticipate`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Creates a new news item
+     *
+     * @tags Community
+     * @name CreateNewsCreate
+     * @request POST:/Community/create-news
+     * @secure
+     */
+    createNewsCreate: (data: CreateNewsRequest, params: RequestParams = {}) =>
       this.request<GuidOperationResultResponse, ProblemDetails>({
-        path: `/Roles/create`,
+        path: `/Community/create-news`,
         method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * Retrieves a role
-     *
-     * @tags Roles
-     * @name GetRoles
-     * @request GET:/Roles/get
-     * @secure
-     */
-    getRoles: (
-      query?: {
-        /** @format uuid */
-        roleid?: string;
-        locale?: string;
-      },
-      params: RequestParams = {}
-    ) =>
-      this.request<RoleResponseOperationResultResponse, ProblemDetails>({
-        path: `/Roles/get`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * Edits role status
-     *
-     * @tags Roles
-     * @name EditRoleStatus
-     * @request PUT:/Roles/editstatus
-     * @secure
-     */
-    editRoleStatus: (
-      query?: {
-        /** @format uuid */
-        roleId?: string;
-        isActive?: boolean;
-      },
-      params: RequestParams = {}
-    ) =>
-      this.request<BooleanOperationResultResponse, ProblemDetails>({
-        path: `/Roles/editstatus`,
-        method: "PUT",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * Updates role rights
-     *
-     * @tags Roles
-     * @name UpdateRoleRights
-     * @request POST:/Roles/updaterightsset
-     * @secure
-     */
-    updateRoleRights: (
-      data: UpdateRoleRightsRequest,
-      params: RequestParams = {}
-    ) =>
-      this.request<BooleanOperationResultResponse, ProblemDetails>({
-        path: `/Roles/updaterightsset`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-  };
-  user = {
-    /**
-     * Edits user role
-     *
-     * @tags User
-     * @name EditUserRole
-     * @request PUT:/User/edit
-     * @secure
-     */
-    editUserRole: (
-      data: EditUserRoleRequest,
-      params: RequestParams = {}
-    ) =>
-      this.request<BooleanOperationResultResponse, ProblemDetails>({
-        path: `/User/edit`,
-        method: "PUT",
         body: data,
         secure: true,
         type: ContentType.Json,

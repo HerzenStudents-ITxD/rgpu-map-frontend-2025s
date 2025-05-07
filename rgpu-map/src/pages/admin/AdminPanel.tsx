@@ -1,52 +1,111 @@
-import React from 'react';
-import { Routes, Route, Navigate, Link } from 'react-router-dom';
-import { Box, Button, Container } from '@mui/material';
-import PointsAdmin from './PointsAdmin';
-import UsersAdmin from './UsersAdmin';
-import FeedbackTypesAdmin  from './FeedbackTypesAdmin'; // Named import
-import { FeedbackAdmin } from './FeedbackAdmin'; // Named import
+import React, { useState } from 'react';
+import { Container, Typography, AppBar, Tabs, Tab, Box } from '@mui/material';
+import useAdminUsers from './useAdminUsers';
+import { useAdminRoles } from './useAdminRoles';
+import { useAdminCommunities } from './useAdminCommunities';
+import { useAdminAgents } from './useAdminAgents';
+import { useAdminPosts } from './useAdminPosts';
+import UsersPage from './UsersPage';
+import RolesPage from './RolesPage';
+import CommunitiesPage from './CommunitiesPage';
+import AgentsPage from './AgentsPage';
+import PostsPage from './PostsPage';
+import FeedbackAdmin from './FeedbackAdmin';
+import FeedbackTypesAdmin from './FeedbackTypesAdmin';
 
 const AdminPanel: React.FC = () => {
+  const [activeTab, setActiveTab] = useState(0);
+  
+  // Since UsersPage and RolesPage manage their own state with hooks,
+  // we don't need to pass props to them
+  const {
+    communities,
+    loading: communitiesLoading,
+    error: communitiesError,
+    createCommunity,
+    editCommunity,
+    deleteCommunity
+  } = useAdminCommunities();
+
+  const {
+    agents,
+    loading: agentsLoading,
+    error: agentsError,
+    addAgent,
+    deleteAgent
+  } = useAdminAgents();
+
+  const {
+    posts,
+    loading: postsLoading,
+    error: postsError,
+    createPost,
+    editPost,
+    deletePost
+  } = useAdminPosts();
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
+
   return (
     <Container maxWidth="lg" sx={{ padding: '20px' }}>
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        <Button
-          component={Link}
-          to="/admin/points"
-          variant="contained"
+      <Typography variant="h4" gutterBottom>
+        Admin Panel
+      </Typography>
+      <AppBar position="static" color="default">
+        <Tabs 
+          value={activeTab} 
+          onChange={handleTabChange} 
+          indicatorColor="primary" 
+          textColor="primary"
+          variant="scrollable"
+          scrollButtons="auto"
         >
-          Управление точками
-        </Button>
-        <Button
-          component={Link}
-          to="/admin/users"
-          variant="contained"
-        >
-          Управление пользователями
-        </Button>
-        <Button
-          component={Link}
-          to="/admin/feedback"
-          variant="contained"
-        >
-          Управление отзывами
-        </Button>
-        <Button
-          component={Link}
-          to="/admin/feedback-types"
-          variant="contained"
-        >
-          Управление типами обратной связи
-        </Button>
+          <Tab label="Users" />
+          <Tab label="Roles" />
+          <Tab label="Communities" />
+          <Tab label="Agents" />
+          <Tab label="Posts" />
+          <Tab label="Feedback" />
+          <Tab label="Feedback Types" />
+        </Tabs>
+      </AppBar>
+      <Box sx={{ mt: 2 }}>
+        {activeTab === 0 && <UsersPage />}
+        {activeTab === 1 && <RolesPage />}
+        {activeTab === 2 && (
+          <CommunitiesPage
+            communities={communities}
+            loading={communitiesLoading}
+            error={communitiesError}
+            createCommunity={createCommunity}
+            editCommunity={editCommunity}
+            deleteCommunity={deleteCommunity}
+          />
+        )}
+        {activeTab === 3 && (
+          <AgentsPage
+            agents={agents}
+            loading={agentsLoading}
+            error={agentsError}
+            addAgent={addAgent}
+            deleteAgent={deleteAgent}
+          />
+        )}
+        {activeTab === 4 && (
+          <PostsPage
+            posts={posts}
+            loading={postsLoading}
+            error={postsError}
+            createPost={createPost}
+            editPost={editPost}
+            deletePost={deletePost}
+          />
+        )}
+        {activeTab === 5 && <FeedbackAdmin />}
+        {activeTab === 6 && <FeedbackTypesAdmin />}
       </Box>
-
-      <Routes>
-        <Route path="/" element={<Navigate to="/admin/points" replace />} />
-        <Route path="/points" element={<PointsAdmin />} />
-        <Route path="/users" element={<UsersAdmin />} />
-        <Route path="/feedback" element={<FeedbackAdmin />} />
-        <Route path="/feedback-types" element={<FeedbackTypesAdmin />} />
-      </Routes>
     </Container>
   );
 };

@@ -1,4 +1,3 @@
-//src/pages/NewsPage
 import { useState, useEffect } from 'react';
 import { 
   Button, 
@@ -10,36 +9,44 @@ import {
 } from '@mui/material';
 import { NewsList } from '../features/news/components/NewsList';
 import { CreateNewsForm } from '../features/news/components/CreateNewsForm';
-import { fetchGroups } from '../features/news/api/fakeApi';
+import { CommunityServiceApi } from '../features/real_api/communityServiceApi';
 import { NewsGroup } from '../features/news/types';
+import { useTranslation } from 'react-i18next';
 import '../features/news/components/News.css';
 
 export const NewsPage = () => {
+  const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
   const [groups, setGroups] = useState<NewsGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const api = new CommunityServiceApi();
 
   useEffect(() => {
     const loadGroups = async () => {
       try {
-        const data = await fetchGroups();
-        setGroups(data);
+        const response = await api.community.getCommunity();
+        const communities = response.data.body?.map(item => ({
+          id: item.community?.id || '',
+          name: item.community?.name || '',
+          avatar: item.community?.avatar,
+        })) || [];
+        setGroups(communities);
       } catch (err) {
-        setError('Ошибка загрузки групп новостей');
+        setError(t('news.error') || 'Ошибка загрузки групп новостей');
       } finally {
         setLoading(false);
       }
     };
     
     loadGroups();
-  }, []);
+  }, [t]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Stack spacing={3}>
         <Typography variant="h4" component="h1">
-          Новости
+          {t('news.title')}
         </Typography>
 
         {loading && <LinearProgress />}
@@ -61,7 +68,7 @@ export const NewsPage = () => {
             fontSize: '1rem'
           }}
         >
-          +Опубликовать
+          {t('news.createPost')}
         </Button>
 
         {showForm && (

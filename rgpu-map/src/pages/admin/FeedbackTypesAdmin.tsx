@@ -16,6 +16,7 @@ import {
   TextField,
   Typography,
   Paper,
+  Alert,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -23,7 +24,7 @@ import {
   TypeResponse,
   CreateTypeRequest,
   UpdateTypeRequest,
-} from './../../features/real_api/feedbackServiceApi';
+} from '../../features/real_api/feedbackServiceApi';
 
 const feedbackApi = new FeedbackServiceApi();
 
@@ -54,7 +55,6 @@ const FeedbackTypesAdmin = () => {
       }
     } catch (err) {
       setError(t('feedback.fetchTypesFailed') || 'Error fetching feedback types');
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -87,7 +87,6 @@ const FeedbackTypesAdmin = () => {
       }
     } catch (err) {
       setError(t('feedback.createTypeFailed') || 'Error creating type');
-      console.error(err);
     }
   };
 
@@ -113,9 +112,7 @@ const FeedbackTypesAdmin = () => {
       const response = await feedbackApi.type.updateType(request);
       if (response.data.body) {
         setTypes(
-          types.map((t) =>
-            t.id === editType.id ? { ...t, name: nameJson } : t
-          )
+          types.map((t) => (t.id === editType.id ? { ...t, name: nameJson } : t))
         );
         setOpenEditDialog(false);
         setEditType(null);
@@ -124,28 +121,20 @@ const FeedbackTypesAdmin = () => {
       }
     } catch (err) {
       setError(t('feedback.updateTypeFailed') || 'Error updating type');
-      console.error(err);
     }
   };
 
   const handleToggleVisibility = async (typeId: string, show: boolean) => {
     try {
       setError(null);
-      const response = await (show
-        ? feedbackApi.type.showType(typeId)
-        : feedbackApi.type.hideType(typeId));
+      const response = await (show ? feedbackApi.type.showType(typeId) : feedbackApi.type.hideType(typeId));
       if (response.data.body) {
-        setTypes(
-          types.map((t) =>
-            t.id === typeId ? { ...t, isActive: show } : t
-          )
-        );
+        setTypes(types.map((t) => (t.id === typeId ? { ...t, isActive: show } : t)));
       } else {
         setError(t('feedback.toggleVisibilityFailed') || 'Failed to toggle visibility');
       }
     } catch (err) {
       setError(t('feedback.toggleVisibilityFailed') || 'Error toggling visibility');
-      console.error(err);
     }
   };
 
@@ -176,31 +165,26 @@ const FeedbackTypesAdmin = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom>
-        {t('feedback.typesAdmin.title') || 'Feedback Types Management'}
+        {t('feedback.typesAdmin.title')}
       </Typography>
-      <Button
-        variant="contained"
-        onClick={() => setOpenCreateDialog(true)}
-        sx={{ mb: 2 }}
-      >
-        {t('feedback.createType') || 'Create Type'}
+      <Button variant="contained" onClick={() => setOpenCreateDialog(true)} sx={{ mb: 2 }}>
+        {t('feedback.createType')}
       </Button>
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
           <CircularProgress />
         </Box>
-      ) : error ? (
-        <Typography color="error">{error}</Typography>
       ) : (
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>{t('feedback.id') || 'ID'}</TableCell>
-                <TableCell>{t('feedback.name') || 'Name'}</TableCell>
-                <TableCell>{t('feedback.type') || 'Type'}</TableCell>
-                <TableCell>{t('feedback.isActive') || 'Active'}</TableCell>
-                <TableCell>{t('feedback.actions') || 'Actions'}</TableCell>
+                <TableCell>{t('feedback.id')}</TableCell>
+                <TableCell>{t('feedback.name')}</TableCell>
+                <TableCell>{t('feedback.type')}</TableCell>
+                <TableCell>{t('feedback.isActive')}</TableCell>
+                <TableCell>{t('feedback.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -209,21 +193,17 @@ const FeedbackTypesAdmin = () => {
                   <TableCell>{type.id}</TableCell>
                   <TableCell>{getDisplayName(type.name)}</TableCell>
                   <TableCell>{type.type}</TableCell>
-                  <TableCell>{type.isActive ? 'Yes' : 'No'}</TableCell>
+                  <TableCell>{type.isActive ? t('yes') : t('no')}</TableCell>
                   <TableCell>
-                    <Button
-                      onClick={() => handleOpenEditDialog(type)}
-                      size="small"
-                      sx={{ mr: 1 }}
-                    >
-                      {t('edit') || 'Edit'}
+                    <Button onClick={() => handleOpenEditDialog(type)} size="small" sx={{ mr: 1 }}>
+                      {t('edit')}
                     </Button>
                     <Button
                       onClick={() => handleToggleVisibility(type.id!, !type.isActive)}
                       size="small"
                       color={type.isActive ? 'error' : 'success'}
                     >
-                      {type.isActive ? t('hide') || 'Hide' : t('show') || 'Show'}
+                      {type.isActive ? t('hide') : t('show')}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -233,98 +213,86 @@ const FeedbackTypesAdmin = () => {
         </TableContainer>
       )}
 
-      {/* Диалог создания типа */}
       <Dialog open={openCreateDialog} onClose={() => setOpenCreateDialog(false)}>
-        <DialogTitle>{t('feedback.createType') || 'Create Feedback Type'}</DialogTitle>
+        <DialogTitle>{t('feedback.createType')}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
-            label={t('feedback.nameRu') || 'Name (Russian)'}
+            label={t('feedback.nameRu')}
             value={newType.ru}
             onChange={(e) => setNewType({ ...newType, ru: e.target.value })}
             sx={{ mt: 2 }}
             error={!newType.ru && error !== null}
-            helperText={!newType.ru && error ? t('feedback.required') || 'Required' : ''}
+            helperText={!newType.ru && error ? t('feedback.required') : ''}
           />
           <TextField
             fullWidth
-            label={t('feedback.nameEn') || 'Name (English)'}
+            label={t('feedback.nameEn')}
             value={newType.en}
             onChange={(e) => setNewType({ ...newType, en: e.target.value })}
             sx={{ mt: 2 }}
             error={!newType.en && error !== null}
-            helperText={!newType.en && error ? t('feedback.required') || 'Required' : ''}
+            helperText={!newType.en && error ? t('feedback.required') : ''}
           />
           <TextField
             fullWidth
-            label={t('feedback.nameZh') || 'Name (Chinese)'}
+            label={t('feedback.nameZh')}
             value={newType.zh}
             onChange={(e) => setNewType({ ...newType, zh: e.target.value })}
             sx={{ mt: 2 }}
             error={!newType.zh && error !== null}
-            helperText={!newType.zh && error ? t('feedback.required') || 'Required' : ''}
+            helperText={!newType.zh && error ? t('feedback.required') : ''}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenCreateDialog(false)}>
-            {t('cancel') || 'Cancel'}
-          </Button>
+          <Button onClick={() => setOpenCreateDialog(false)}>{t('cancel')}</Button>
           <Button
             onClick={handleCreateType}
             disabled={!newType.ru || !newType.en || !newType.zh}
           >
-            {t('create') || 'Create'}
+            {t('create')}
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Диалог редактирования типа */}
       <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
-        <DialogTitle>{t('feedback.editType') || 'Edit Feedback Type'}</DialogTitle>
+        <DialogTitle>{t('feedback.editType')}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
-            label={t('feedback.nameRu') || 'Name (Russian)'}
+            label={t('feedback.nameRu')}
             value={editTranslations.ru}
-            onChange={(e) =>
-              setEditTranslations({ ...editTranslations, ru: e.target.value })
-            }
+            onChange={(e) => setEditTranslations({ ...editTranslations, ru: e.target.value })}
             sx={{ mt: 2 }}
             error={!editTranslations.ru && error !== null}
-            helperText={!editTranslations.ru && error ? t('feedback.required') || 'Required' : ''}
+            helperText={!editTranslations.ru && error ? t('feedback.required') : ''}
           />
           <TextField
             fullWidth
-            label={t('feedback.nameEn') || 'Name (English)'}
+            label={t('feedback.nameEn')}
             value={editTranslations.en}
-            onChange={(e) =>
-              setEditTranslations({ ...editTranslations, en: e.target.value })
-            }
+            onChange={(e) => setEditTranslations({ ...editTranslations, en: e.target.value })}
             sx={{ mt: 2 }}
             error={!editTranslations.en && error !== null}
-            helperText={!editTranslations.en && error ? t('feedback.required') || 'Required' : ''}
+            helperText={!editTranslations.en && error ? t('feedback.required') : ''}
           />
           <TextField
             fullWidth
-            label={t('feedback.nameZh') || 'Name (Chinese)'}
+            label={t('feedback.nameZh')}
             value={editTranslations.zh}
-            onChange={(e) =>
-              setEditTranslations({ ...editTranslations, zh: e.target.value })
-            }
+            onChange={(e) => setEditTranslations({ ...editTranslations, zh: e.target.value })}
             sx={{ mt: 2 }}
             error={!editTranslations.zh && error !== null}
-            helperText={!editTranslations.zh && error ? t('feedback.required') || 'Required' : ''}
+            helperText={!editTranslations.zh && error ? t('feedback.required') : ''}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)}>
-            {t('cancel') || 'Cancel'}
-          </Button>
+          <Button onClick={() => setOpenEditDialog(false)}>{t('cancel')}</Button>
           <Button
             onClick={handleUpdateType}
             disabled={!editTranslations.ru || !editTranslations.en || !editTranslations.zh}
           >
-            {t('save') || 'Save'}
+            {t('save')}
           </Button>
         </DialogActions>
       </Dialog>

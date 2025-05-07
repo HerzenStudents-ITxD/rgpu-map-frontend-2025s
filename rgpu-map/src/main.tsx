@@ -26,6 +26,8 @@ import { useMapStore } from './store/slices/mapSlice';
 import './i18n';
 import './index.css';
 
+import AgentsAdmin from './pages/admin/AgentsAdmin';
+import CommunitiesAdmin from './pages/admin/CommunitiesAdmin';
 import AdminPanel from './pages/admin/AdminPanel';
 import PointsAdmin from './pages/admin/PointsAdmin';
 import UsersAdmin from './pages/admin/UsersAdmin';
@@ -76,6 +78,8 @@ const App: React.FC = () => {
           <Route path="users" element={<UsersAdmin />} />
           <Route path="feedback" element={<FeedbackAdmin />} />
           <Route path="feedback-types" element={<FeedbackTypesAdmin />} />
+          <Route path="communities" element={<CommunitiesAdmin />} />
+          <Route path="agents" element={<AgentsAdmin />} />
         </Route>
 
         <Route path="/point/:id" element={

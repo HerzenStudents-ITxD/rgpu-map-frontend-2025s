@@ -1,4 +1,4 @@
-// src/features/news/components/NewsCard.tsx
+import { useState } from 'react';
 import { NewsItem } from '../types';
 import { 
   Card, 
@@ -12,6 +12,8 @@ import {
 } from '@mui/material';
 import { AvatarBox } from './AvatarBox';
 import { useTheme } from '@mui/material/styles';
+import { CommunityServiceApi } from '../../real_api/communityServiceApi';
+import { useTranslation } from 'react-i18next';
 import RouteIconLight from '../../../../public/svg/News-route-l.svg';
 import RouteIconDark from '../../../../public/svg/News-route-d.svg';
 
@@ -21,8 +23,20 @@ interface NewsCardProps {
 }
 
 export const NewsCard = ({ item, sx }: NewsCardProps) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const routeIcon = theme.palette.mode === 'light' ? RouteIconLight : RouteIconDark;
+  const [error, setError] = useState<string | null>(null);
+  const api = new CommunityServiceApi();
+
+  const handleParticipate = async () => {
+    try {
+      await api.community.participateCreate({ newsId: item.id });
+      // Можно обновить состояние, если нужно отобразить, что пользователь участвует
+    } catch (err) {
+      setError(t('news.error') || 'Ошибка при участии');
+    }
+  };
 
   return (
     <Card sx={{ 
@@ -81,9 +95,16 @@ export const NewsCard = ({ item, sx }: NewsCardProps) => {
             variant="contained"
             color="primary"
             sx={{ mt: 2, textTransform: 'none' }}
+            onClick={handleParticipate}
           >
-            Участвую!
+            {t('news.participate')}
           </Button>
+        )}
+
+        {error && (
+          <Typography color="error" variant="body2" sx={{ mt: 2 }}>
+            {error}
+          </Typography>
         )}
       </CardContent>
     </Card>
