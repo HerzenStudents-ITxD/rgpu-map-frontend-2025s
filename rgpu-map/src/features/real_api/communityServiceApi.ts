@@ -42,6 +42,7 @@ export interface CommunityAgentInfo {
   userName?: string;
   /** @format uuid */
   communityId?: string;
+  isModerator?: boolean;
 }
 
 export interface CommunityInfo {
@@ -50,6 +51,8 @@ export interface CommunityInfo {
   name?: string | null;
   isHidden?: boolean;
   avatar?: string | null;
+  /** @format date-time */
+  createdAt?: string;
 }
 
 export interface CommunityResponse {
@@ -223,7 +226,9 @@ export class HttpClient<SecurityDataType = unknown> {
 
   protected toQueryString(rawQuery?: QueryParamsType): string {
     const query = rawQuery || {};
-    const keys = Object.keys(query).filter((key) => "undefined" !== typeof query[key]);
+    const keys = Object.keys(query).filter(
+      (key) => "undefined" !== typeof query[key],
+    );
     return keys
       .map((key) =>
         Array.isArray(query[key])
@@ -263,7 +268,10 @@ export class HttpClient<SecurityDataType = unknown> {
     [ContentType.UrlEncoded]: (input: any) => this.toQueryString(input),
   };
 
-  protected mergeRequestParams(params1: RequestParams, params2?: RequestParams): RequestParams {
+  protected mergeRequestParams(
+    params1: RequestParams,
+    params2?: RequestParams,
+  ): RequestParams {
     return {
       ...this.baseApiParams,
       ...params1,
@@ -276,7 +284,9 @@ export class HttpClient<SecurityDataType = unknown> {
     };
   }
 
-  protected createAbortSignal = (cancelToken: CancelToken): AbortSignal | undefined => {
+  protected createAbortSignal = (
+    cancelToken: CancelToken,
+  ): AbortSignal | undefined => {
     if (this.abortControllers.has(cancelToken)) {
       const abortController = this.abortControllers.get(cancelToken);
       if (abortController) {
@@ -387,33 +397,51 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
   community = {
     /**
      * Retrieves all communities
-     *
      * @tags Community
      * @name GetCommunity
      * @request GET:/Community/all
      * @secure
      */
-    getCommunity: (params: RequestParams = {}) =>
+    getCommunity: (
+      query?: {
+        IsCancellationRequested?: boolean;
+        CanBeCanceled?: boolean;
+        "WaitHandle.Handle"?: IntPtr;
+        "WaitHandle.SafeWaitHandle.IsInvalid"?: boolean;
+        "WaitHandle.SafeWaitHandle.IsClosed"?: boolean;
+      },
+      params: RequestParams = {},
+    ) =>
       this.request<CommunityResponseFindResultResponse, ProblemDetails>({
         path: `/Community/all`,
         method: "GET",
+        query: query,
         secure: true,
         format: "json",
         ...params,
       }),
 
     /**
-     * Retrieves user communities
-     *
+     * Retrieves communities for the current user
      * @tags Community
      * @name UserList
      * @request GET:/Community/user
      * @secure
      */
-    userList: (params: RequestParams = {}) =>
+    userList: (
+      query?: {
+        IsCancellationRequested?: boolean;
+        CanBeCanceled?: boolean;
+        "WaitHandle.Handle"?: IntPtr;
+        "WaitHandle.SafeWaitHandle.IsInvalid"?: boolean;
+        "WaitHandle.SafeWaitHandle.IsClosed"?: boolean;
+      },
+      params: RequestParams = {},
+    ) =>
       this.request<CommunityResponseFindResultResponse, ProblemDetails>({
         path: `/Community/user`,
         method: "GET",
+        query: query,
         secure: true,
         format: "json",
         ...params,
@@ -421,7 +449,6 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
 
     /**
      * Creates a new community
-     *
      * @tags Community
      * @name CreateCommunity
      * @request POST:/Community/create
@@ -439,8 +466,7 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
       }),
 
     /**
-     * Updates a community partially
-     *
+     * Updates a community
      * @tags Community
      * @name EditPartialUpdate
      * @request PATCH:/Community/edit
@@ -448,9 +474,9 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
      */
     editPartialUpdate: (
       data: Operation[],
-      query?: {
+      query: {
         /** @format uuid */
-        communityId?: string;
+        communityId: string;
       },
       params: RequestParams = {},
     ) =>
@@ -467,16 +493,15 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
 
     /**
      * Soft deletes a community
-     *
      * @tags Community
      * @name SoftdeleteDelete
      * @request DELETE:/Community/softdelete
      * @secure
      */
     softdeleteDelete: (
-      query?: {
+      query: {
         /** @format uuid */
-        communityId?: string;
+        communityId: string;
       },
       params: RequestParams = {},
     ) =>
@@ -491,7 +516,6 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
 
     /**
      * Adds an agent to a community
-     *
      * @tags Community
      * @name AddAgentCreate
      * @request POST:/Community/add-agent
@@ -510,18 +534,17 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
 
     /**
      * Removes an agent from a community
-     *
      * @tags Community
      * @name RemoveAgentDelete
      * @request DELETE:/Community/remove-agent
      * @secure
      */
     removeAgentDelete: (
-      query?: {
+      query: {
         /** @format uuid */
-        communityId?: string;
+        communityId: string;
         /** @format uuid */
-        userId?: string;
+        userId: string;
       },
       params: RequestParams = {},
     ) =>
@@ -535,8 +558,7 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
       }),
 
     /**
-     * Retrieves all news
-     *
+     * Retrieves news items
      * @tags Community
      * @name NewsList
      * @request GET:/Community/news
@@ -548,6 +570,11 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
         page?: number;
         /** @format int32 */
         pageSize?: number;
+        IsCancellationRequested?: boolean;
+        CanBeCanceled?: boolean;
+        "WaitHandle.Handle"?: IntPtr;
+        "WaitHandle.SafeWaitHandle.IsInvalid"?: boolean;
+        "WaitHandle.SafeWaitHandle.IsClosed"?: boolean;
       },
       params: RequestParams = {},
     ) =>
@@ -561,21 +588,25 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
       }),
 
     /**
-     * Retrieves news for a specific community
-     *
+     * Retrieves news items for a specific community
      * @tags Community
      * @name CommunityNewsList
      * @request GET:/Community/community-news
      * @secure
      */
     communityNewsList: (
-      query?: {
+      query: {
         /** @format uuid */
-        communityId?: string;
+        communityId: string;
         /** @format int32 */
         page?: number;
         /** @format int32 */
         pageSize?: number;
+        IsCancellationRequested?: boolean;
+        CanBeCanceled?: boolean;
+        "WaitHandle.Handle"?: IntPtr;
+        "WaitHandle.SafeWaitHandle.IsInvalid"?: boolean;
+        "WaitHandle.SafeWaitHandle.IsClosed"?: boolean;
       },
       params: RequestParams = {},
     ) =>
@@ -590,16 +621,15 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
 
     /**
      * Hides a community
-     *
      * @tags Community
      * @name HideCreate
      * @request POST:/Community/hide
      * @secure
      */
     hideCreate: (
-      query?: {
+      query: {
         /** @format uuid */
-        communityId?: string;
+        communityId: string;
       },
       params: RequestParams = {},
     ) =>
@@ -614,16 +644,15 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
 
     /**
      * Unhides a community
-     *
      * @tags Community
      * @name UnhideCreate
      * @request POST:/Community/unhide
      * @secure
      */
     unhideCreate: (
-      query?: {
+      query: {
         /** @format uuid */
-        communityId?: string;
+        communityId: string;
       },
       params: RequestParams = {},
     ) =>
@@ -637,8 +666,7 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
       }),
 
     /**
-     * Participates in a news event
-     *
+     * Participates in a news item
      * @tags Community
      * @name ParticipateCreate
      * @request POST:/Community/participate
@@ -656,14 +684,16 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
       }),
 
     /**
-     * Unparticipates from a news event
-     *
+     * Unparticipates from a news item
      * @tags Community
      * @name UnparticipateCreate
      * @request POST:/Community/unparticipate
      * @secure
      */
-    unparticipateCreate: (data: ParticipateRequest, params: RequestParams = {}) =>
+    unparticipateCreate: (
+      data: ParticipateRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<BooleanOperationResultResponse, ProblemDetails>({
         path: `/Community/unparticipate`,
         method: "POST",
@@ -676,7 +706,6 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
 
     /**
      * Creates a new news item
-     *
      * @tags Community
      * @name CreateNewsCreate
      * @request POST:/Community/create-news
