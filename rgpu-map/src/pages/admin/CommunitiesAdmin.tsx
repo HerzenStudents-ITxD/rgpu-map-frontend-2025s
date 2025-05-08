@@ -47,7 +47,7 @@ const CommunitiesAdmin = () => {
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openCreateNewsDialog, setOpenCreateNewsDialog] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [newCommunity, setNewCommunity] = useState({ name: "", avatarImage: "" });
+  const [newCommunity, setNewCommunity] = useState({ name: "", avatarFile: null as File | null });
   const [newNews, setNewNews] = useState<CreateNewsRequest>({
     communityId: "",
     title: "",
@@ -57,58 +57,9 @@ const CommunitiesAdmin = () => {
     isFeatured: false,
   });
   const [editCommunity, setEditCommunity] = useState<CommunityResponse | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", avatarImage: "" });
+  const [editForm, setEditForm] = useState({ name: "", avatarFile: null as File | null });
   const [newsImage, setNewsImage] = useState<File | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const fetchCommunities = useCallback(async (retryCount = 3) => {
-    if (!getAccessToken()) {
-      setError(t('admin.noAuth') || 'Please log in to view communities');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await communityApi.community.getCommunity();
-      console.log('Communities API response:', response.data);
-      if (response.data.body) {
-        setCommunities(response.data.body);
-      } else {
-        setCommunities([]);
-      }
-    } catch (err: any) {
-      console.error('Error fetching communities:', err);
-      if (retryCount > 0) {
-        console.log(`Retrying... Attempts left: ${retryCount}`);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return fetchCommunities(retryCount - 1);
-      }
-      setError(t('admin.errorFetchingCommunities') || err.message || 'Error fetching communities');
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  const fetchNews = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await communityApi.community.newsList({ page: 1, pageSize: 100, isActive: true });
-      console.log('News API response:', response.data);
-      if (response.data.body) {
-        setNews(response.data.body);
-      } else {
-        setNews([]);
-      }
-    } catch (err: any) {
-      console.error('Error fetching news:', err);
-      setError(t('admin.errorFetchingNews') || err.message || 'Error fetching news');
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
 
   const readFileAsBase64 = useCallback((file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -135,6 +86,57 @@ const CommunitiesAdmin = () => {
     return null;
   }, [t]);
 
+  const fetchCommunities = useCallback(async (retryCount = 3) => {
+    if (!getAccessToken()) {
+      setError(t('admin.noAuth') || 'Please log in to view communities');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await communityApi.community.getCommunity();
+      console.log('Communities API response:', response.data);
+      if (response.data.body) {
+        setCommunities(response.data.body);
+      } else {
+        console.warn('No communities returned. Total count:', response.data.totalCount);
+        setCommunities([]);
+      }
+    } catch (err: any) {
+      console.error('Error fetching communities:', err);
+      if (retryCount > 0) {
+        console.log(`Retrying... Attempts left: ${retryCount}`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return fetchCommunities(retryCount - 1);
+      }
+      setError(t('admin.errorFetchingCommunities') || err.message || 'Error fetching communities');
+    } finally {
+      setLoading(false);
+    }
+  }, [t]);
+
+  const fetchNews = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await communityApi.community.newsList({ page: 0, pageSize: 100 });
+      console.log('News API response:', response.data);
+      if (response.data.body) {
+        setNews(response.data.body);
+      } else {
+        console.warn('No news returned. Total count:', response.data.totalCount);
+        setNews([]);
+      }
+    } catch (err: any) {
+      console.error('Error fetching news:', err);
+      setError(t('admin.errorFetchingNews') || err.message || 'Error fetching news');
+    } finally {
+      setLoading(false);
+    }
+  }, [t]);
+
   const handleCreateCommunity = useCallback(async () => {
     try {
       setError(null);
@@ -144,8 +146,17 @@ const CommunitiesAdmin = () => {
       }
       const request: CreateCommunityRequest = {
         name: newCommunity.name.trim(),
-        avatarImage: newCommunity.avatarImage.trim() || undefined,
+        avatarImage: undefined,
       };
+      if (newCommunity.avatarFile) {
+        const validationError = validateImage(newCommunity.avatarFile);
+        if (validationError) {
+          setError(validationError);
+          return;
+        }
+        request.avatarImage = await readFileAsBase64(newCommunity.avatarFile);
+      }
+      console.log('Creating community with request:', request);
       const response = await communityApi.community.createCommunity(request);
       console.log('Create community response:', response.data);
       if (response.data.body) {
@@ -155,14 +166,14 @@ const CommunitiesAdmin = () => {
             community: {
               id: response.data.body,
               name: request.name,
-              avatar: request.avatarImage,
+              avatar: request.avatarImage || null,
               isHidden: false,
               createdAt: new Date().toISOString(),
             },
             agents: []
           },
         ]);
-        setNewCommunity({ name: "", avatarImage: "" });
+        setNewCommunity({ name: "", avatarFile: null });
         setOpenCreateDialog(false);
       } else {
         throw new Error(t("admin.errorCreatingCommunity") || "Failed to create community");
@@ -171,7 +182,7 @@ const CommunitiesAdmin = () => {
       console.error('Error creating community:', err);
       setError(t("admin.errorCreatingCommunity") || err.message || "Error creating community");
     }
-  }, [newCommunity, communities, t]);
+  }, [newCommunity, communities, t, readFileAsBase64, validateImage]);
 
   const handleCreateNews = useCallback(async () => {
     try {
@@ -191,7 +202,7 @@ const CommunitiesAdmin = () => {
       };
 
       if (newsImage) {
-        const validationError = validateImage(newsImage);
+        const validationError = validateImage(newNewsImage);
         if (validationError) {
           setError(validationError);
           return;
@@ -200,6 +211,7 @@ const CommunitiesAdmin = () => {
         request.images!.push(base64Image);
       }
       
+      console.log('Creating news with request:', request);
       const response = await communityApi.community.createNewsCreate(request);
       console.log('Create news response:', response.data);
       if (response.data.body) {
@@ -256,9 +268,18 @@ const CommunitiesAdmin = () => {
         {
           operationType: OperationType.Replace,
           path: "/avatar",
-          value: editForm.avatarImage.trim() || null,
+          value: null as string | null,
         },
       ];
+      if (editForm.avatarFile) {
+        const validationError = validateImage(editForm.avatarFile);
+        if (validationError) {
+          setError(validationError);
+          return;
+        }
+        operations[1].value = await readFileAsBase64(editForm.avatarFile);
+      }
+      console.log('Editing community with operations:', operations);
       const response = await communityApi.community.editPartialUpdate(
         operations,
         { communityId: editCommunity.community.id }
@@ -273,7 +294,7 @@ const CommunitiesAdmin = () => {
                   community: {
                     ...c.community!,
                     name: editForm.name,
-                    avatar: editForm.avatarImage || null,
+                    avatar: operations[1].value || null,
                   },
                 }
               : c
@@ -281,7 +302,7 @@ const CommunitiesAdmin = () => {
         );
         setOpenEditDialog(false);
         setEditCommunity(null);
-        setEditForm({ name: "", avatarImage: "" });
+        setEditForm({ name: "", avatarFile: null });
       } else {
         throw new Error(t("admin.errorUpdatingCommunity") || "Failed to update community");
       }
@@ -289,11 +310,12 @@ const CommunitiesAdmin = () => {
       console.error('Error updating community:', err);
       setError(t("admin.errorUpdatingCommunity") || err.message || "Error updating community");
     }
-  }, [editCommunity, editForm, communities, t]);
+  }, [editCommunity, editForm, communities, t, readFileAsBase64, validateImage]);
 
   const handleSoftDeleteCommunity = useCallback(async (communityId: string) => {
     try {
       setError(null);
+      console.log('Deleting community:', communityId);
       const response = await communityApi.community.softdeleteDelete({
         communityId,
       });
@@ -320,13 +342,22 @@ const CommunitiesAdmin = () => {
       setEditCommunity(community);
       setEditForm({
         name: community.community.name || "",
-        avatarImage: community.community.avatar || "",
+        avatarFile: null,
       });
       setOpenEditDialog(true);
     } else {
       setError(t("admin.invalidCommunity") || "Invalid community selected");
     }
   }, [t]);
+
+  const handleAvatarChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, isEdit: boolean) => {
+    const file = e.target.files?.[0] || null;
+    if (isEdit) {
+      setEditForm(prev => ({ ...prev, avatarFile: file }));
+    } else {
+      setNewCommunity(prev => ({ ...prev, avatarFile: file }));
+    }
+  }, []);
 
   const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -401,7 +432,7 @@ const CommunitiesAdmin = () => {
                     <TableRow key={community.community?.id || 'unknown'}>
                       <TableCell>{community.community?.id || "N/A"}</TableCell>
                       <TableCell>{community.community?.name || "N/A"}</TableCell>
-                      <TableCell>{community.community?.avatar ? "Base64 Image" : "N/A"}</TableCell>
+                      <TableCell>{community.community?.avatar ? "Image" : "N/A"}</TableCell>
                       <TableCell>
                         {community.community?.isHidden ? t("yes") : t("no")}
                       </TableCell>
@@ -504,15 +535,25 @@ const CommunitiesAdmin = () => {
               !!error && !newCommunity.name ? t("admin.nameRequired") : ""
             }
           />
-          <TextField
-            fullWidth
-            label={t("admin.avatar")}
-            value={newCommunity.avatarImage}
-            onChange={(e) =>
-              setNewCommunity({ ...newCommunity, avatarImage: e.target.value })
-            }
-            sx={{ mt: 2 }}
-          />
+          <Box sx={{ mt: 2 }}>
+            <Button
+              variant="outlined"
+              component="label"
+            >
+              {t('admin.uploadAvatar')}
+              <input
+                type="file"
+                accept="image/jpeg,image/png"
+                hidden
+                onChange={(e) => handleAvatarChange(e, false)}
+              />
+            </Button>
+            {newCommunity.avatarFile && (
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                {t('feedback.selectedFile')}: {newCommunity.avatarFile.name}
+              </Typography>
+            )}
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenCreateDialog(false)}>
@@ -634,15 +675,25 @@ const CommunitiesAdmin = () => {
               !!error && !editForm.name ? t("admin.nameRequired") : ""
             }
           />
-          <TextField
-            fullWidth
-            label={t("admin.avatar")}
-            value={editForm.avatarImage}
-            onChange={(e) =>
-              setEditForm({ ...editForm, avatarImage: e.target.value })
-            }
-            sx={{ mt: 2 }}
-          />
+          <Box sx={{ mt: 2 }}>
+            <Button
+              variant="outlined"
+              component="label"
+            >
+              {t('admin.uploadAvatar')}
+              <input
+                type="file"
+                accept="image/jpeg,image/png"
+                hidden
+                onChange={(e) => handleAvatarChange(e, true)}
+              />
+            </Button>
+            {editForm.avatarFile && (
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                {t('feedback.selectedFile')}: {editForm.avatarFile.name}
+              </Typography>
+            )}
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenEditDialog(false)}>{t("cancel")}</Button>

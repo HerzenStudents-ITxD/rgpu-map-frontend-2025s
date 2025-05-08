@@ -19,15 +19,14 @@ export const useAdminPosts = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await communityServiceApi.community.newsList({ 
-        page: 1, 
-        pageSize: 100,
-        isActive: true // Filter active posts
-      });
-      console.log('Posts API response:', response.data); // Debug log
+      const query = { page: 0, pageSize: 100 }; // Use page: 0
+      console.log('Fetching posts with query:', query);
+      const response = await communityServiceApi.community.newsList(query);
+      console.log('Posts API response:', response.data);
       if (response.data.body) {
         setPosts(response.data.body);
       } else {
+        console.warn('No posts returned. Total count:', response.data.totalCount);
         setPosts([]);
       }
     } catch (e: any) {
@@ -52,7 +51,7 @@ export const useAdminPosts = () => {
     setError(null);
     try {
       const response = await communityServiceApi.community.createNewsCreate(post);
-      console.log('Create post response:', response.data); // Debug log
+      console.log('Create post response:', response.data);
       if (response.data.body) {
         await loadPosts();
       } else {
@@ -80,7 +79,7 @@ export const useAdminPosts = () => {
         throw new Error('Community ID is required for update');
       }
       const success = await communityServiceApi.community.editPartialUpdate(operations, { communityId: updates.communityId });
-      console.log('Edit post response:', success.data); // Debug log
+      console.log('Edit post response:', success.data);
       if (success.data.body) {
         await loadPosts();
       } else {
@@ -99,7 +98,7 @@ export const useAdminPosts = () => {
     setError(null);
     try {
       const success = await communityServiceApi.community.softdeleteDelete({ communityId: newsId });
-      console.log('Delete post response:', success.data); // Debug log
+      console.log('Delete post response:', success.data);
       if (success.data.body) {
         await loadPosts();
       } else {
