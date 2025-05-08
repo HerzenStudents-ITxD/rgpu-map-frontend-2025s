@@ -12,7 +12,7 @@ import { CreateNewsForm } from '../features/news/components/CreateNewsForm';
 import { CommunityServiceApi } from '../features/real_api/communityServiceApi';
 import { NewsGroup } from '../features/news/types';
 import { useTranslation } from 'react-i18next';
-import { getAccessToken } from '../../utils/tokenService';
+import { getAccessToken } from '../utils/tokenService';
 import '../features/news/components/News.css';
 
 export const NewsPage = () => {
