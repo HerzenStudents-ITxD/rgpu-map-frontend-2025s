@@ -92,6 +92,8 @@ export interface GuidOperationResultResponse {
 }
 
 export interface NewsResponse {
+  text: string;
+  id: string;
   /** @format uuid */
   newsId?: string;
   /** @format uuid */
