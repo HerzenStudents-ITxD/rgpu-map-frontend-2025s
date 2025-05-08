@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FC, useState } from 'react';
 import {
   Box,
   Button,
@@ -27,11 +27,11 @@ interface CreateNewsFormProps {
   sx?: SxProps<Theme>;
 }
 
-export const CreateNewsForm = ({ 
+export const CreateNewsForm: FC<CreateNewsFormProps> = ({ 
   groups,
   onClose,
   sx 
-}: CreateNewsFormProps) => {
+}) => {
   const { t } = useTranslation();
   const [form, setForm] = useState({
     title: '',
@@ -48,25 +48,48 @@ export const CreateNewsForm = ({
     e.preventDefault();
     setError(null);
 
+    // Валидация обязательных полей
     if (!form.groupId || !form.title || !form.content) {
       setError(t('news.error') || 'Заполните обязательные поля');
       return;
     }
 
     try {
-      const images = form.image ? [URL.createObjectURL(form.image)] : undefined;
-      await api.community.createNewsCreate({
+      // Подготовка данных
+      const requestData = {
         communityId: form.groupId,
-        title: form.title,
-        content: form.content,
-        images,
-        location: form.location || undefined,
+        title: form.title.trim(),
+        content: form.content.trim(),
+        location: form.location.trim() || undefined,
         isFeatured: form.isFeatured,
-      });
+        images: [] as string[]
+      };
+
+      // Конвертация изображения в base64
+      if (form.image) {
+        const base64Image = await readFileAsBase64(form.image);
+        requestData.images.push(base64Image);
+      }
+
+      // Отправка запроса
+      await api.community.createNewsCreate(requestData);
       onClose();
     } catch (error: any) {
-      setError(t('news.error') || 'Ошибка при создании новости');
+      console.error('Ошибка создания новости:', error);
+      setError(error.response?.data?.message || t('news.error') || 'Ошибка при создании новости');
     }
+  };
+
+  const readFileAsBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.split(',')[1] || result); // Удаление data URL префикса
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,7 +112,9 @@ export const CreateNewsForm = ({
       }}
     >
       <DialogTitle>
-        <Typography variant="h5">{t('news.createPost')}</Typography>
+        <Typography variant="h6" component="div">
+          {t('news.createPost')}
+        </Typography>
       </DialogTitle>
 
       <DialogContent dividers>
@@ -100,7 +125,7 @@ export const CreateNewsForm = ({
               value={form.groupId}
               onChange={(e) => setForm({...form, groupId: e.target.value})}
               required
-              label={t('news.routePoint') + ' *'}
+              label={`${t('news.routePoint')} *`}
             >
               {groups.map(g => (
                 <MenuItem key={g.id} value={g.id}>
@@ -112,7 +137,7 @@ export const CreateNewsForm = ({
 
           <TextField
             fullWidth
-            label={t('news.titlePlaceholder') + ' *'}
+            label={`${t('news.titlePlaceholder')} *`}
             value={form.title}
             onChange={(e) => setForm({...form, title: e.target.value})}
             sx={{ mb: 3 }}
@@ -123,7 +148,7 @@ export const CreateNewsForm = ({
             fullWidth
             multiline
             rows={4}
-            label={t('news.description') + ' *'}
+            label={`${t('news.description')} *`}
             value={form.content}
             onChange={(e) => setForm({...form, content: e.target.value})}
             sx={{ mb: 3 }}

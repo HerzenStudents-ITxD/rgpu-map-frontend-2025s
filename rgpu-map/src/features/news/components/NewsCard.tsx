@@ -79,7 +79,7 @@ export const NewsCard = ({ item, sx }: NewsCardProps) => {
                 <img
                   src={routeIcon}
                   alt="Location"
-                  style={{ width: 24, height: 24, fill: theme.palette.icon.main }}
+                  style={{ width: 24, height: 24, fill: theme.palette.ico.nmain }}
                 />
               </Button>
             </>
