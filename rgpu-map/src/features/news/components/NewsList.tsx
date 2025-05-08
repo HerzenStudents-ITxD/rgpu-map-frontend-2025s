@@ -22,15 +22,14 @@ export const NewsList = () => {
       if (!getAccessToken()) {
         throw new Error('No access token available');
       }
-      const response = await api.community.newsList({ 
-        page: 1, 
-        pageSize: 10,
-        isActive: true // Add filter for active news
-      });
+      const query = { page: 0, pageSize: 10 }; // Try page: 0 for zero-based indexing
+      console.log('Fetching news with query:', query);
+      const response = await api.community.newsList(query);
       
-      console.log('News API response:', response.data); // Debug log
+      console.log('News API response:', response.data);
 
       if (!response.data.body || response.data.body.length === 0) {
+        console.warn('No news items returned. Total count:', response.data.totalCount);
         setNews([]);
         return;
       }
@@ -73,7 +72,7 @@ export const NewsList = () => {
     if (isAuthenticated) {
       try {
         const groupsResponse = await api.community.getCommunity();
-        console.log('Groups API response:', groupsResponse.data); // Debug log
+        console.log('Groups API response:', groupsResponse.data);
         setGroups(groupsResponse.data.body?.map(g => ({
           id: g.community?.id || 'unknown',
           name: g.community?.name || 'Unknown',
@@ -101,7 +100,7 @@ export const NewsList = () => {
     <div className="news-list">
       {news.map(item => (
         <NewsCard 
-          key={`${item.id}-${item.group.id}-${item.date}`} // Ensure unique key
+          key={`${item.id}-${item.group.id}-${item.date}`} 
           item={item} 
           sx={{ mb: 3 }}
         />
