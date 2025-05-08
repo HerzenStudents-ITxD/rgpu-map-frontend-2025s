@@ -19,11 +19,16 @@ export const useAdminPosts = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await communityServiceApi.community.newsList({ page: 1, pageSize: 100 });
+      const response = await communityServiceApi.community.newsList({ 
+        page: 1, 
+        pageSize: 100,
+        isActive: true // Filter active posts
+      });
+      console.log('Posts API response:', response.data); // Debug log
       if (response.data.body) {
         setPosts(response.data.body);
       } else {
-        throw new Error('No posts found in response');
+        setPosts([]);
       }
     } catch (e: any) {
       console.error('Error loading posts:', e);
@@ -39,10 +44,15 @@ export const useAdminPosts = () => {
   };
 
   const createPost = async (post: CreateNewsRequest) => {
+    if (!post.communityId || !post.title || !post.content) {
+      setError('Community ID, title, and content are required');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const response = await communityServiceApi.community.createNewsCreate(post);
+      console.log('Create post response:', response.data); // Debug log
       if (response.data.body) {
         await loadPosts();
       } else {
@@ -66,7 +76,11 @@ export const useAdminPosts = () => {
       if (updates.isFeatured !== undefined) operations.push({ op: 'replace', path: '/isFeatured', value: updates.isFeatured });
       if (updates.location !== undefined) operations.push({ op: 'replace', path: '/location', value: updates.location });
       if (updates.images !== undefined) operations.push({ op: 'replace', path: '/images', value: updates.images });
+      if (!updates.communityId) {
+        throw new Error('Community ID is required for update');
+      }
       const success = await communityServiceApi.community.editPartialUpdate(operations, { communityId: updates.communityId });
+      console.log('Edit post response:', success.data); // Debug log
       if (success.data.body) {
         await loadPosts();
       } else {
@@ -85,6 +99,7 @@ export const useAdminPosts = () => {
     setError(null);
     try {
       const success = await communityServiceApi.community.softdeleteDelete({ communityId: newsId });
+      console.log('Delete post response:', success.data); // Debug log
       if (success.data.body) {
         await loadPosts();
       } else {

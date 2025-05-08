@@ -72,10 +72,11 @@ const CommunitiesAdmin = () => {
       setLoading(true);
       setError(null);
       const response = await communityApi.community.getCommunity();
+      console.log('Communities API response:', response.data);
       if (response.data.body) {
         setCommunities(response.data.body);
       } else {
-        throw new Error(t('admin.noCommunities') || 'No communities found');
+        setCommunities([]);
       }
     } catch (err: any) {
       console.error('Error fetching communities:', err);
@@ -94,11 +95,12 @@ const CommunitiesAdmin = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await communityApi.community.newsList();
+      const response = await communityApi.community.newsList({ page: 1, pageSize: 100, isActive: true });
+      console.log('News API response:', response.data);
       if (response.data.body) {
         setNews(response.data.body);
       } else {
-        throw new Error(t('admin.noNews') || 'No news found');
+        setNews([]);
       }
     } catch (err: any) {
       console.error('Error fetching news:', err);
@@ -145,6 +147,7 @@ const CommunitiesAdmin = () => {
         avatarImage: newCommunity.avatarImage.trim() || undefined,
       };
       const response = await communityApi.community.createCommunity(request);
+      console.log('Create community response:', response.data);
       if (response.data.body) {
         setCommunities([
           ...communities,
@@ -180,10 +183,10 @@ const CommunitiesAdmin = () => {
 
       const request: CreateNewsRequest = {
         communityId: newNews.communityId,
-        title: newNews.title,
-        content: newNews.content,
+        title: newNews.title.trim(),
+        content: newNews.content.trim(),
         images: [],
-        location: newNews.location || undefined,
+        location: newNews.location?.trim() || undefined,
         isFeatured: newNews.isFeatured,
       };
 
@@ -198,7 +201,7 @@ const CommunitiesAdmin = () => {
       }
       
       const response = await communityApi.community.createNewsCreate(request);
-      
+      console.log('Create news response:', response.data);
       if (response.data.body) {
         setNews([...news, {
           newsId: response.data.body,
@@ -227,6 +230,9 @@ const CommunitiesAdmin = () => {
     } catch (err: any) {
       console.error('Error creating news:', err);
       setError(t("admin.errorCreatingNews") || err.message || "Error creating news");
+      if (err.response?.status === 400) {
+        setError(`Bad request: ${err.response?.data?.message || 'Invalid news data'}`);
+      }
     }
   }, [newNews, news, newsImage, t, readFileAsBase64, validateImage]);
 
@@ -257,6 +263,7 @@ const CommunitiesAdmin = () => {
         operations,
         { communityId: editCommunity.community.id }
       );
+      console.log('Edit community response:', response.data);
       if (response.data.body) {
         setCommunities(
           communities.map((c) =>
@@ -290,6 +297,7 @@ const CommunitiesAdmin = () => {
       const response = await communityApi.community.softdeleteDelete({
         communityId,
       });
+      console.log('Delete community response:', response.data);
       if (response.data.body) {
         setCommunities(
           communities.map((c) =>
