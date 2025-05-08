@@ -3,7 +3,7 @@ import { NewsCard } from './NewsCard';
 import { CommunityServiceApi } from '../../real_api/communityServiceApi';
 import { NewsItem, NewsGroup } from '../types';
 import { useTranslation } from 'react-i18next';
-import { Alert, Box } from '@mui/material';
+import { Alert, Box, CircularProgress } from '@mui/material';
 import { getAccessToken } from '../../../utils/tokenService';
 
 export const NewsList = () => {
