@@ -21,6 +21,7 @@ import {
   Tabs,
   Checkbox,
   FormControlLabel,
+  MenuItem,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import {
@@ -32,6 +33,7 @@ import {
   CreateNewsRequest,
 } from "../../features/real_api/communityServiceApi";
 import { Link } from "react-router-dom";
+import { getAccessToken } from '../../utils/tokenService';
 
 const communityApi = new CommunityServiceApi();
 
@@ -57,8 +59,15 @@ const CommunitiesAdmin = () => {
   const [editCommunity, setEditCommunity] = useState<CommunityResponse | null>(null);
   const [editForm, setEditForm] = useState({ name: "", avatarImage: "" });
   const [newsImage, setNewsImage] = useState<File | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const fetchCommunities = useCallback(async () => {
+  const fetchCommunities = useCallback(async (retryCount = 3) => {
+    if (!getAccessToken()) {
+      setError(t('admin.noAuth') || 'Please log in to view communities');
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -66,10 +75,16 @@ const CommunitiesAdmin = () => {
       if (response.data.body) {
         setCommunities(response.data.body);
       } else {
-        setError(t("admin.errorFetchingCommunities") || "Failed to fetch communities");
+        throw new Error(t('admin.noCommunities') || 'No communities found');
       }
     } catch (err: any) {
-      setError(t("admin.errorFetchingCommunities") || err.message || "Error fetching communities");
+      console.error('Error fetching communities:', err);
+      if (retryCount > 0) {
+        console.log(`Retrying... Attempts left: ${retryCount}`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return fetchCommunities(retryCount - 1);
+      }
+      setError(t('admin.errorFetchingCommunities') || err.message || 'Error fetching communities');
     } finally {
       setLoading(false);
     }
@@ -83,10 +98,11 @@ const CommunitiesAdmin = () => {
       if (response.data.body) {
         setNews(response.data.body);
       } else {
-        setError(t("admin.errorFetchingNews") || "Failed to fetch news");
+        throw new Error(t('admin.noNews') || 'No news found');
       }
     } catch (err: any) {
-      setError(t("admin.errorFetchingNews") || err.message || "Error fetching news");
+      console.error('Error fetching news:', err);
+      setError(t('admin.errorFetchingNews') || err.message || 'Error fetching news');
     } finally {
       setLoading(false);
     }
@@ -146,9 +162,10 @@ const CommunitiesAdmin = () => {
         setNewCommunity({ name: "", avatarImage: "" });
         setOpenCreateDialog(false);
       } else {
-        setError(t("admin.errorCreatingCommunity") || "Failed to create community");
+        throw new Error(t("admin.errorCreatingCommunity") || "Failed to create community");
       }
     } catch (err: any) {
+      console.error('Error creating community:', err);
       setError(t("admin.errorCreatingCommunity") || err.message || "Error creating community");
     }
   }, [newCommunity, communities, t]);
@@ -205,9 +222,10 @@ const CommunitiesAdmin = () => {
         setNewsImage(null);
         setOpenCreateNewsDialog(false);
       } else {
-        setError(t("admin.errorCreatingNews") || "Failed to create news");
+        throw new Error(t("admin.errorCreatingNews") || "Failed to create news");
       }
     } catch (err: any) {
+      console.error('Error creating news:', err);
       setError(t("admin.errorCreatingNews") || err.message || "Error creating news");
     }
   }, [newNews, news, newsImage, t, readFileAsBase64, validateImage]);
@@ -258,9 +276,10 @@ const CommunitiesAdmin = () => {
         setEditCommunity(null);
         setEditForm({ name: "", avatarImage: "" });
       } else {
-        setError(t("admin.errorUpdatingCommunity") || "Failed to update community");
+        throw new Error(t("admin.errorUpdatingCommunity") || "Failed to update community");
       }
     } catch (err: any) {
+      console.error('Error updating community:', err);
       setError(t("admin.errorUpdatingCommunity") || err.message || "Error updating community");
     }
   }, [editCommunity, editForm, communities, t]);
@@ -280,9 +299,10 @@ const CommunitiesAdmin = () => {
           )
         );
       } else {
-        setError(t("admin.errorDeletingCommunity") || "Failed to delete community");
+        throw new Error(t("admin.errorDeletingCommunity") || "Failed to delete community");
       }
     } catch (err: any) {
+      console.error('Error deleting community:', err);
       setError(t("admin.errorDeletingCommunity") || err.message || "Error deleting community");
     }
   }, [communities, t]);
@@ -304,6 +324,21 @@ const CommunitiesAdmin = () => {
     const file = e.target.files?.[0] || null;
     setNewsImage(file);
   }, []);
+
+  useEffect(() => {
+    const checkAuth = () => setIsAuthenticated(!!getAccessToken());
+    checkAuth();
+    fetchCommunities();
+    fetchNews();
+  }, [fetchCommunities, fetchNews]);
+
+  if (!isAuthenticated) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">{t('admin.noAuth') || 'Please log in to access this page'}</Alert>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: 3 }}>
@@ -337,6 +372,10 @@ const CommunitiesAdmin = () => {
             <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
               <CircularProgress />
             </Box>
+          ) : communities.length === 0 ? (
+            <Typography variant="body1" sx={{ mt: 2 }}>
+              {t('admin.noCommunities') || 'No communities available'}
+            </Typography>
           ) : (
             <TableContainer component={Paper}>
               <Table>
@@ -403,6 +442,10 @@ const CommunitiesAdmin = () => {
             <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
               <CircularProgress />
             </Box>
+          ) : news.length === 0 ? (
+            <Typography variant="body1" sx={{ mt: 2 }}>
+              {t('admin.noNews') || 'No news available'}
+            </Typography>
           ) : (
             <TableContainer component={Paper}>
               <Table>
@@ -492,9 +535,9 @@ const CommunitiesAdmin = () => {
             error={!!error && !newNews.communityId}
             helperText={!!error && !newNews.communityId ? t("admin.required") : ""}
           >
-            <MenuItem value="">Select Community</MenuItem>
+            <MenuItem value="">{t('admin.selectCommunity')}</MenuItem>
             {communities.map((community) => (
-              <MenuItem key={community.community?.id} value={community.community?.id}>
+              <MenuItem key={community.community?.id || 'unknown'} value={community.community?.id || ''}>
                 {community.community?.name || "N/A"}
               </MenuItem>
             ))}

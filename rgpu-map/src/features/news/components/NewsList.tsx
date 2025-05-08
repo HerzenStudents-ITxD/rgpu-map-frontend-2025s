@@ -3,8 +3,7 @@ import { NewsCard } from './NewsCard';
 import { CommunityServiceApi } from '../../real_api/communityServiceApi';
 import { NewsItem, NewsGroup } from '../types';
 import { useTranslation } from 'react-i18next';
-import { Button, Box } from '@mui/material';
-import { CreateNewsForm } from './CreateNewsForm';
+import { Alert, Box } from '@mui/material';
 import { getAccessToken } from '../../../utils/tokenService';
 
 export const NewsList = () => {
@@ -12,7 +11,6 @@ export const NewsList = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showCreateForm, setShowCreateForm] = useState(false);
   const [groups, setGroups] = useState<NewsGroup[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const api = new CommunityServiceApi();
@@ -25,12 +23,12 @@ export const NewsList = () => {
 
       const newsItems = response.data.body?.map(item => ({
         id: item.newsId || Date.now().toString(),
-        title: item.title || '',
-        content: item.content || '',
+        title: item.title || 'N/A',
+        content: item.content || 'N/A',
         date: item.createdAt || new Date().toISOString(),
         group: {
           id: item.communityId || '',
-          name: item.communityId || '',
+          name: item.communityId || 'N/A',
           avatar: item.photos?.[0] || null
         },
         imageUrl: item.photos?.[0] || null,
@@ -45,6 +43,7 @@ export const NewsList = () => {
 
       setNews(uniqueNews);
     } catch (err: any) {
+      console.error('Error fetching news:', err);
       setError(t('news.error') || err.message || 'Ошибка загрузки новостей');
     } finally {
       setLoading(false);
@@ -57,10 +56,11 @@ export const NewsList = () => {
         const groupsResponse = await api.community.getCommunity();
         setGroups(groupsResponse.data.body?.map(g => ({
           id: g.community?.id || '',
-          name: g.community?.name || '',
+          name: g.community?.name || 'N/A',
           avatar: g.community?.avatar || null
         })) || []);
       } catch (err: any) {
+        console.error('Error fetching groups:', err);
         setError(t('news.error') || err.message || 'Ошибка загрузки групп');
       }
     }
@@ -73,46 +73,11 @@ export const NewsList = () => {
     fetchGroups();
   }, [fetchNews, fetchGroups]);
 
-  const handleNewsCreated = useCallback(() => {
-    setShowCreateForm(false);
-    fetchNews();
-  }, [fetchNews]);
-
-  if (loading) return <div>{t('news.loading')}</div>;
-  if (error) return <div>{error}</div>;
+  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
+  if (error) return <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>;
 
   return (
     <div className="news-list">
-      {isAuthenticated && (
-        <Box sx={{ 
-          position: 'sticky', 
-          top: 0, 
-          zIndex: 1,
-          bgcolor: 'background.paper',
-          py: 2,
-          display: !showCreateForm ? 'block' : 'none'
-        }}>
-          <Button
-            variant="contained"
-            onClick={() => setShowCreateForm(true)}
-            sx={{ 
-              display: 'block',
-              mx: 'auto',
-              maxWidth: 200
-            }}
-          >
-            {t('news.createPost')}
-          </Button>
-        </Box>
-      )}
-
-      {showCreateForm && (
-        <CreateNewsForm 
-          groups={groups}
-          onClose={handleNewsCreated}
-        />
-      )}
-
       {news.map(item => (
         <NewsCard 
           key={`${item.id}-${item.group.id}`}

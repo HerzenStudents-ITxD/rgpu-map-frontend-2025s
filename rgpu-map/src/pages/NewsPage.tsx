@@ -12,6 +12,7 @@ import { CreateNewsForm } from '../features/news/components/CreateNewsForm';
 import { CommunityServiceApi } from '../features/real_api/communityServiceApi';
 import { NewsGroup } from '../features/news/types';
 import { useTranslation } from 'react-i18next';
+import { getAccessToken } from '../../utils/tokenService';
 import '../features/news/components/News.css';
 
 export const NewsPage = () => {
@@ -20,6 +21,7 @@ export const NewsPage = () => {
   const [groups, setGroups] = useState<NewsGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const api = new CommunityServiceApi();
 
   const loadGroups = useCallback(async () => {
@@ -29,11 +31,12 @@ export const NewsPage = () => {
       const response = await api.community.getCommunity();
       const communities = response.data.body?.map(item => ({
         id: item.community?.id || '',
-        name: item.community?.name || '',
+        name: item.community?.name || 'N/A',
         avatar: item.community?.avatar || null
       })) || [];
       setGroups(communities);
     } catch (err: any) {
+      console.error('Error fetching groups:', err);
       setError(t('news.error') || err.message || 'Ошибка загрузки групп новостей');
     } finally {
       setLoading(false);
@@ -41,6 +44,8 @@ export const NewsPage = () => {
   }, [t]);
 
   useEffect(() => {
+    const checkAuth = () => setIsAuthenticated(!!getAccessToken());
+    checkAuth();
     loadGroups();
   }, [loadGroups]);
 
@@ -64,19 +69,21 @@ export const NewsPage = () => {
           </Alert>
         )}
 
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setShowForm(true)}
-          sx={{ 
-            alignSelf: 'flex-start',
-            px: 4,
-            textTransform: 'none',
-            fontSize: '1rem'
-          }}
-        >
-          {t('news.createPost')}
-        </Button>
+        {isAuthenticated && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setShowForm(true)}
+            sx={{ 
+              alignSelf: 'flex-start',
+              px: 4,
+              textTransform: 'none',
+              fontSize: '1rem'
+            }}
+          >
+            {t('news.createPost')}
+          </Button>
+        )}
 
         {showForm && (
           <CreateNewsForm 
