@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -25,11 +25,7 @@ const AgentsAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchCommunities();
-  }, []);
-
-  const fetchCommunities = async () => {
+  const fetchCommunities = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -39,12 +35,16 @@ const AgentsAdmin = () => {
       } else {
         setError(t('admin.errorFetchingCommunities') || 'Failed to fetch communities');
       }
-    } catch (err) {
-      setError(t('admin.errorFetchingCommunities') || 'Error fetching communities');
+    } catch (err: any) {
+      setError(t('admin.errorFetchingCommunities') || err.message || 'Error fetching communities');
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    fetchCommunities();
+  }, [fetchCommunities]);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -71,12 +71,12 @@ const AgentsAdmin = () => {
             </TableHead>
             <TableBody>
               {communities.map((community) => (
-                <TableRow key={community.community?.id}>
-                  <TableCell>{community.community?.id}</TableCell>
-                  <TableCell>{community.community?.name}</TableCell>
+                <TableRow key={community.community?.id || 'unknown'}>
+                  <TableCell>{community.community?.id || 'N/A'}</TableCell>
+                  <TableCell>{community.community?.name || 'N/A'}</TableCell>
                   <TableCell>
                     {community.agents?.length
-                      ? community.agents.map((agent) => agent.userId).join(', ')
+                      ? community.agents.map((agent) => agent.userName || agent.userId || 'N/A').join(', ')
                       : t('admin.noAgents')}
                   </TableCell>
                 </TableRow>

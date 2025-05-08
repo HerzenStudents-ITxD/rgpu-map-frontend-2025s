@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   Box, 
   Button, 
@@ -17,14 +17,14 @@ import {
   Checkbox,
   FormControlLabel
 } from '@mui/material';
-import { CommunityInfo, CreateCommunityRequest } from '../../features/real_api/communityServiceApi';
+import { CommunityInfo, CreateCommunityRequest, OperationType } from '../../features/real_api/communityServiceApi';
 
 interface CommunitiesPageProps {
   communities: CommunityInfo[];
   loading: boolean;
   error: string | null;
   createCommunity: (community: CreateCommunityRequest) => Promise<void>;
-  editCommunity: (communityId: string, updates: { name?: string; isHidden?: boolean }) => Promise<void>;
+  editCommunity: (communityId: string, updates: { name?: string; isHidden?: boolean; avatar?: string | null }) => Promise<void>;
   deleteCommunity: (communityId: string) => Promise<void>;
 }
 
@@ -49,22 +49,24 @@ const CommunitiesPage: React.FC<CommunitiesPageProps> = ({
     community.name?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleCreate = async () => {
+  const handleCreate = useCallback(async () => {
+    if (!newCommunity.name) return;
     await createCommunity(newCommunity);
     setOpenCreate(false);
     setNewCommunity({ name: '', avatarImage: null });
-  };
+  }, [newCommunity, createCommunity]);
 
-  const handleEdit = async () => {
+  const handleEdit = useCallback(async () => {
     if (selectedCommunity && selectedCommunity.id) {
       await editCommunity(selectedCommunity.id, { 
         name: selectedCommunity.name || undefined, 
-        isHidden: selectedCommunity.isHidden 
+        isHidden: selectedCommunity.isHidden,
+        avatar: selectedCommunity.avatar || null
       });
       setOpenEdit(false);
       setSelectedCommunity(null);
     }
-  };
+  }, [selectedCommunity, editCommunity]);
 
   return (
     <Box>
@@ -95,7 +97,7 @@ const CommunitiesPage: React.FC<CommunitiesPageProps> = ({
           </TableHead>
           <TableBody>
             {filteredCommunities.map(community => (
-              <TableRow key={community.id}>
+              <TableRow key={community.id || 'unknown'}>
                 <TableCell>{community.name || 'N/A'}</TableCell>
                 <TableCell>{community.isHidden ? 'Yes' : 'No'}</TableCell>
                 <TableCell>
@@ -112,7 +114,6 @@ const CommunitiesPage: React.FC<CommunitiesPageProps> = ({
         </Table>
       )}
 
-      {/* Create Community Dialog */}
       <Dialog open={openCreate} onClose={() => setOpenCreate(false)}>
         <DialogTitle>Create Community</DialogTitle>
         <DialogContent>
@@ -123,6 +124,13 @@ const CommunitiesPage: React.FC<CommunitiesPageProps> = ({
             value={newCommunity.name}
             onChange={(e) => setNewCommunity({ ...newCommunity, name: e.target.value })}
             required
+          />
+          <TextField
+            label="Avatar (Base64)"
+            fullWidth
+            margin="dense"
+            value={newCommunity.avatarImage || ''}
+            onChange={(e) => setNewCommunity({ ...newCommunity, avatarImage: e.target.value || null })}
           />
         </DialogContent>
         <DialogActions>
@@ -137,7 +145,6 @@ const CommunitiesPage: React.FC<CommunitiesPageProps> = ({
         </DialogActions>
       </Dialog>
 
-      {/* Edit Community Dialog */}
       <Dialog open={openEdit} onClose={() => setOpenEdit(false)}>
         <DialogTitle>Edit Community</DialogTitle>
         <DialogContent>
@@ -151,6 +158,16 @@ const CommunitiesPage: React.FC<CommunitiesPageProps> = ({
                 onChange={(e) => setSelectedCommunity({ 
                   ...selectedCommunity, 
                   name: e.target.value 
+                })}
+              />
+              <TextField
+                label="Avatar (Base64)"
+                fullWidth
+                margin="dense"
+                value={selectedCommunity.avatar || ''}
+                onChange={(e) => setSelectedCommunity({ 
+                  ...selectedCommunity, 
+                  avatar: e.target.value || null 
                 })}
               />
               <FormControlLabel

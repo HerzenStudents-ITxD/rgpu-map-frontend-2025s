@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Button, 
   Container, 
@@ -22,25 +22,32 @@ export const NewsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const api = new CommunityServiceApi();
 
-  useEffect(() => {
-    const loadGroups = async () => {
-      try {
-        const response = await api.community.getCommunity();
-        const communities = response.data.body?.map(item => ({
-          id: item.community?.id || '',
-          name: item.community?.name || '',
-          avatar: item.community?.avatar,
-        })) || [];
-        setGroups(communities);
-      } catch (err) {
-        setError(t('news.error') || 'Ошибка загрузки групп новостей');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    loadGroups();
+  const loadGroups = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await api.community.getCommunity();
+      const communities = response.data.body?.map(item => ({
+        id: item.community?.id || '',
+        name: item.community?.name || '',
+        avatar: item.community?.avatar || null
+      })) || [];
+      setGroups(communities);
+    } catch (err: any) {
+      setError(t('news.error') || err.message || 'Ошибка загрузки групп новостей');
+    } finally {
+      setLoading(false);
+    }
   }, [t]);
+
+  useEffect(() => {
+    loadGroups();
+  }, [loadGroups]);
+
+  const handleFormClose = useCallback(() => {
+    setShowForm(false);
+    loadGroups();
+  }, [loadGroups]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -74,7 +81,7 @@ export const NewsPage = () => {
         {showForm && (
           <CreateNewsForm 
             groups={groups} 
-            onClose={() => setShowForm(false)}
+            onClose={handleFormClose}
             sx={{ 
               boxShadow: 3,
               borderRadius: 2,

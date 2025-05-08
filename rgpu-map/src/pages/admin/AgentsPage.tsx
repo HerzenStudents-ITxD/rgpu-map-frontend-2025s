@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   Box, 
   Button, 
@@ -18,8 +18,7 @@ import {
   FormControlLabel,
   Checkbox
 } from '@mui/material';
-import { CommunityAgentInfo } from '../../features/real_api/communityServiceApi';
-import { AddAgentRequest } from '../../features/real_api/communityServiceApi';
+import { CommunityAgentInfo, AddAgentRequest } from '../../features/real_api/communityServiceApi';
 
 interface AgentsPageProps {
   agents: CommunityAgentInfo[];
@@ -39,23 +38,24 @@ const AgentsPage: React.FC<AgentsPageProps> = ({ agents, loading, error, addAgen
   });
 
   const filteredAgents = agents.filter(agent => 
-    agent.userName?.toLowerCase().includes(search.toLowerCase())
+    agent.userName?.toLowerCase().includes(search.toLowerCase()) ||
+    agent.userId?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleCreate = async () => {
+  const handleCreate = useCallback(async () => {
     if (!newAgent.communityId || !newAgent.userId) {
       return;
     }
     await addAgent(newAgent);
     setOpenCreate(false);
     setNewAgent({ communityId: '', userId: '', isModerator: false });
-  };
+  }, [newAgent, addAgent]);
 
-  const handleDelete = (communityId: string | undefined, userId: string | undefined) => {
+  const handleDelete = useCallback((communityId: string | undefined, userId: string | undefined) => {
     if (communityId && userId) {
       deleteAgent(communityId, userId);
     }
-  };
+  }, [deleteAgent]);
 
   return (
     <Box>
@@ -86,8 +86,8 @@ const AgentsPage: React.FC<AgentsPageProps> = ({ agents, loading, error, addAgen
           </TableHead>
           <TableBody>
             {filteredAgents.map(agent => (
-              <TableRow key={`${agent.communityId}-${agent.userId}`}>
-                <TableCell>{agent.userName || 'N/A'}</TableCell>
+              <TableRow key={`${agent.communityId || 'unknown'}-${agent.userId || 'unknown'}`}>
+                <TableCell>{agent.userName || agent.userId || 'N/A'}</TableCell>
                 <TableCell>{agent.communityId || 'N/A'}</TableCell>
                 <TableCell>
                   <Button 
@@ -104,7 +104,6 @@ const AgentsPage: React.FC<AgentsPageProps> = ({ agents, loading, error, addAgen
         </Table>
       )}
 
-      {/* Add Agent Dialog */}
       <Dialog open={openCreate} onClose={() => setOpenCreate(false)}>
         <DialogTitle>Add Agent</DialogTitle>
         <DialogContent>

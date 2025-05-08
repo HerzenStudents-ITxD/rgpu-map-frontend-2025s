@@ -1,8 +1,7 @@
-// src/components/AvatarBox.tsx
 import { CSSProperties } from 'react';
 
 interface AvatarBoxProps {
-  imageUrl?: string;
+  imageUrl?: string | null;
   name: string;
   color?: string;
   size?: number;
@@ -33,9 +32,11 @@ export const AvatarBox = ({
     overflow: 'hidden'
   };
 
+  const isBase64 = imageUrl?.startsWith('data:image/');
+
   return (
     <div style={style}>
-      {imageUrl ? (
+      {imageUrl && (isBase64 || imageUrl.startsWith('http')) ? (
         <img 
           src={imageUrl} 
           alt={name}

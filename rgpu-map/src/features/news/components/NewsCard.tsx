@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { NewsItem } from '../types';
 import { 
   Card, 
@@ -29,14 +29,14 @@ export const NewsCard = ({ item, sx }: NewsCardProps) => {
   const [error, setError] = useState<string | null>(null);
   const api = new CommunityServiceApi();
 
-  const handleParticipate = async () => {
+  const handleParticipate = useCallback(async () => {
     try {
       await api.community.participateCreate({ newsId: item.id });
-      // Можно обновить состояние, если нужно отобразить, что пользователь участвует
-    } catch (err) {
-      setError(t('news.error') || 'Ошибка при участии');
+      setError(null);
+    } catch (err: any) {
+      setError(t('news.error') || err.message || 'Ошибка при участии');
     }
-  };
+  }, [item.id, t]);
 
   return (
     <Card sx={{ 
@@ -48,11 +48,11 @@ export const NewsCard = ({ item, sx }: NewsCardProps) => {
         <Stack direction="row" spacing={2} alignItems="center">
           <AvatarBox 
             imageUrl={item.group.avatar}
-            name={item.group.name}
+            name={item.group.name || 'N/A'}
             color="#3f51b5"
           />
           <div>
-            <Typography variant="h6">{item.group.name}</Typography>
+            <Typography variant="h6">{item.group.name || 'N/A'}</Typography>
             <Typography variant="body2" color="text.secondary">
               {new Date(item.date).toLocaleDateString('ru-RU', {
                 day: 'numeric',
@@ -79,7 +79,7 @@ export const NewsCard = ({ item, sx }: NewsCardProps) => {
                 <img
                   src={routeIcon}
                   alt="Location"
-                  style={{ width: 24, height: 24, fill: theme.palette.ico.nmain }}
+                  style={{ width: 24, height: 24, fill: theme.palette.ico?.nmain }}
                 />
               </Button>
             </>

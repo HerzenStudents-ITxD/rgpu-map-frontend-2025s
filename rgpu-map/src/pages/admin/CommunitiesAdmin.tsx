@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Button,
@@ -19,6 +19,8 @@ import {
   Alert,
   Tab,
   Tabs,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import {
@@ -48,22 +50,15 @@ const CommunitiesAdmin = () => {
     communityId: "",
     title: "",
     content: "",
-    images: null,
+    images: [],
     location: "",
     isFeatured: false,
   });
   const [editCommunity, setEditCommunity] = useState<CommunityResponse | null>(null);
   const [editForm, setEditForm] = useState({ name: "", avatarImage: "" });
+  const [newsImage, setNewsImage] = useState<File | null>(null);
 
-  useEffect(() => {
-    if (activeTab === 0) {
-      fetchCommunities();
-    } else {
-      fetchNews();
-    }
-  }, [activeTab]);
-
-  const fetchCommunities = async () => {
+  const fetchCommunities = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -73,14 +68,14 @@ const CommunitiesAdmin = () => {
       } else {
         setError(t("admin.errorFetchingCommunities") || "Failed to fetch communities");
       }
-    } catch (err) {
-      setError(t("admin.errorFetchingCommunities") || "Error fetching communities");
+    } catch (err: any) {
+      setError(t("admin.errorFetchingCommunities") || err.message || "Error fetching communities");
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
-  const fetchNews = async () => {
+  const fetchNews = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -90,14 +85,39 @@ const CommunitiesAdmin = () => {
       } else {
         setError(t("admin.errorFetchingNews") || "Failed to fetch news");
       }
-    } catch (err) {
-      setError(t("admin.errorFetchingNews") || "Error fetching news");
+    } catch (err: any) {
+      setError(t("admin.errorFetchingNews") || err.message || "Error fetching news");
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
-  const handleCreateCommunity = async () => {
+  const readFileAsBase64 = useCallback((file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.split(',')[1] || result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
+  const validateImage = useCallback((file: File): string | null => {
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/jpeg', 'image/png'];
+    
+    if (file.size > maxSize) {
+      return t('news.imageTooLarge') || 'Image size exceeds 5MB';
+    }
+    if (!allowedTypes.includes(file.type)) {
+      return t('news.invalidImageFormat') || 'Only JPEG and PNG images are allowed';
+    }
+    return null;
+  }, [t]);
+
+  const handleCreateCommunity = useCallback(async () => {
     try {
       setError(null);
       if (!newCommunity.name.trim()) {
@@ -118,7 +138,9 @@ const CommunitiesAdmin = () => {
               name: request.name,
               avatar: request.avatarImage,
               isHidden: false,
+              createdAt: new Date().toISOString(),
             },
+            agents: []
           },
         ]);
         setNewCommunity({ name: "", avatarImage: "" });
@@ -126,27 +148,39 @@ const CommunitiesAdmin = () => {
       } else {
         setError(t("admin.errorCreatingCommunity") || "Failed to create community");
       }
-    } catch (err) {
-      setError(t("admin.errorCreatingCommunity") || "Error creating community");
+    } catch (err: any) {
+      setError(t("admin.errorCreatingCommunity") || err.message || "Error creating community");
     }
-  };
+  }, [newCommunity, communities, t]);
 
-  const handleCreateNews = async () => {
+  const handleCreateNews = useCallback(async () => {
     try {
       setError(null);
-      if (!newNews.title.trim() || !newNews.content.trim()) {
-        setError(t("admin.titleAndContentRequired") || "Title and content are required");
+      if (!newNews.title.trim() || !newNews.content.trim() || !newNews.communityId) {
+        setError(t("admin.titleAndContentRequired") || "Title, content, and community are required");
         return;
       }
-      
-      const response = await communityApi.community.createNewsCreate({
+
+      const request: CreateNewsRequest = {
         communityId: newNews.communityId,
         title: newNews.title,
         content: newNews.content,
-        images: newNews.images,
-        location: newNews.location,
+        images: [],
+        location: newNews.location || undefined,
         isFeatured: newNews.isFeatured,
-      });
+      };
+
+      if (newsImage) {
+        const validationError = validateImage(newsImage);
+        if (validationError) {
+          setError(validationError);
+          return;
+        }
+        const base64Image = await readFileAsBase64(newsImage);
+        request.images!.push(base64Image);
+      }
+      
+      const response = await communityApi.community.createNewsCreate(request);
       
       if (response.data.body) {
         setNews([...news, {
@@ -154,7 +188,7 @@ const CommunitiesAdmin = () => {
           communityId: newNews.communityId,
           title: newNews.title,
           content: newNews.content,
-          photos: newNews.images || null,
+          photos: request.images || null,
           participants: [],
           location: newNews.location || null,
           isFeatured: newNews.isFeatured,
@@ -164,20 +198,21 @@ const CommunitiesAdmin = () => {
           communityId: "",
           title: "",
           content: "",
-          images: null,
+          images: [],
           location: "",
           isFeatured: false,
         });
+        setNewsImage(null);
         setOpenCreateNewsDialog(false);
       } else {
         setError(t("admin.errorCreatingNews") || "Failed to create news");
       }
-    } catch (err) {
-      setError(t("admin.errorCreatingNews") || "Error creating news");
+    } catch (err: any) {
+      setError(t("admin.errorCreatingNews") || err.message || "Error creating news");
     }
-  };
+  }, [newNews, news, newsImage, t, readFileAsBase64, validateImage]);
 
-  const handleEditCommunity = async () => {
+  const handleEditCommunity = useCallback(async () => {
     if (!editCommunity?.community?.id) {
       setError(t("admin.invalidCommunity") || "Invalid community selected");
       return;
@@ -211,9 +246,9 @@ const CommunitiesAdmin = () => {
               ? {
                   ...c,
                   community: {
-                    ...c.community,
+                    ...c.community!,
                     name: editForm.name,
-                    avatar: editForm.avatarImage,
+                    avatar: editForm.avatarImage || null,
                   },
                 }
               : c
@@ -225,12 +260,12 @@ const CommunitiesAdmin = () => {
       } else {
         setError(t("admin.errorUpdatingCommunity") || "Failed to update community");
       }
-    } catch (err) {
-      setError(t("admin.errorUpdatingCommunity") || "Error updating community");
+    } catch (err: any) {
+      setError(t("admin.errorUpdatingCommunity") || err.message || "Error updating community");
     }
-  };
+  }, [editCommunity, editForm, communities, t]);
 
-  const handleSoftDeleteCommunity = async (communityId: string) => {
+  const handleSoftDeleteCommunity = useCallback(async (communityId: string) => {
     try {
       setError(null);
       const response = await communityApi.community.softdeleteDelete({
@@ -240,19 +275,19 @@ const CommunitiesAdmin = () => {
         setCommunities(
           communities.map((c) =>
             c.community?.id === communityId
-              ? { ...c, community: { ...c.community, isHidden: true } }
+              ? { ...c, community: { ...c.community!, isHidden: true } }
               : c
           )
         );
       } else {
         setError(t("admin.errorDeletingCommunity") || "Failed to delete community");
       }
-    } catch (err) {
-      setError(t("admin.errorDeletingCommunity") || "Error deleting community");
+    } catch (err: any) {
+      setError(t("admin.errorDeletingCommunity") || err.message || "Error deleting community");
     }
-  };
+  }, [communities, t]);
 
-  const handleOpenEditDialog = (community: CommunityResponse) => {
+  const handleOpenEditDialog = useCallback((community: CommunityResponse) => {
     if (community.community?.id) {
       setEditCommunity(community);
       setEditForm({
@@ -263,7 +298,12 @@ const CommunitiesAdmin = () => {
     } else {
       setError(t("admin.invalidCommunity") || "Invalid community selected");
     }
-  };
+  }, [t]);
+
+  const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setNewsImage(file);
+  }, []);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -311,10 +351,10 @@ const CommunitiesAdmin = () => {
                 </TableHead>
                 <TableBody>
                   {communities.map((community) => (
-                    <TableRow key={community.community?.id}>
+                    <TableRow key={community.community?.id || 'unknown'}>
                       <TableCell>{community.community?.id || "N/A"}</TableCell>
                       <TableCell>{community.community?.name || "N/A"}</TableCell>
-                      <TableCell>{community.community?.avatar || "N/A"}</TableCell>
+                      <TableCell>{community.community?.avatar ? "Base64 Image" : "N/A"}</TableCell>
                       <TableCell>
                         {community.community?.isHidden ? t("yes") : t("no")}
                       </TableCell>
@@ -377,10 +417,10 @@ const CommunitiesAdmin = () => {
                 </TableHead>
                 <TableBody>
                   {news.map((item) => (
-                    <TableRow key={item.newsId}>
-                      <TableCell>{item.title}</TableCell>
-                      <TableCell>{item.content}</TableCell>
-                      <TableCell>{item.communityId}</TableCell>
+                    <TableRow key={item.newsId || 'unknown'}>
+                      <TableCell>{item.title || "N/A"}</TableCell>
+                      <TableCell>{item.content || "N/A"}</TableCell>
+                      <TableCell>{item.communityId || "N/A"}</TableCell>
                       <TableCell>
                         {item.createdAt ? new Date(item.createdAt).toLocaleString() : "N/A"}
                       </TableCell>
@@ -394,7 +434,6 @@ const CommunitiesAdmin = () => {
         </>
       )}
 
-      {/* Create Community Dialog */}
       <Dialog
         open={openCreateDialog}
         onClose={() => setOpenCreateDialog(false)}
@@ -437,7 +476,6 @@ const CommunitiesAdmin = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Create News Dialog */}
       <Dialog
         open={openCreateNewsDialog}
         onClose={() => setOpenCreateNewsDialog(false)}
@@ -451,15 +489,14 @@ const CommunitiesAdmin = () => {
             value={newNews.communityId}
             onChange={(e) => setNewNews({ ...newNews, communityId: e.target.value })}
             sx={{ mt: 2 }}
-            SelectProps={{
-              native: true,
-            }}
+            error={!!error && !newNews.communityId}
+            helperText={!!error && !newNews.communityId ? t("admin.required") : ""}
           >
-            <option value=""></option>
+            <MenuItem value="">Select Community</MenuItem>
             {communities.map((community) => (
-              <option key={community.community?.id} value={community.community?.id}>
-                {community.community?.name}
-              </option>
+              <MenuItem key={community.community?.id} value={community.community?.id}>
+                {community.community?.name || "N/A"}
+              </MenuItem>
             ))}
           </TextField>
           <TextField
@@ -489,6 +526,25 @@ const CommunitiesAdmin = () => {
             onChange={(e) => setNewNews({ ...newNews, location: e.target.value })}
             sx={{ mt: 2 }}
           />
+          <Box sx={{ mt: 2 }}>
+            <Button
+              variant="outlined"
+              component="label"
+            >
+              {t('news.addImage')}
+              <input
+                type="file"
+                accept="image/jpeg,image/png"
+                hidden
+                onChange={handleImageChange}
+              />
+            </Button>
+            {newsImage && (
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                {t('feedback.selectedFile')}: {newsImage.name}
+              </Typography>
+            )}
+          </Box>
           <FormControlLabel
             control={
               <Checkbox
@@ -513,7 +569,6 @@ const CommunitiesAdmin = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Edit Community Dialog */}
       <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
         <DialogTitle>{t("admin.editCommunity")}</DialogTitle>
         <DialogContent>

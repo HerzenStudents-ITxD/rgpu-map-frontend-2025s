@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -44,18 +44,41 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
   const [error, setError] = useState<string | null>(null);
   const api = new CommunityServiceApi();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const validateImage = (file: File): string | null => {
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/jpeg', 'image/png'];
+    
+    if (file.size > maxSize) {
+      return t('news.imageTooLarge') || 'Image size exceeds 5MB';
+    }
+    if (!allowedTypes.includes(file.type)) {
+      return t('news.invalidImageFormat') || 'Only JPEG and PNG images are allowed';
+    }
+    return null;
+  };
+
+  const readFileAsBase64 = useCallback((file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.split(',')[1] || result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Валидация обязательных полей
     if (!form.groupId || !form.title || !form.content) {
       setError(t('news.error') || 'Заполните обязательные поля');
       return;
     }
 
     try {
-      // Подготовка данных
       const requestData = {
         communityId: form.groupId,
         title: form.title.trim(),
@@ -65,37 +88,27 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
         images: [] as string[]
       };
 
-      // Конвертация изображения в base64
       if (form.image) {
+        const validationError = validateImage(form.image);
+        if (validationError) {
+          setError(validationError);
+          return;
+        }
         const base64Image = await readFileAsBase64(form.image);
         requestData.images.push(base64Image);
       }
 
-      // Отправка запроса
       await api.community.createNewsCreate(requestData);
       onClose();
-    } catch (error: any) {
-      console.error('Ошибка создания новости:', error);
-      setError(error.response?.data?.message || t('news.error') || 'Ошибка при создании новости');
+    } catch (err: any) {
+      setError(err.message || t('news.error') || 'Ошибка при создании новости');
     }
-  };
+  }, [form, t, readFileAsBase64, onClose]);
 
-  const readFileAsBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        resolve(result.split(',')[1] || result); // Удаление data URL префикса
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setForm({ ...form, image: file });
-  };
+  }, [form]);
 
   return (
     <Dialog 
@@ -172,7 +185,7 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
               {t('news.addImage')}
               <input
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png"
                 hidden
                 onChange={handleImageChange}
               />

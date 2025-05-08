@@ -16,8 +16,6 @@ import FeedbackTypesAdmin from './FeedbackTypesAdmin';
 const AdminPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   
-  // Since UsersPage and RolesPage manage their own state with hooks,
-  // we don't need to pass props to them
   const {
     communities,
     loading: communitiesLoading,
