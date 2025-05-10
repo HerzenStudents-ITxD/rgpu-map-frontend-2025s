@@ -81,8 +81,7 @@ export interface CreateNewsRequest {
   /** @minLength 1 */
   content: string;
   images?: string[] | null;
-  location?: string;
-  isFeatured?: boolean;
+  image?: string | null;
 }
 
 export interface GuidOperationResultResponse {

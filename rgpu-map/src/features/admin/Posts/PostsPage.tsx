@@ -34,7 +34,7 @@ const PostsPage: React.FC<PostsPageProps> = ({ posts, loading, error, createPost
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedPost, setSelectedPost] = useState<NewsResponse | null>(null);
-  const [newPost, setNewPost] = useState<CreateNewsRequest>({ communityId: '', title: '', content: '', isFeatured: false });
+  const [newPost, setNewPost] = useState<CreateNewsRequest>({ communityId: '', title: '', content: ''});
 
   const filteredPosts = posts.filter(post => 
     post.title?.toLowerCase().includes(search.toLowerCase()) || 
@@ -44,7 +44,7 @@ const PostsPage: React.FC<PostsPageProps> = ({ posts, loading, error, createPost
   const handleCreate = async () => {
     await createPost(newPost);
     setOpenCreate(false);
-    setNewPost({ communityId: '', title: '', content: '', isFeatured: false });
+    setNewPost({ communityId: '', title: '', content: ''});
   };
 
   const handleEdit = async () => {
@@ -52,7 +52,6 @@ const PostsPage: React.FC<PostsPageProps> = ({ posts, loading, error, createPost
       await editPost(selectedPost.newsId, { 
         title: selectedPost.title || '', 
         content: selectedPost.content || '', 
-        isFeatured: selectedPost.isFeatured,
         communityId: selectedPost.communityId || ''
       });
       setOpenEdit(false);
@@ -134,15 +133,6 @@ const PostsPage: React.FC<PostsPageProps> = ({ posts, loading, error, createPost
             rows={4}
             value={newPost.content}
             onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={newPost.isFeatured}
-                onChange={(e) => setNewPost({ ...newPost, isFeatured: e.target.checked })}
-              />
-            }
-            label="Is Featured"
           />
         </DialogContent>
         <DialogActions>

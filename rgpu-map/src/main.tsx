@@ -28,8 +28,8 @@ import './index.css';
 
 import AgentsAdmin from './features/admin/Agents/AgentsAdmin';
 import CommunitiesAdmin from './features/admin/Communities/CommunitiesAdmin';
-import AdminPanel from './features/admin/AdminPanel';
-import PointsAdmin from './features/admin/PointsPage';
+import AdminPanel from './pages/AdminPanel';
+import PointsAdmin from './features/admin/Points/PointsPage';
 import UsersAdmin from './features/admin/Users/UsersAdmin';
 import FeedbackAdmin from './features/admin/Feedback/FeedbackAdmin';
 import FeedbackTypesAdmin from './features/admin/Feedback/FeedbackTypesAdmin';

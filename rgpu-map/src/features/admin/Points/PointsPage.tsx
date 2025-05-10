@@ -23,7 +23,7 @@ import {
   FormControlLabel,
   Checkbox
 } from '@mui/material';
-import { PointInfo } from '../real_api/MapServiceApi';
+import { PointInfo } from '../../real_api/MapServiceApi';
 import { useAdminPoints } from './useAdminPoints';
 
 interface PointFormData {

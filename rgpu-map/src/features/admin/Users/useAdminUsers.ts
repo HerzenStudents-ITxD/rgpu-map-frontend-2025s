@@ -5,7 +5,7 @@ import {
   CreateUserRequest, 
   UserInfoFindResultResponse,
   UsersServiceApi
-} from '../real_api/usersServiceApi';
+} from '../../real_api/usersServiceApi';
 
 const usersService = new UsersServiceApi();
 

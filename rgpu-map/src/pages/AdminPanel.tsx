@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { Container, Typography, AppBar, Tabs, Tab, Box } from '@mui/material';
-import useAdminUsers from './useAdminUsers';
-import { useAdminRoles } from './Roles/useAdminRoles';
-import { useAdminCommunities } from './Communities/useAdminCommunities';
-import { useAdminAgents } from './Agents/useAdminAgents';
-import { useAdminPosts } from './Posts/useAdminPosts';
-import UsersPage from './Users/UsersPage';
-import RolesPage from './Roles/RolesPage';
-import CommunitiesPage from './Communities/CommunitiesPage';
-import AgentsPage from './Agents/AgentsPage';
-import PostsPage from './Posts/PostsPage';
-import FeedbackAdmin from './Feedback/FeedbackAdmin';
-import FeedbackTypesAdmin from './Feedback/FeedbackTypesAdmin';
-import PointsPage from './PointsPage';
+import useAdminUsers from '../features/admin/Users/useAdminUsers';
+import { useAdminRoles } from '../features/admin/Roles/useAdminRoles';
+import { useAdminCommunities } from '../features/admin/Communities/useAdminCommunities';
+import { useAdminAgents } from '../features/admin/Agents/useAdminAgents';
+import { useAdminPosts } from '../features/admin/Posts/useAdminPosts';
+import UsersPage from '../features/admin/Users/UsersPage';
+import RolesPage from '../features/admin/Roles/RolesPage';
+import CommunitiesPage from '../features/admin/Communities/CommunitiesPage';
+import AgentsPage from '../features/admin/Agents/AgentsPage';
+import PostsPage from '../features/admin/Posts/PostsPage';
+import FeedbackAdmin from '../features/admin/Feedback/FeedbackAdmin';
+import FeedbackTypesAdmin from '../features/admin/Feedback/FeedbackTypesAdmin';
+import PointsPage from '../features/admin/Points/PointsPage';
 
 const AdminPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);

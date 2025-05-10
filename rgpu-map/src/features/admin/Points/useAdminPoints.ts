@@ -1,6 +1,6 @@
 // hooks/useAdminPoints.ts
 import { useState, useEffect } from 'react';
-import { Api, PointInfo, CreatePointRequest, EditPointRequest } from '../real_api/MapServiceApi';
+import { Api, PointInfo, CreatePointRequest, EditPointRequest } from '../../real_api/MapServiceApi';
 
 const mapApi = new Api();
 
