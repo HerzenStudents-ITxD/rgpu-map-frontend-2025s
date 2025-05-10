@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { Container, Typography, AppBar, Tabs, Tab, Box } from '@mui/material';
 import useAdminUsers from './useAdminUsers';
-import { useAdminRoles } from './useAdminRoles';
-import { useAdminCommunities } from './useAdminCommunities';
-import { useAdminAgents } from './useAdminAgents';
-import { useAdminPosts } from './useAdminPosts';
-import UsersPage from './UsersPage';
-import RolesPage from './RolesPage';
-import CommunitiesPage from './CommunitiesPage';
-import AgentsPage from './AgentsPage';
-import PostsPage from './PostsPage';
-import FeedbackAdmin from './FeedbackAdmin';
-import FeedbackTypesAdmin from './FeedbackTypesAdmin';
+import { useAdminRoles } from './Roles/useAdminRoles';
+import { useAdminCommunities } from './Communities/useAdminCommunities';
+import { useAdminAgents } from './Agents/useAdminAgents';
+import { useAdminPosts } from './Posts/useAdminPosts';
+import UsersPage from './Users/UsersPage';
+import RolesPage from './Roles/RolesPage';
+import CommunitiesPage from './Communities/CommunitiesPage';
+import AgentsPage from './Agents/AgentsPage';
+import PostsPage from './Posts/PostsPage';
+import FeedbackAdmin from './Feedback/FeedbackAdmin';
+import FeedbackTypesAdmin from './Feedback/FeedbackTypesAdmin';
+import PointsPage from './PointsPage';
 
 const AdminPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -67,6 +68,7 @@ const AdminPanel: React.FC = () => {
           <Tab label="Posts" />
           <Tab label="Feedback" />
           <Tab label="Feedback Types" />
+          <Tab label="Points" />
         </Tabs>
       </AppBar>
       <Box sx={{ mt: 2 }}>
@@ -103,6 +105,7 @@ const AdminPanel: React.FC = () => {
         )}
         {activeTab === 5 && <FeedbackAdmin />}
         {activeTab === 6 && <FeedbackTypesAdmin />}
+        {activeTab === 7 && <PointsPage />}
       </Box>
     </Container>
   );

@@ -17,8 +17,8 @@ import {
   CircularProgress,
   Pagination
 } from '@mui/material';
-import { UserInfo, CreateUserRequest, CommunicationType } from '../../features/real_api/usersServiceApi';
-import { useAdminUsers } from './useAdminUsers';
+import { UserInfo, CreateUserRequest, CommunicationType } from '../../real_api/usersServiceApi';
+import { useAdminUsers } from '../useAdminUsers';
 
 const UsersPage: React.FC = () => {
   const [search, setSearch] = useState('');

@@ -17,8 +17,8 @@ import {
   FormControlLabel,
   Checkbox 
 } from '@mui/material';
-import { NewsResponse } from '../../features/real_api/communityServiceApi';
-import { CreateNewsRequest } from '../../features/real_api/communityServiceApi';
+import { NewsResponse } from '../../real_api/communityServiceApi';
+import { CreateNewsRequest } from '../../real_api/communityServiceApi';
 
 interface PostsPageProps {
   posts: NewsResponse[];

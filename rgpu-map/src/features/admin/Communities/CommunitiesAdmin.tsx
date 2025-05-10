@@ -31,9 +31,9 @@ import {
   OperationType,
   NewsResponse,
   CreateNewsRequest,
-} from "../../features/real_api/communityServiceApi";
+} from "../../real_api/communityServiceApi";
 import { Link } from "react-router-dom";
-import { getAccessToken } from '../../utils/tokenService';
+import { getAccessToken } from '../../../utils/tokenService';
 
 const communityApi = new CommunityServiceApi();
 

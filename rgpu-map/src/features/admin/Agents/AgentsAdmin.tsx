@@ -14,7 +14,7 @@ import {
   Alert,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { CommunityServiceApi, CommunityResponse } from '../../features/real_api/communityServiceApi';
+import { CommunityServiceApi, CommunityResponse } from '../../real_api/communityServiceApi';
 import { Link } from 'react-router-dom';
 
 const communityApi = new CommunityServiceApi();

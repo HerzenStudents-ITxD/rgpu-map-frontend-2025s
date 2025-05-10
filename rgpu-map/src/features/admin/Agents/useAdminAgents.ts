@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { CommunityServiceApi } from '../../features/real_api/communityServiceApi';
-import { AddAgentRequest, CommunityAgentInfo, CommunityResponseFindResultResponse } from '../../features/real_api/communityServiceApi';
+import { CommunityServiceApi } from '../../real_api/communityServiceApi';
+import { AddAgentRequest, CommunityAgentInfo, CommunityResponseFindResultResponse } from '../../real_api/communityServiceApi';
 
 const communityServiceApi = new CommunityServiceApi();
 

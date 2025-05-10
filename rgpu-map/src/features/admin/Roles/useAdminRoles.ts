@@ -5,7 +5,7 @@ import {
   CreateRoleRequest, 
   RoleInfoFindResultResponse,
   RightsServiceApi
-} from '../../features/real_api/rightsServiceApi';
+} from '../../real_api/rightsServiceApi';
 
 const rightsService = new RightsServiceApi();
 

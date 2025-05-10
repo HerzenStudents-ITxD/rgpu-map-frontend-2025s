@@ -26,13 +26,13 @@ import { useMapStore } from './store/slices/mapSlice';
 import './i18n';
 import './index.css';
 
-import AgentsAdmin from './pages/admin/AgentsAdmin';
-import CommunitiesAdmin from './pages/admin/CommunitiesAdmin';
-import AdminPanel from './pages/admin/AdminPanel';
-import PointsAdmin from './pages/admin/PointsAdmin';
-import UsersAdmin from './pages/admin/UsersAdmin';
-import FeedbackAdmin from './pages/admin/FeedbackAdmin';
-import FeedbackTypesAdmin from './pages/admin/FeedbackTypesAdmin';
+import AgentsAdmin from './features/admin/Agents/AgentsAdmin';
+import CommunitiesAdmin from './features/admin/Communities/CommunitiesAdmin';
+import AdminPanel from './features/admin/AdminPanel';
+import PointsAdmin from './features/admin/PointsPage';
+import UsersAdmin from './features/admin/Users/UsersAdmin';
+import FeedbackAdmin from './features/admin/Feedback/FeedbackAdmin';
+import FeedbackTypesAdmin from './features/admin/Feedback/FeedbackTypesAdmin';
 
 import PointDetails from './features/3dMap/components/PointDetails';
 import BuildingDetails from './features/3dMap/components/BuildingDetails';

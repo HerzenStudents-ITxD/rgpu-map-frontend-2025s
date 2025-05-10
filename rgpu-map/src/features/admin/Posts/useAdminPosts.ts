@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { CommunityServiceApi, CreateNewsRequest, NewsResponse } from '../../features/real_api/communityServiceApi';
-import { getAccessToken } from '../../utils/tokenService';
+import { CommunityServiceApi, CreateNewsRequest, NewsResponse } from '../../real_api/communityServiceApi';
+import { getAccessToken } from '../../../utils/tokenService';
 
 const communityServiceApi = new CommunityServiceApi();
 

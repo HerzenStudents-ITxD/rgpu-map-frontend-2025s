@@ -24,7 +24,7 @@ import {
   TypeResponse,
   CreateTypeRequest,
   UpdateTypeRequest,
-} from '../../features/real_api/feedbackServiceApi';
+} from '../../real_api/feedbackServiceApi';
 
 const feedbackApi = new FeedbackServiceApi();
 

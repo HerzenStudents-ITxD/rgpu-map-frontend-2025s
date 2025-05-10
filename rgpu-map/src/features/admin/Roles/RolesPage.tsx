@@ -17,7 +17,7 @@ import {
   CircularProgress,
   Pagination
 } from '@mui/material';
-import { CreateRoleRequest } from '../../features/real_api/rightsServiceApi';
+import { CreateRoleRequest } from '../../real_api/rightsServiceApi';
 import { useAdminRoles } from './useAdminRoles';
 
 const RolesPage: React.FC = () => {

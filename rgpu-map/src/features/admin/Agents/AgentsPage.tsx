@@ -18,7 +18,7 @@ import {
   FormControlLabel,
   Checkbox
 } from '@mui/material';
-import { CommunityAgentInfo, AddAgentRequest } from '../../features/real_api/communityServiceApi';
+import { CommunityAgentInfo, AddAgentRequest } from '../../real_api/communityServiceApi';
 
 interface AgentsPageProps {
   agents: CommunityAgentInfo[];

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { HttpClient, ContentType } from '../../features/real_api/communityServiceApi';
-import { getAccessToken } from '../../utils/tokenService';
+import { HttpClient, ContentType } from '../../real_api/communityServiceApi';
+import { getAccessToken } from '../../../utils/tokenService';
 import { useTranslation } from 'react-i18next';
 
 export interface User {

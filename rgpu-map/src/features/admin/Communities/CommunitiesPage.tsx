@@ -17,7 +17,7 @@ import {
   Checkbox,
   FormControlLabel
 } from '@mui/material';
-import { CommunityInfo, CreateCommunityRequest, OperationType } from '../../features/real_api/communityServiceApi';
+import { CommunityInfo, CreateCommunityRequest, OperationType } from '../../real_api/communityServiceApi';
 
 interface CommunitiesPageProps {
   communities: CommunityInfo[];
