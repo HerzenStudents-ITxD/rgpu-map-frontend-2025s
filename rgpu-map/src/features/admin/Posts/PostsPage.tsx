@@ -56,11 +56,10 @@ const PostsPage: React.FC<PostsPageProps> = ({
   const [newPost, setNewPost] = useState<CreateNewsRequest>({ 
     communityId: '', 
     title: '', 
-    content: '', 
+    text: '', 
     pointId: null 
   });
 
-  // Загрузка сообществ при монтировании
   useEffect(() => {
     const loadCommunities = async () => {
       setLoadingCommunities(true);
@@ -78,7 +77,6 @@ const PostsPage: React.FC<PostsPageProps> = ({
         setLoadingCommunities(false);
       }
     };
-    
     loadCommunities();
   }, []);
 
@@ -87,7 +85,7 @@ const PostsPage: React.FC<PostsPageProps> = ({
       await createPost(newPost);
       await refreshPosts();
       setOpenCreate(false);
-      setNewPost({ communityId: '', title: '', content: '', pointId: null });
+      setNewPost({ communityId: '', title: '', text: '', pointId: null });
     } catch (err) {
       console.error('Create post error:', err);
     }
@@ -95,14 +93,13 @@ const PostsPage: React.FC<PostsPageProps> = ({
 
   const filteredPosts = posts.filter(post => 
     post.title?.toLowerCase().includes(search.toLowerCase()) || 
-    post.content?.toLowerCase().includes(search.toLowerCase())
+    post.text?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom>Manage Posts</Typography>
       
-      {/* Панель управления */}
       <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
         <TextField
           label="Search Posts"
@@ -120,7 +117,6 @@ const PostsPage: React.FC<PostsPageProps> = ({
         </Button>
       </Box>
 
-      {/* Диалог создания поста */}
       <Dialog open={openCreate} onClose={() => setOpenCreate(false)} maxWidth="md" fullWidth>
         <DialogTitle>Create New Post</DialogTitle>
         <DialogContent dividers>
@@ -159,8 +155,8 @@ const PostsPage: React.FC<PostsPageProps> = ({
               multiline
               rows={4}
               label="Content *"
-              value={newPost.content}
-              onChange={(e) => setNewPost({...newPost, content: e.target.value})}
+              value={newPost.text}
+              onChange={(e) => setNewPost({...newPost, text: e.target.value})}
               sx={{ mb: 3 }}
               required
             />
@@ -178,14 +174,97 @@ const PostsPage: React.FC<PostsPageProps> = ({
           <Button 
             onClick={handleCreate}
             variant="contained"
-            disabled={!newPost.communityId || !newPost.title || !newPost.content}
+            disabled={!newPost.communityId || !newPost.title || !newPost.text}
           >
             Create
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Таблица постов */}
+      <Dialog open={openEdit} onClose={() => setOpenEdit(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Edit Post</DialogTitle>
+        <DialogContent dividers>
+          {selectedPost && (
+            <Box component="form" sx={{ mt: 2 }}>
+              <FormControl fullWidth sx={{ mb: 3 }}>
+                <InputLabel>Community *</InputLabel>
+                <Select
+                  value={selectedPost.communityId}
+                  onChange={(e) => setSelectedPost({
+                    ...selectedPost,
+                    communityId: e.target.value
+                  })}
+                  required
+                  label="Community *"
+                >
+                  {communities.map(community => (
+                    <MenuItem key={community.id} value={community.id}>
+                      {community.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <TextField
+                fullWidth
+                label="Title *"
+                value={selectedPost.title}
+                onChange={(e) => setSelectedPost({
+                  ...selectedPost,
+                  title: e.target.value
+                })}
+                sx={{ mb: 3 }}
+                required
+              />
+
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                label="Content *"
+                value={selectedPost.text}
+                onChange={(e) => setSelectedPost({
+                  ...selectedPost,
+                  text: e.target.value
+                })}
+                sx={{ mb: 3 }}
+                required
+              />
+
+              <TextField
+                fullWidth
+                label="Point ID"
+                value={selectedPost.pointId || ''}
+                onChange={(e) => setSelectedPost({
+                  ...selectedPost,
+                  pointId: e.target.value
+                })}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEdit(false)}>Cancel</Button>
+          <Button 
+            onClick={async () => {
+              if (selectedPost?.newsId) {
+                await editPost(selectedPost.newsId, {
+                  communityId: selectedPost.communityId,
+                  title: selectedPost.title,
+                  text: selectedPost.text,
+                  pointId: selectedPost.pointId
+                });
+                await refreshPosts();
+                setOpenEdit(false);
+              }
+            }}
+            variant="contained"
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {loading ? (
         <CircularProgress sx={{ mt: 4 }} />
       ) : error ? (
@@ -227,11 +306,6 @@ const PostsPage: React.FC<PostsPageProps> = ({
           </TableBody>
         </Table>
       )}
-
-      {/* Диалог редактирования (аналогично можно доработать) */}
-      <Dialog open={openEdit} onClose={() => setOpenEdit(false)}>
-        {/* ... аналогичная логика для редактирования ... */}
-      </Dialog>
     </Box>
   );
 };

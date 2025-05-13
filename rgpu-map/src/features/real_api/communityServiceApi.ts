@@ -81,7 +81,7 @@ export interface CreateNewsRequest {
   /** @minLength 1 */
   title: string;
   /** @minLength 1 */
-  content: string;
+  text: string;
   images?: string[] | null;
   image?: string | null;
   /** @format uuid */
@@ -103,7 +103,7 @@ export interface NewsResponse {
   /** @format uuid */
   communityId?: string;
   title?: string | null;
-  content?: string | null;
+  text?: string | null;
   photos?: string[] | null;
   participants?: string[] | null;
   location?: string | null;

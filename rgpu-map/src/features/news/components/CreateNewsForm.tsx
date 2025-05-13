@@ -35,7 +35,7 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
   const { t } = useTranslation();
   const [form, setForm] = useState({
     title: '',
-    content: '',
+    text: '',
     groupId: '',
     pointId: '',
     image: null as File | null,
@@ -71,7 +71,7 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
     setError(null);
 
     // Валидация обязательных полей
-    if (!form.groupId || !form.title || !form.content) {
+    if (!form.groupId || !form.title || !form.text) {
       setError(t('news.fillRequiredFields') || 'Fill all required fields');
       return;
     }
@@ -80,7 +80,7 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
       const requestData: CreateNewsRequest = {
         communityId: form.groupId,
         title: form.title.trim(),
-        content: form.content.trim(),
+        text: form.text.trim(),
         pointId: form.pointId.trim() || null,
         isFeatured: form.isFeatured,
         images: [],
@@ -148,9 +148,9 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
             fullWidth
             multiline
             rows={4}
-            label={`${t('news.content')} *`}
-            value={form.content}
-            onChange={(e) => setForm({...form, content: e.target.value})}
+            label={`${t('news.text')} *`}
+            value={form.text}
+            onChange={(e) => setForm({...form, text: e.target.value})}
             sx={{ mb: 3 }}
             required
           />

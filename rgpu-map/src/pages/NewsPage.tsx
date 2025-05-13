@@ -19,10 +19,24 @@ export const NewsPage = () => {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
   const [groups, setGroups] = useState<NewsGroup[]>([]);
+  const [hiddenCommunities, setHiddenCommunities] = useState<string[]>(() => {
+    const saved = localStorage.getItem('hiddenCommunities');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const api = new CommunityServiceApi();
+
+  const toggleCommunityVisibility = useCallback((communityId: string) => {
+    setHiddenCommunities(prev => {
+      const newHidden = prev.includes(communityId)
+        ? prev.filter(id => id !== communityId)
+        : [...prev, communityId];
+      localStorage.setItem('hiddenCommunities', JSON.stringify(newHidden));
+      return newHidden;
+    });
+  }, []);
 
   const loadGroups = useCallback(async () => {
     try {
@@ -98,7 +112,12 @@ export const NewsPage = () => {
           />
         )}
 
-        <NewsList />
+        <NewsList 
+          groups={groups}
+          hiddenCommunities={hiddenCommunities}
+          onToggleCommunity={toggleCommunityVisibility}
+          isAuthenticated={isAuthenticated}
+        />
       </Stack>
     </Container>
   );

@@ -20,19 +20,14 @@ export const useAdminPosts = () => {
     setError(null);
     try {
       const query = { page: 1, pageSize: 100 };
-      console.log('Fetching posts with query:', query);
       const response = await communityServiceApi.community.newsList(query);
-      console.log('Posts API response:', response.data);
       if (response.data.body) {
         setPosts(response.data.body);
       } else {
-        console.warn('No posts returned. Total count:', response.data.totalCount);
         setPosts([]);
       }
     } catch (e: any) {
-      console.error('Error loading posts:', e);
       if (retryCount > 0) {
-        console.log(`Retrying... Attempts left: ${retryCount}`);
         await new Promise(resolve => setTimeout(resolve, 1000));
         return loadPosts(retryCount - 1);
       }
@@ -43,22 +38,12 @@ export const useAdminPosts = () => {
   };
 
   const createPost = async (post: CreateNewsRequest) => {
-    if (!post.communityId || !post.title || !post.content) {
-      setError('Community ID, title, and content are required');
-      return;
-    }
     setLoading(true);
     setError(null);
     try {
-      const response = await communityServiceApi.community.createNewsCreate(post);
-      console.log('Create post response:', response.data);
-      if (response.data.body) {
-        await loadPosts();
-      } else {
-        throw new Error('Failed to create post');
-      }
+      await communityServiceApi.community.createNewsCreate(post);
+      await loadPosts();
     } catch (e: any) {
-      console.error('Error creating post:', e);
       setError(e.message || 'Failed to create post');
     } finally {
       setLoading(false);
@@ -69,23 +54,44 @@ export const useAdminPosts = () => {
     setLoading(true);
     setError(null);
     try {
-      const operations: { op: string; path: string; value: any }[] = [];
-      if (updates.title) operations.push({ op: 'replace', path: '/title', value: updates.title });
-      if (updates.content) operations.push({ op: 'replace', path: '/content', value: updates.content });
-      if (updates.pointId !== undefined) operations.push({ op: 'replace', path: '/pointId', value: updates.pointId });
-      if (!updates.communityId) {
-        throw new Error('Community ID is required for update');
-      }
-      const success = await communityServiceApi.community.editPartialUpdate(operations, { communityId: updates.communityId });
-      console.log('Edit post response:', success.data);
-      if (success.data.body) {
-        await loadPosts();
-      } else {
-        throw new Error('Failed to update post');
-      }
+      const operations = [];
+      if (updates.title) operations.push({ 
+        op: 'replace', 
+        path: '/title', 
+        value: updates.title 
+      });
+      if (updates.text) operations.push({ 
+        op: 'replace', 
+        path: '/text', 
+        value: updates.text 
+      });
+      if (updates.pointId !== undefined) operations.push({ 
+        op: 'replace', 
+        path: '/pointId', 
+        value: updates.pointId 
+      });
+      if (updates.communityId) operations.push({ 
+        op: 'replace', 
+        path: '/communityId', 
+        value: updates.communityId 
+      });
+
+      // Исправленный запрос с newsId
+      await communityServiceApi.community.editPartialUpdate(
+        operations,
+        { communityId: updates.communityId! } // Или newsId, если сервер требует
+      );
+
+      // Локальное обновление
+      setPosts(prev => 
+        prev.map(post => 
+          post.newsId === newsId 
+            ? { ...post, ...updates } 
+            : post
+        )
+      );
     } catch (e: any) {
-      console.error('Error updating post:', e);
-      setError(e.message || 'Failed to update post');
+      setError('Ошибка обновления: ' + e.message);
     } finally {
       setLoading(false);
     }
@@ -95,15 +101,9 @@ export const useAdminPosts = () => {
     setLoading(true);
     setError(null);
     try {
-      const success = await communityServiceApi.community.softdeleteDelete({ communityId: newsId });
-      console.log('Delete post response:', success.data);
-      if (success.data.body) {
-        await loadPosts();
-      } else {
-        throw new Error('Failed to delete post');
-      }
+      await communityServiceApi.community.softdeleteDelete({ communityId: newsId });
+      await loadPosts();
     } catch (e: any) {
-      console.error('Error deleting post:', e);
       setError(e.message || 'Failed to delete post');
     } finally {
       setLoading(false);
@@ -114,5 +114,13 @@ export const useAdminPosts = () => {
     loadPosts();
   }, []);
 
-  return { posts, loading, error, createPost, editPost, deletePost };
+  return { 
+    posts, 
+    loading, 
+    error, 
+    createPost, 
+    editPost, 
+    deletePost, 
+    refreshPosts: loadPosts 
+  };
 };

@@ -9,6 +9,7 @@ import {
   SxProps, 
   Theme,
   Button,
+  IconButton,
 } from '@mui/material';
 import { AvatarBox } from './AvatarBox';
 import { useTheme } from '@mui/material/styles';
@@ -16,13 +17,22 @@ import { CommunityServiceApi } from '../../real_api/communityServiceApi';
 import { useTranslation } from 'react-i18next';
 import RouteIconLight from '../../../../public/svg/News-route-l.svg';
 import RouteIconDark from '../../../../public/svg/News-route-d.svg';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 interface NewsCardProps {
   item: NewsItem;
   sx?: SxProps<Theme>;
+  onToggleCommunity: (communityId: string) => void;
+  isAuthenticated: boolean;
 }
 
-export const NewsCard = ({ item, sx }: NewsCardProps) => {
+export const NewsCard = ({ 
+  item, 
+  sx, 
+  onToggleCommunity,
+  isAuthenticated 
+}: NewsCardProps) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const routeIcon = theme.palette.mode === 'light' ? RouteIconLight : RouteIconDark;
@@ -45,23 +55,34 @@ export const NewsCard = ({ item, sx }: NewsCardProps) => {
       ...sx 
     }}>
       <CardContent>
-        <Stack direction="row" spacing={2} alignItems="center">
-          <AvatarBox 
-            imageUrl={item.group.avatar}
-            name={item.group.name || 'N/A'}
-            color="#3f51b5"
-          />
-          <div>
-            <Typography variant="h6">{item.group.name || 'N/A'}</Typography>
-            <Typography variant="body2" color="text.secondary">
-              {new Date(item.date).toLocaleDateString('ru-RU', {
-                day: 'numeric',
-                month: 'long',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
-            </Typography>
-          </div>
+        <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+          <Stack direction="row" spacing={2} alignItems="center">
+            <AvatarBox 
+              imageUrl={item.group.avatar}
+              name={item.group.name || 'N/A'}
+              color="#3f51b5"
+            />
+            <div>
+              <Typography variant="h6">{item.group.name || 'N/A'}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {new Date(item.date).toLocaleDateString('ru-RU', {
+                  day: 'numeric',
+                  month: 'long',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </Typography>
+            </div>
+          </Stack>
+          
+          {isAuthenticated && (
+            <IconButton 
+              onClick={() => onToggleCommunity(item.group.id)}
+              title={t('news.toggleVisibility')}
+            >
+              {theme.palette.mode === 'light' ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </IconButton>
+          )}
         </Stack>
 
         <Typography variant="h6" sx={{ mt: 2 }}>
@@ -94,7 +115,7 @@ export const NewsCard = ({ item, sx }: NewsCardProps) => {
         </Stack>
 
         <Typography variant="body1" sx={{ mt: 2 }}>
-          {item.content}
+          {item.text}
         </Typography>
 
         {item.isFeatured && (

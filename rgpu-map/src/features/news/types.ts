@@ -8,7 +8,7 @@ export interface NewsGroup {
 export interface NewsItem {
   id: string;
   title: string;
-  content: string;
+  text: string;
   date: string;
   group: NewsGroup;
   imageUrl?: string | null; // Первое изображение из photos (base64)
