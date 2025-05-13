@@ -7,7 +7,7 @@
  * ##                                                           ##
  * ## AUTHOR: acacode                                           ##
  * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ## MODIFIED: To align with updated backend API specification ##
+ * ## MODIFIED: Merged and updated API definitions             ##
  * ---------------------------------------------------------------
  */
 
@@ -51,6 +51,7 @@ export interface CommunityInfo {
   name?: string | null;
   isHidden?: boolean;
   avatar?: string | null;
+  text?: string | null;
   /** @format date-time */
   createdAt?: string;
 }
@@ -71,6 +72,7 @@ export interface CreateCommunityRequest {
   /** @minLength 1 */
   name: string;
   avatarImage?: string | null;
+  text?: string | null;
 }
 
 export interface CreateNewsRequest {
@@ -82,6 +84,9 @@ export interface CreateNewsRequest {
   content: string;
   images?: string[] | null;
   image?: string | null;
+  /** @format uuid */
+  pointId?: string | null;
+  isFeatured?: boolean;
 }
 
 export interface GuidOperationResultResponse {
@@ -105,6 +110,8 @@ export interface NewsResponse {
   isFeatured?: boolean;
   /** @format date-time */
   createdAt?: string;
+  /** @format uuid */
+  pointId?: string | null;
 }
 
 export interface NewsResponseFindResultResponse {
@@ -138,7 +145,6 @@ export interface ProblemDetails {
 }
 
 export type IntPtr = object;
-
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -197,7 +203,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
   constructor(apiConfig: ApiConfig<SecurityDataType> = {}) {
     Object.assign(this, apiConfig);
-    this.securityWorker = async () => {
+   this.securityWorker = async () => {
       const token = getAccessToken();
       return {
         headers: {
@@ -303,7 +309,6 @@ export class HttpClient<SecurityDataType = unknown> {
 
   public abortRequest = (cancelToken: CancelToken) => {
     const abortController = this.abortControllers.get(cancelToken);
-
     if (abortController) {
       abortController.abort();
       this.abortControllers.delete(cancelToken);
@@ -376,11 +381,11 @@ export class HttpClient<SecurityDataType = unknown> {
       }
 
       if (!response.ok) {
-        const errorMessage = data.error
-          ? Object.entries(data.error.errors || {})
-              .map(([key, value]) => `${key}: ${value.join(', ')}`)
-              .join('; ')
-          : data.error?.title || 'Unknown error';
+        const errorData = await response.json();
+        const errorMessage = errorData?.detail || 
+          (data.error ? Object.entries(data.error.errors || {})
+            .map(([key, value]) => `${key}: ${value.join(', ')}`)
+            .join('; ') : 'Unknown error');
         throw new Error(errorMessage);
       }
       return data;
@@ -391,8 +396,8 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title CommunityService
  * @version 2.0.2.0
- *
- * CommunityService is an API intended to work with the communities.
+ * 
+ * CommunityService is an API intended to work with communities.
  */
 export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   community = {
@@ -616,91 +621,6 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
         method: "GET",
         query: query,
         secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * Hides a community
-     * @tags Community
-     * @name HideCreate
-     * @request POST:/Community/hide
-     * @secure
-     */
-    hideCreate: (
-      query: {
-        /** @format uuid */
-        communityId: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<BooleanOperationResultResponse, ProblemDetails>({
-        path: `/Community/hide`,
-        method: "POST",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * Unhides a community
-     * @tags Community
-     * @name UnhideCreate
-     * @request POST:/Community/unhide
-     * @secure
-     */
-    unhideCreate: (
-      query: {
-        /** @format uuid */
-        communityId: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<BooleanOperationResultResponse, ProblemDetails>({
-        path: `/Community/unhide`,
-        method: "POST",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * Participates in a news item
-     * @tags Community
-     * @name ParticipateCreate
-     * @request POST:/Community/participate
-     * @secure
-     */
-    participateCreate: (data: ParticipateRequest, params: RequestParams = {}) =>
-      this.request<BooleanOperationResultResponse, ProblemDetails>({
-        path: `/Community/participate`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * Unparticipates from a news item
-     * @tags Community
-     * @name UnparticipateCreate
-     * @request POST:/Community/unparticipate
-     * @secure
-     */
-    unparticipateCreate: (
-      data: ParticipateRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<BooleanOperationResultResponse, ProblemDetails>({
-        path: `/Community/unparticipate`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
         format: "json",
         ...params,
       }),

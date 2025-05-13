@@ -19,7 +19,7 @@ export const useAdminPosts = () => {
     setLoading(true);
     setError(null);
     try {
-      const query = { page: 0, pageSize: 100 }; // Use page: 0
+      const query = { page: 1, pageSize: 100 };
       console.log('Fetching posts with query:', query);
       const response = await communityServiceApi.community.newsList(query);
       console.log('Posts API response:', response.data);
@@ -72,9 +72,7 @@ export const useAdminPosts = () => {
       const operations: { op: string; path: string; value: any }[] = [];
       if (updates.title) operations.push({ op: 'replace', path: '/title', value: updates.title });
       if (updates.content) operations.push({ op: 'replace', path: '/content', value: updates.content });
-      if (updates.isFeatured !== undefined) operations.push({ op: 'replace', path: '/isFeatured', value: updates.isFeatured });
-      if (updates.location !== undefined) operations.push({ op: 'replace', path: '/location', value: updates.location });
-      if (updates.images !== undefined) operations.push({ op: 'replace', path: '/images', value: updates.images });
+      if (updates.pointId !== undefined) operations.push({ op: 'replace', path: '/pointId', value: updates.pointId });
       if (!updates.communityId) {
         throw new Error('Community ID is required for update');
       }

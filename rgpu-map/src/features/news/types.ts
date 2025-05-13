@@ -14,5 +14,6 @@ export interface NewsItem {
   imageUrl?: string | null; // Первое изображение из photos (base64)
   participants: number;
   location?: string | null;
+  pointId?: string | null; // Новое поле для ID связанной точки
   isFeatured: boolean;
 }

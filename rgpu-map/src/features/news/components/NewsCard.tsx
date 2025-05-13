@@ -84,6 +84,13 @@ export const NewsCard = ({ item, sx }: NewsCardProps) => {
               </Button>
             </>
           )}
+          {item.pointId && (
+            <Chip 
+              label={`Point ID: ${item.pointId}`} 
+              variant="outlined" 
+              sx={{ ml: 1 }}
+            />
+          )}
         </Stack>
 
         <Typography variant="body1" sx={{ mt: 2 }}>

@@ -17,7 +17,7 @@ import {
   Checkbox,
   FormControlLabel,
 } from '@mui/material';
-import { CommunityServiceApi } from '../../real_api/communityServiceApi';
+import { CommunityServiceApi, CreateNewsRequest } from '../../real_api/communityServiceApi';
 import { NewsGroup } from '../types';
 import { useTranslation } from 'react-i18next';
 
@@ -37,7 +37,7 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
     title: '',
     content: '',
     groupId: '',
-    location: '',
+    pointId: '',
     image: null as File | null,
     isFeatured: false,
   });
@@ -45,7 +45,7 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
   const api = new CommunityServiceApi();
 
   const validateImage = (file: File): string | null => {
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024;
     const allowedTypes = ['image/jpeg', 'image/png'];
     
     if (file.size > maxSize) {
@@ -60,10 +60,7 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
   const readFileAsBase64 = useCallback((file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        resolve(result.split(',')[1] || result);
-      };
+      reader.onload = () => resolve(reader.result as string);
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
@@ -73,21 +70,23 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
     e.preventDefault();
     setError(null);
 
+    // Валидация обязательных полей
     if (!form.groupId || !form.title || !form.content) {
-      setError(t('news.error') || 'Заполните обязательные поля');
+      setError(t('news.fillRequiredFields') || 'Fill all required fields');
       return;
     }
 
     try {
-      const requestData = {
+      const requestData: CreateNewsRequest = {
         communityId: form.groupId,
         title: form.title.trim(),
         content: form.content.trim(),
-        location: form.location.trim() || undefined,
+        pointId: form.pointId.trim() || null,
         isFeatured: form.isFeatured,
-        images: [] as string[]
+        images: [],
       };
 
+      // Обработка изображения
       if (form.image) {
         const validationError = validateImage(form.image);
         if (validationError) {
@@ -95,93 +94,79 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
           return;
         }
         const base64Image = await readFileAsBase64(form.image);
-        requestData.images.push(base64Image);
+        requestData.images?.push(base64Image.split(',')[1]); // Отправляем только данные без префикса
       }
 
+      console.log('Sending request:', JSON.stringify(requestData, null, 2));
       await api.community.createNewsCreate(requestData);
       onClose();
     } catch (err: any) {
-      setError(err.message || t('news.error') || 'Ошибка при создании новости');
+      console.error('Error creating news:', err);
+      setError(err.message || t('news.error') || 'Error creating news');
     }
   }, [form, t, readFileAsBase64, onClose]);
 
-  const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setForm({ ...form, image: file });
-  }, [form]);
+  };
 
   return (
-    <Dialog 
-      open 
-      onClose={onClose}
-      maxWidth="md"
-      fullWidth
-      sx={{
-        '& .MuiDialog-paper': {
-          ...(sx as any),
-          borderRadius: 3,
-          p: 3
-        }
-      }}
-    >
-      <DialogTitle>
-        <Typography variant="h6" component="div">
-          {t('news.createPost')}
-        </Typography>
-      </DialogTitle>
-
+    <Dialog open onClose={onClose} maxWidth="md" fullWidth sx={sx}>
+      <DialogTitle>{t('news.createPost')}</DialogTitle>
+      
       <DialogContent dividers>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+          
+          {/* Выбор сообщества */}
           <FormControl fullWidth sx={{ mb: 3 }}>
-            <InputLabel>{t('news.routePoint')} *</InputLabel>
+            <InputLabel>{t('news.community')} *</InputLabel>
             <Select
               value={form.groupId}
               onChange={(e) => setForm({...form, groupId: e.target.value})}
               required
-              label={`${t('news.routePoint')} *`}
+              label={`${t('news.community')} *`}
             >
               {groups.map(g => (
-                <MenuItem key={g.id} value={g.id}>
-                  {g.name}
-                </MenuItem>
+                <MenuItem key={g.id} value={g.id}>{g.name}</MenuItem>
               ))}
             </Select>
           </FormControl>
 
+          {/* Поле заголовка */}
           <TextField
             fullWidth
-            label={`${t('news.titlePlaceholder')} *`}
+            label={`${t('news.title')} *`}
             value={form.title}
             onChange={(e) => setForm({...form, title: e.target.value})}
             sx={{ mb: 3 }}
             required
           />
 
+          {/* Поле контента */}
           <TextField
             fullWidth
             multiline
             rows={4}
-            label={`${t('news.description')} *`}
+            label={`${t('news.content')} *`}
             value={form.content}
             onChange={(e) => setForm({...form, content: e.target.value})}
             sx={{ mb: 3 }}
             required
           />
 
+          {/* Поле Point ID */}
           <TextField
             fullWidth
-            label={t('news.routePoint')}
-            value={form.location}
-            onChange={(e) => setForm({...form, location: e.target.value})}
-            placeholder={t('news.routePoint')}
+            label="Point ID"
+            value={form.pointId}
+            onChange={(e) => setForm({...form, pointId: e.target.value})}
             sx={{ mb: 3 }}
           />
 
+          {/* Загрузка изображения */}
           <Box sx={{ mb: 3 }}>
-            <Button
-              variant="outlined"
-              component="label"
-            >
+            <Button variant="outlined" component="label">
               {t('news.addImage')}
               <input
                 type="file"
@@ -192,11 +177,12 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
             </Button>
             {form.image && (
               <Typography variant="body2" sx={{ mt: 1 }}>
-                {t('feedback.selectedFile')}: {form.image.name}
+                {form.image.name}
               </Typography>
             )}
           </Box>
 
+          {/* Чекбокс "Избранное" */}
           <FormControlLabel
             control={
               <Checkbox
@@ -204,30 +190,21 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
                 onChange={(e) => setForm({...form, isFeatured: e.target.checked})}
               />
             }
-            label={t('news.participate')}
+            label={t('news.featured')}
           />
 
+          {/* Отображение ошибок */}
           {error && (
-            <Typography color="error" variant="body2" sx={{ mt: 2 }}>
+            <Typography color="error" sx={{ mt: 2 }}>
               {error}
             </Typography>
           )}
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button 
-          onClick={onClose} 
-          variant="outlined"
-          sx={{ mr: 2 }}
-        >
-          {t('news.cancel')}
-        </Button>
-        <Button 
-          type="submit" 
-          variant="contained"
-          onClick={handleSubmit}
-        >
+      <DialogActions>
+        <Button onClick={onClose}>{t('news.cancel')}</Button>
+        <Button variant="contained" onClick={handleSubmit}>
           {t('news.publish')}
         </Button>
       </DialogActions>
