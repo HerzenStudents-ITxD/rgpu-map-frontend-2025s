@@ -1,4 +1,4 @@
-import { FC, useState, useCallback } from 'react';
+import { FC, useState, useCallback, ChangeEvent } from 'react';
 import {
   Box,
   Button,
@@ -16,6 +16,7 @@ import {
   Theme,
   Checkbox,
   FormControlLabel,
+  CircularProgress,
 } from '@mui/material';
 import { CommunityServiceApi, CreateNewsRequest } from '../../real_api/communityServiceApi';
 import { NewsGroup } from '../types';
@@ -38,41 +39,59 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
     text: '',
     groupId: '',
     pointId: '',
-    image: null as File | null,
+    image: null as string | null,
     isFeatured: false,
   });
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const api = new CommunityServiceApi();
 
+  // Валидация изображения
   const validateImage = (file: File): string | null => {
-    const maxSize = 5 * 1024 * 1024;
-    const allowedTypes = ['image/jpeg', 'image/png'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
     
     if (file.size > maxSize) {
-      return t('news.imageTooLarge') || 'Image size exceeds 5MB';
+      return t('news.imageTooLarge') || 'Максимальный размер файла 5MB';
     }
     if (!allowedTypes.includes(file.type)) {
-      return t('news.invalidImageFormat') || 'Only JPEG and PNG images are allowed';
+      return t('news.invalidImageFormat') || 'Допустимые форматы: JPEG, PNG, GIF';
     }
     return null;
   };
 
-  const readFileAsBase64 = useCallback((file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }, []);
+  // Конвертация файла в base64
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    const error = validateImage(file);
+    if (error) {
+      setError(error);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setForm({ ...form, image: reader.result as string });
+        setLoading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      setError(t('news.uploadError') || 'Ошибка загрузки изображения');
+      setLoading(false);
+    }
+  };
+
+  // Отправка формы
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Валидация обязательных полей
     if (!form.groupId || !form.title || !form.text) {
-      setError(t('news.fillRequiredFields') || 'Fill all required fields');
+      setError(t('news.fillRequiredFields') || 'Заполните обязательные поля');
       return;
     }
 
@@ -83,41 +102,21 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
         text: form.text.trim(),
         pointId: form.pointId.trim() || null,
         isFeatured: form.isFeatured,
-        images: [],
+        images: form.image ? [form.image] : [],
       };
 
-      // Обработка изображения
-      if (form.image) {
-        const validationError = validateImage(form.image);
-        if (validationError) {
-          setError(validationError);
-          return;
-        }
-        const base64Image = await readFileAsBase64(form.image);
-        requestData.images?.push(base64Image.split(',')[1]); // Отправляем только данные без префикса
-      }
-
-      console.log('Sending request:', JSON.stringify(requestData, null, 2));
       await api.community.createNewsCreate(requestData);
       onClose();
     } catch (err: any) {
-      console.error('Error creating news:', err);
-      setError(err.message || t('news.error') || 'Error creating news');
+      setError(err.message || t('news.error') || 'Ошибка создания новости');
     }
-  }, [form, t, readFileAsBase64, onClose]);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setForm({ ...form, image: file });
   };
 
   return (
     <Dialog open onClose={onClose} maxWidth="md" fullWidth sx={sx}>
       <DialogTitle>{t('news.createPost')}</DialogTitle>
-      
       <DialogContent dividers>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-          
           {/* Выбор сообщества */}
           <FormControl fullWidth sx={{ mb: 3 }}>
             <InputLabel>{t('news.community')} *</InputLabel>
@@ -143,7 +142,7 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
             required
           />
 
-          {/* Поле контента */}
+          {/* Поле текста */}
           <TextField
             fullWidth
             multiline
@@ -155,30 +154,38 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
             required
           />
 
-          {/* Поле Point ID */}
-          <TextField
-            fullWidth
-            label="Point ID"
-            value={form.pointId}
-            onChange={(e) => setForm({...form, pointId: e.target.value})}
-            sx={{ mb: 3 }}
-          />
-
           {/* Загрузка изображения */}
           <Box sx={{ mb: 3 }}>
-            <Button variant="outlined" component="label">
-              {t('news.addImage')}
+            <Button
+              variant="outlined"
+              component="label"
+              fullWidth
+              disabled={loading}
+            >
+              {loading ? (
+                <CircularProgress size={24} />
+              ) : (
+                t('news.uploadImage') || 'Загрузить изображение'
+              )}
               <input
                 type="file"
-                accept="image/jpeg,image/png"
                 hidden
-                onChange={handleImageChange}
+                accept="image/*"
+                onChange={handleImageUpload}
               />
             </Button>
             {form.image && (
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                {form.image.name}
-              </Typography>
+              <Box sx={{ mt: 2, textAlign: 'center' }}>
+                <img
+                  src={form.image}
+                  alt="Preview"
+                  style={{ 
+                    maxWidth: '100%', 
+                    maxHeight: '200px',
+                    borderRadius: '8px'
+                  }}
+                />
+              </Box>
             )}
           </Box>
 
@@ -204,7 +211,11 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
 
       <DialogActions>
         <Button onClick={onClose}>{t('news.cancel')}</Button>
-        <Button variant="contained" onClick={handleSubmit}>
+        <Button 
+          variant="contained" 
+          onClick={handleSubmit}
+          disabled={loading}
+        >
           {t('news.publish')}
         </Button>
       </DialogActions>

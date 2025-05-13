@@ -13,34 +13,48 @@ export const AvatarBox = ({
   color = '#4CAF50',
   size = 40
 }: AvatarBoxProps) => {
-  const initials = name.split(' ')
+  const initials = name
+    .split(' ')
+    .slice(0, 2)
     .map(part => part[0])
     .join('')
     .toUpperCase();
 
-  const style: CSSProperties = {
-    width: size,
-    height: size,
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: color,
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: size * 0.4,
-    overflow: 'hidden'
+  const imageStyle: CSSProperties = {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    borderRadius: '50%'
   };
 
-  const isBase64 = imageUrl?.startsWith('data:image/');
+  const getImageUrl = () => {
+    if (!imageUrl) return null;
+    if (imageUrl.startsWith('data:')) return imageUrl;
+    if (/^[A-Za-z0-9+/]+={0,2}$/.test(imageUrl)) {
+      return `data:image/jpeg;base64,${imageUrl}`;
+    }
+    return imageUrl;
+  };
 
   return (
-    <div style={style}>
-      {imageUrl && (isBase64 || imageUrl.startsWith('http')) ? (
+    <div style={{
+      width: size,
+      height: size,
+      borderRadius: '50%',
+      backgroundColor: color,
+      color: 'white',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+      fontSize: size * 0.4,
+      fontWeight: 'bold'
+    }}>
+      {getImageUrl() ? (
         <img 
-          src={imageUrl} 
+          src={getImageUrl()!} 
           alt={name}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          style={imageStyle}
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = 'none';
           }}

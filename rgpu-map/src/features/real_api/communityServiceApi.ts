@@ -39,10 +39,6 @@ export interface BooleanOperationResultResponse {
 export interface CommunityAgentInfo {
   /** @format uuid */
   userId?: string;
-  userName?: string;
-  /** @format uuid */
-  communityId?: string;
-  isModerator?: boolean;
 }
 
 export interface CommunityInfo {
@@ -52,8 +48,14 @@ export interface CommunityInfo {
   isHidden?: boolean;
   avatar?: string | null;
   text?: string | null;
+  /** @format uuid */
+  createdBy?: string;
   /** @format date-time */
-  createdAt?: string;
+  createdAtUtc?: string;
+  /** @format uuid */
+  modifiedBy?: string;
+  /** @format date-time */
+  modifiedAtUtc?: string;
 }
 
 export interface CommunityResponse {
@@ -83,10 +85,8 @@ export interface CreateNewsRequest {
   /** @minLength 1 */
   text: string;
   images?: string[] | null;
-  image?: string | null;
   /** @format uuid */
   pointId?: string | null;
-  isFeatured?: boolean;
 }
 
 export interface GuidOperationResultResponse {
@@ -95,23 +95,21 @@ export interface GuidOperationResultResponse {
   errors: string[];
 }
 
+export type IntPtr = object;
+
 export interface NewsResponse {
-  text: string;
-  id: string;
   /** @format uuid */
-  newsId?: string;
+  id?: string;
   /** @format uuid */
   communityId?: string;
   title?: string | null;
   text?: string | null;
   photos?: string[] | null;
   participants?: string[] | null;
-  location?: string | null;
-  isFeatured?: boolean;
-  /** @format date-time */
-  createdAt?: string;
   /** @format uuid */
   pointId?: string | null;
+  /** @format date-time */
+  date?: string;
 }
 
 export interface NewsResponseFindResultResponse {
@@ -144,7 +142,6 @@ export interface ProblemDetails {
   [key: string]: any;
 }
 
-export type IntPtr = object;
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -203,7 +200,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
   constructor(apiConfig: ApiConfig<SecurityDataType> = {}) {
     Object.assign(this, apiConfig);
-   this.securityWorker = async () => {
+    this.securityWorker = async () => {
       const token = getAccessToken();
       return {
         headers: {
@@ -309,6 +306,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
   public abortRequest = (cancelToken: CancelToken) => {
     const abortController = this.abortControllers.get(cancelToken);
+
     if (abortController) {
       abortController.abort();
       this.abortControllers.delete(cancelToken);
@@ -480,9 +478,9 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
      */
     editPartialUpdate: (
       data: Operation[],
-      query: {
+      query?: {
         /** @format uuid */
-        communityId: string;
+        communityId?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -505,9 +503,9 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
      * @secure
      */
     softdeleteDelete: (
-      query: {
+      query?: {
         /** @format uuid */
-        communityId: string;
+        communityId?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -546,11 +544,11 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
      * @secure
      */
     removeAgentDelete: (
-      query: {
+      query?: {
         /** @format uuid */
-        communityId: string;
+        communityId?: string;
         /** @format uuid */
-        userId: string;
+        userId?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -564,10 +562,58 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
       }),
 
     /**
-     * Retrieves news items
+     * Hides a community
      * @tags Community
+     * @name HideCreate
+     * @request POST:/Community/hide
+     * @secure
+     */
+    hideCreate: (
+      query?: {
+        /** @format uuid */
+        communityId?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<BooleanOperationResultResponse, ProblemDetails>({
+        path: `/Community/hide`,
+        method: "POST",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Unhides a community
+     * @tags Community
+     * @name UnhideCreate
+     * @request POST:/Community/unhide
+     * @secure
+     */
+    unhideCreate: (
+      query?: {
+        /** @format uuid */
+        communityId?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<BooleanOperationResultResponse, ProblemDetails>({
+        path: `/Community/unhide`,
+        method: "POST",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+
+  news = {
+    /**
+     * Retrieves news items
+     * @tags News
      * @name NewsList
-     * @request GET:/Community/news
+     * @request GET:/News/news
      * @secure
      */
     newsList: (
@@ -585,7 +631,7 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
       params: RequestParams = {},
     ) =>
       this.request<NewsResponseFindResultResponse, ProblemDetails>({
-        path: `/Community/news`,
+        path: `/News/news`,
         method: "GET",
         query: query,
         secure: true,
@@ -595,15 +641,15 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
 
     /**
      * Retrieves news items for a specific community
-     * @tags Community
+     * @tags News
      * @name CommunityNewsList
-     * @request GET:/Community/community-news
+     * @request GET:/News/community-news
      * @secure
      */
     communityNewsList: (
-      query: {
+      query?: {
         /** @format uuid */
-        communityId: string;
+        communityId?: string;
         /** @format int32 */
         page?: number;
         /** @format int32 */
@@ -617,7 +663,7 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
       params: RequestParams = {},
     ) =>
       this.request<NewsResponseFindResultResponse, ProblemDetails>({
-        path: `/Community/community-news`,
+        path: `/News/community-news`,
         method: "GET",
         query: query,
         secure: true,
@@ -626,19 +672,107 @@ export class CommunityServiceApi<SecurityDataType extends unknown> extends HttpC
       }),
 
     /**
-     * Creates a new news item
-     * @tags Community
-     * @name CreateNewsCreate
-     * @request POST:/Community/create-news
+     * Participates in a news item
+     * @tags News
+     * @name ParticipateCreate
+     * @request POST:/News/participate
      * @secure
      */
-    createNewsCreate: (data: CreateNewsRequest, params: RequestParams = {}) =>
-      this.request<GuidOperationResultResponse, ProblemDetails>({
-        path: `/Community/create-news`,
+    participateCreate: (data: ParticipateRequest, params: RequestParams = {}) =>
+      this.request<BooleanOperationResultResponse, ProblemDetails>({
+        path: `/News/participate`,
         method: "POST",
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Unparticipates from a news item
+     * @tags News
+     * @name UnparticipateCreate
+     * @request POST:/News/unparticipate
+     * @secure
+     */
+    unparticipateCreate: (
+      data: ParticipateRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<BooleanOperationResultResponse, ProblemDetails>({
+        path: `/News/unparticipate`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Creates a new news item
+     * @tags News
+     * @name CreateNewsCreate
+     * @request POST:/News/create-news
+     * @secure
+     */
+    createNewsCreate: (data: CreateNewsRequest, params: RequestParams = {}) =>
+      this.request<GuidOperationResultResponse, ProblemDetails>({
+        path: `/News/create-news`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Updates a news item
+     * @tags News
+     * @name EditNewsPartialUpdate
+     * @request PATCH:/News/edit-news
+     * @secure
+     */
+    editNewsPartialUpdate: (
+      data: Operation[],
+      query?: {
+        /** @format uuid */
+        newsId?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<BooleanOperationResultResponse, ProblemDetails>({
+        path: `/News/edit-news`,
+        method: "PATCH",
+        query: query,
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * Deletes a news item
+     * @tags News
+     * @name DeleteNewsDelete
+     * @request DELETE:/News/delete-news
+     * @secure
+     */
+    deleteNewsDelete: (
+      query?: {
+        /** @format uuid */
+        newsId?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<BooleanOperationResultResponse, ProblemDetails>({
+        path: `/News/delete-news`,
+        method: "DELETE",
+        query: query,
+        secure: true,
         format: "json",
         ...params,
       }),

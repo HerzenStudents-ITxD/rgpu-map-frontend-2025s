@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { NewsItem } from '../types';
 import { 
   Card, 
   CardContent, 
@@ -10,15 +9,15 @@ import {
   Theme,
   Button,
   IconButton,
+  Box,
 } from '@mui/material';
 import { AvatarBox } from './AvatarBox';
 import { useTheme } from '@mui/material/styles';
 import { CommunityServiceApi } from '../../real_api/communityServiceApi';
 import { useTranslation } from 'react-i18next';
-import RouteIconLight from '../../../../public/svg/News-route-l.svg';
-import RouteIconDark from '../../../../public/svg/News-route-d.svg';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { NewsItem } from '../types';
 
 interface NewsCardProps {
   item: NewsItem;
@@ -35,102 +34,103 @@ export const NewsCard = ({
 }: NewsCardProps) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const routeIcon = theme.palette.mode === 'light' ? RouteIconLight : RouteIconDark;
   const [error, setError] = useState<string | null>(null);
-  const api = new CommunityServiceApi();
 
+  // Обработчик для участия в новости
   const handleParticipate = useCallback(async () => {
     try {
+      const api = new CommunityServiceApi();
       await api.community.participateCreate({ newsId: item.id });
       setError(null);
     } catch (err: any) {
-      setError(t('news.error') || err.message || 'Ошибка при участии');
+      setError(err.message || t('news.error') || 'Ошибка участия');
     }
   }, [item.id, t]);
 
   return (
     <Card sx={{ 
       mb: 3, 
-      boxShadow: 3, 
+      boxShadow: 3,
+      overflow: 'visible',
       ...sx 
     }}>
       <CardContent>
-        <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
-          <Stack direction="row" spacing={2} alignItems="center">
-            <AvatarBox 
-              imageUrl={item.group.avatar}
-              name={item.group.name || 'N/A'}
-              color="#3f51b5"
-            />
-            <div>
-              <Typography variant="h6">{item.group.name || 'N/A'}</Typography>
-              <Typography variant="body2" color="text.secondary">
-                {new Date(item.date).toLocaleDateString('ru-RU', {
-                  day: 'numeric',
-                  month: 'long',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </Typography>
-            </div>
-          </Stack>
-          
-          {isAuthenticated && (
-            <IconButton 
-              onClick={() => onToggleCommunity(item.group.id)}
-              title={t('news.toggleVisibility')}
-            >
-              {theme.palette.mode === 'light' ? <VisibilityOffIcon /> : <VisibilityIcon />}
-            </IconButton>
-          )}
+        {/* Заголовок и аватар */}
+        <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+          <AvatarBox 
+            imageUrl={item.group.avatar}
+            name={item.group.name}
+            size={48}
+          />
+          <Box>
+            <Typography variant="h6">{item.group.name}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              {new Date(item.date).toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </Typography>
+          </Box>
         </Stack>
 
-        <Typography variant="h6" sx={{ mt: 2 }}>
+        {/* Изображение новости */}
+        {item.imageUrl && (
+          <Box sx={{ 
+            mb: 2,
+            borderRadius: 2,
+            overflow: 'hidden',
+            position: 'relative',
+            height: 300
+          }}>
+            <img
+              src={item.imageUrl}
+              alt={item.title}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
+          </Box>
+        )}
+
+        {/* Контент новости */}
+        <Typography variant="h5" sx={{ mb: 1.5 }}>
           {item.title}
         </Typography>
         
-        <Stack direction="row" spacing={1} sx={{ mt: 1, alignItems: 'center' }}>
-          {item.location && (
-            <>
-              <Chip label={item.location} />
-              <Button
-                sx={{ minWidth: 'auto', p: 1 }}
-                aria-label="Location icon"
-              >
-                <img
-                  src={routeIcon}
-                  alt="Location"
-                  style={{ width: 24, height: 24, fill: theme.palette.ico?.nmain }}
-                />
-              </Button>
-            </>
-          )}
-          {item.pointId && (
-            <Chip 
-              label={`Point ID: ${item.pointId}`} 
-              variant="outlined" 
-              sx={{ ml: 1 }}
-            />
-          )}
-        </Stack>
-
-        <Typography variant="body1" sx={{ mt: 2 }}>
+        <Typography variant="body1" sx={{ mb: 2 }}>
           {item.text}
         </Typography>
 
+        {/* Мета-данные */}
+        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1, mb: 2 }}>
+          {item.location && (
+            <Chip label={item.location} variant="outlined" />
+          )}
+          {item.pointId && (
+            <Chip label={`ID точки: ${item.pointId}`} variant="outlined" />
+          )}
+        </Stack>
+
+        {/* Кнопка участия */}
         {item.isFeatured && (
           <Button
+            fullWidth
             variant="contained"
             color="primary"
-            sx={{ mt: 2, textTransform: 'none' }}
+            sx={{ borderRadius: 2 }}
             onClick={handleParticipate}
           >
             {t('news.participate')}
           </Button>
         )}
 
+        {/* Отображение ошибок */}
         {error && (
-          <Typography color="error" variant="body2" sx={{ mt: 2 }}>
+          <Typography color="error" sx={{ mt: 1.5 }}>
             {error}
           </Typography>
         )}

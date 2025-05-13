@@ -13,9 +13,13 @@ import {
   DialogContent, 
   DialogActions, 
   Typography, 
-  CircularProgress
+  CircularProgress,
+  IconButton
 } from '@mui/material';
 import { CommunityServiceApi } from '../../real_api/communityServiceApi';
+import { AvatarBox } from '../components/AvatarBox';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Community {
   id: string;
@@ -30,6 +34,7 @@ const CommunitiesPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
+  const [avatarLoading, setAvatarLoading] = useState(false);
   
   const api = new CommunityServiceApi();
 
@@ -44,58 +49,66 @@ const CommunitiesPage = () => {
         text: c.community?.text || ''
       })) || []);
     } catch (err) {
-      setError('Failed to load communities');
+      setError('Ошибка загрузки сообществ');
     } finally {
       setLoading(false);
     }
   };
 
-  const updateCommunity = async () => {
+  const handleAvatarUpload = async (file: File) => {
     if (!selectedCommunity) return;
+    
     try {
-      // Отправляем только измененные поля
-      const operations = [];
-      if (selectedCommunity.name) operations.push({ 
-        op: "replace", 
-        path: "/name", 
-        value: selectedCommunity.name 
-      });
-      if (selectedCommunity.avatar !== undefined) operations.push({ 
-        op: "replace", 
-        path: "/avatar", 
-        value: selectedCommunity.avatar 
-      });
-      if (selectedCommunity.text !== undefined) operations.push({ 
-        op: "replace", 
-        path: "/text", 
-        value: selectedCommunity.text 
-      });
-
-      await api.community.editPartialUpdate(
-        operations,
-        { communityId: selectedCommunity.id }
-      );
-
-      // Локальное обновление состояния
-      setCommunities(prev => 
-        prev.map(c => 
-          c.id === selectedCommunity.id ? selectedCommunity : c
-        )
-      );
+      setAvatarLoading(true);
+      const reader = new FileReader();
       
-      setOpenEdit(false);
+      reader.onloadend = async () => {
+        const base64Image = reader.result as string;
+        
+        const operations = [{
+          op: "replace",
+          path: "/avatar",
+          value: base64Image
+        }];
+
+        await api.community.editPartialUpdate(
+          operations,
+          { communityId: selectedCommunity.id }
+        );
+
+        setCommunities(prev => 
+          prev.map(c => 
+            c.id === selectedCommunity.id 
+              ? { ...c, avatar: base64Image } 
+              : c
+          )
+        );
+        setAvatarLoading(false);
+      };
+
+      reader.readAsDataURL(file);
     } catch (err) {
-      setError('Ошибка обновления: ' + (err as Error).message);
+      setError('Ошибка загрузки аватарки');
+      setAvatarLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadCommunities();
-  }, []);
+  const validateImage = (file: File) => {
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    const allowedTypes = ['image/jpeg', 'image/png'];
+    
+    if (file.size > maxSize) {
+      return 'Максимальный размер файла 2MB';
+    }
+    if (!allowedTypes.includes(file.type)) {
+      return 'Допустимы только JPEG и PNG';
+    }
+    return null;
+  };
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>Manage Communities</Typography>
+      <Typography variant="h4" gutterBottom>Управление сообществами</Typography>
 
       {loading && <CircularProgress />}
       {error && <Typography color="error">{error}</Typography>}
@@ -103,28 +116,34 @@ const CommunitiesPage = () => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Avatar</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>Actions</TableCell>
+            <TableCell>Аватар</TableCell>
+            <TableCell>Название</TableCell>
+            <TableCell>Описание</TableCell>
+            <TableCell>Действия</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {communities.map(community => (
             <TableRow key={community.id}>
-              <TableCell>{community.name}</TableCell>
-              <TableCell>{community.avatar || 'N/A'}</TableCell>
-              <TableCell>{community.text || 'N/A'}</TableCell>
               <TableCell>
-                <Button 
-                  variant="outlined"
-                  onClick={() => {
-                    setSelectedCommunity(community);
-                    setOpenEdit(true);
-                  }}
-                >
-                  Edit
-                </Button>
+                <AvatarBox 
+                  imageUrl={community.avatar}
+                  name={community.name}
+                  size={64}
+                />
+              </TableCell>
+              <TableCell>{community.name}</TableCell>
+              <TableCell>{community.text || '—'}</TableCell>
+              <TableCell>
+                <IconButton onClick={() => {
+                  setSelectedCommunity(community);
+                  setOpenEdit(true);
+                }}>
+                  <EditIcon />
+                </IconButton>
+                <IconButton>
+                  <DeleteIcon color="error" />
+                </IconButton>
               </TableCell>
             </TableRow>
           ))}
@@ -132,13 +151,59 @@ const CommunitiesPage = () => {
       </Table>
 
       <Dialog open={openEdit} onClose={() => setOpenEdit(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Edit Community</DialogTitle>
+        <DialogTitle>Редактирование сообщества</DialogTitle>
         <DialogContent dividers>
           {selectedCommunity && (
-            <Box component="form" sx={{ mt: 2 }}>
+            <Box sx={{ mt: 2 }}>
+              {/* Поле загрузки аватарки */}
+              <Box sx={{ mb: 3, textAlign: 'center' }}>
+                <input
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  id="avatar-upload"
+                  type="file"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    
+                    const error = validateImage(file);
+                    if (error) {
+                      setError(error);
+                      return;
+                    }
+                    
+                    handleAvatarUpload(file);
+                  }}
+                />
+                <label htmlFor="avatar-upload">
+                  <Button 
+                    variant="outlined" 
+                    component="span"
+                    disabled={avatarLoading}
+                  >
+                    {avatarLoading ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      'Изменить аватар'
+                    )}
+                  </Button>
+                </label>
+                
+                {selectedCommunity.avatar && (
+                  <Box sx={{ mt: 2 }}>
+                    <AvatarBox 
+                      imageUrl={selectedCommunity.avatar}
+                      name={selectedCommunity.name}
+                      size={120}
+                    />
+                  </Box>
+                )}
+              </Box>
+
+              {/* Остальные поля формы */}
               <TextField
                 fullWidth
-                label="Name"
+                label="Название"
                 value={selectedCommunity.name}
                 onChange={(e) => setSelectedCommunity({
                   ...selectedCommunity,
@@ -146,21 +211,12 @@ const CommunitiesPage = () => {
                 })}
                 sx={{ mb: 3 }}
               />
-              <TextField
-                fullWidth
-                label="Avatar URL"
-                value={selectedCommunity.avatar || ''}
-                onChange={(e) => setSelectedCommunity({
-                  ...selectedCommunity,
-                  avatar: e.target.value
-                })}
-                sx={{ mb: 3 }}
-              />
+              
               <TextField
                 fullWidth
                 multiline
                 rows={4}
-                label="Description"
+                label="Описание"
                 value={selectedCommunity.text || ''}
                 onChange={(e) => setSelectedCommunity({
                   ...selectedCommunity,
@@ -171,13 +227,43 @@ const CommunitiesPage = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEdit(false)}>Cancel</Button>
+          <Button onClick={() => setOpenEdit(false)}>Отмена</Button>
           <Button 
-            onClick={updateCommunity}
-            variant="contained"
-            color="primary"
+            variant="contained" 
+            onClick={async () => {
+              if (!selectedCommunity) return;
+              try {
+                const operations = [];
+                
+                if (selectedCommunity.name) {
+                  operations.push({
+                    op: "replace",
+                    path: "/name",
+                    value: selectedCommunity.name
+                  });
+                }
+                
+                if (selectedCommunity.text !== undefined) {
+                  operations.push({
+                    op: "replace",
+                    path: "/text",
+                    value: selectedCommunity.text
+                  });
+                }
+
+                await api.community.editPartialUpdate(
+                  operations,
+                  { communityId: selectedCommunity.id }
+                );
+                
+                setOpenEdit(false);
+                loadCommunities();
+              } catch (err) {
+                setError('Ошибка сохранения');
+              }
+            }}
           >
-            Save Changes
+            Сохранить
           </Button>
         </DialogActions>
       </Dialog>

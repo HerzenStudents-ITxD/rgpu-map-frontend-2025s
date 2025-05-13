@@ -47,7 +47,7 @@ export const NewsList = ({
         return;
       }
 
-      const newsItems = response.data.body.map(item => ({
+       const newsItems = response.data.body.map(item => ({
         id: item.newsId || `temp-${Date.now()}`,
         title: item.title || t('news.untitled') || 'Untitled',
         text: item.text || t('news.noContent') || 'No text',
@@ -57,7 +57,9 @@ export const NewsList = ({
           name: groups.find(g => g.id === item.communityId)?.name || 'Unknown',
           avatar: item.photos?.[0] || null,
         },
-        imageUrl: item.photos?.[0] || null,
+        imageUrl: item.photos?.[0] 
+          ? `data:image/jpeg;base64,${item.photos[0]}` // Добавляем префикс если нужно
+          : null,
         participants: item.participants?.length || 0,
         location: item.location || null,
         isFeatured: item.isFeatured || false,
