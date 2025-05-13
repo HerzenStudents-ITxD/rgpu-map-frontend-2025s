@@ -30,10 +30,7 @@ export const AvatarBox = ({
   const getImageUrl = () => {
     if (!imageUrl) return null;
     if (imageUrl.startsWith('data:')) return imageUrl;
-    if (/^[A-Za-z0-9+/]+={0,2}$/.test(imageUrl)) {
-      return `data:image/jpeg;base64,${imageUrl}`;
-    }
-    return imageUrl;
+    return `data:image/jpeg;base64,${imageUrl}`;
   };
 
   return (

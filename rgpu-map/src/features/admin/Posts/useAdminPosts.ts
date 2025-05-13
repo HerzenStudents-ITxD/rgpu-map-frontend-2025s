@@ -1,37 +1,39 @@
 import { useState, useEffect } from 'react';
-import { CommunityServiceApi, CreateNewsRequest, NewsResponse } from '../../real_api/communityServiceApi';
+import { 
+  CommunityServiceApi, 
+  CreateNewsRequest, 
+  NewsResponse,
+  Operation
+} from '../../real_api/communityServiceApi';
 import { getAccessToken } from '../../../utils/tokenService';
 
 const communityServiceApi = new CommunityServiceApi();
 
 export const useAdminPosts = () => {
   const [posts, setPosts] = useState<NewsResponse[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadPosts = async (retryCount = 3): Promise<void> => {
+  const loadPosts = async (retryCount = 3) => {
     if (!getAccessToken()) {
-      setError('No access token available');
-      setLoading(false);
+      setError('Требуется авторизация');
       return;
     }
 
     setLoading(true);
     setError(null);
     try {
-      const query = { page: 1, pageSize: 100 };
-      const response = await communityServiceApi.community.newsList(query);
-      if (response.data.body) {
-        setPosts(response.data.body);
-      } else {
-        setPosts([]);
-      }
-    } catch (e: any) {
+      const response = await communityServiceApi.news.newsList({
+        page: 1,
+        pageSize: 100
+      });
+      setPosts(response.data.body || []);
+    } catch (err) {
       if (retryCount > 0) {
         await new Promise(resolve => setTimeout(resolve, 1000));
         return loadPosts(retryCount - 1);
       }
-      setError(e.message || 'Failed to load posts');
+      setError('Ошибка загрузки: ' + (err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -39,12 +41,11 @@ export const useAdminPosts = () => {
 
   const createPost = async (post: CreateNewsRequest) => {
     setLoading(true);
-    setError(null);
     try {
-      await communityServiceApi.community.createNewsCreate(post);
+      await communityServiceApi.news.createNewsCreate(post);
       await loadPosts();
-    } catch (e: any) {
-      setError(e.message || 'Failed to create post');
+    } catch (err) {
+      setError('Ошибка создания: ' + (err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -52,46 +53,41 @@ export const useAdminPosts = () => {
 
   const editPost = async (newsId: string, updates: Partial<CreateNewsRequest>) => {
     setLoading(true);
-    setError(null);
     try {
-      const operations = [];
-      if (updates.title) operations.push({ 
-        op: 'replace', 
-        path: '/title', 
-        value: updates.title 
+      const operations: Operation[] = [];
+      
+      if (updates.title) operations.push({
+        op: 'replace',
+        path: '/title',
+        value: updates.title
       });
-      if (updates.text) operations.push({ 
-        op: 'replace', 
-        path: '/text', 
-        value: updates.text 
+      
+      if (updates.text) operations.push({
+        op: 'replace',
+        path: '/text',
+        value: updates.text
       });
-      if (updates.pointId !== undefined) operations.push({ 
-        op: 'replace', 
-        path: '/pointId', 
-        value: updates.pointId 
+      
+      if (updates.pointId !== undefined) operations.push({
+        op: 'replace',
+        path: '/pointId',
+        value: updates.pointId
       });
-      if (updates.communityId) operations.push({ 
-        op: 'replace', 
-        path: '/communityId', 
-        value: updates.communityId 
+      
+      if (updates.communityId) operations.push({
+        op: 'replace',
+        path: '/communityId',
+        value: updates.communityId
       });
 
-      // Исправленный запрос с newsId
-      await communityServiceApi.community.editPartialUpdate(
+      await communityServiceApi.news.editNewsPartialUpdate(
         operations,
-        { communityId: updates.communityId! } // Или newsId, если сервер требует
+        { newsId }
       );
-
-      // Локальное обновление
-      setPosts(prev => 
-        prev.map(post => 
-          post.newsId === newsId 
-            ? { ...post, ...updates } 
-            : post
-        )
-      );
-    } catch (e: any) {
-      setError('Ошибка обновления: ' + e.message);
+      
+      await loadPosts();
+    } catch (err) {
+      setError('Ошибка обновления: ' + (err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -99,12 +95,11 @@ export const useAdminPosts = () => {
 
   const deletePost = async (newsId: string) => {
     setLoading(true);
-    setError(null);
     try {
-      await communityServiceApi.community.softdeleteDelete({ communityId: newsId });
+      await communityServiceApi.news.deleteNewsDelete({ newsId });
       await loadPosts();
-    } catch (e: any) {
-      setError(e.message || 'Failed to delete post');
+    } catch (err) {
+      setError('Ошибка удаления: ' + (err as Error).message);
     } finally {
       setLoading(false);
     }

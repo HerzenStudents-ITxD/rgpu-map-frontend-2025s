@@ -102,8 +102,8 @@ export interface NewsResponse {
   id?: string;
   /** @format uuid */
   communityId?: string;
-  title?: string | null;
-  text?: string | null;
+  title: string ;
+  text: string ;
   photos?: string[] | null;
   participants?: string[] | null;
   /** @format uuid */

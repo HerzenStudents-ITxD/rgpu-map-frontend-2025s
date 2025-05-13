@@ -35,8 +35,10 @@ export const NewsList = ({
         throw new Error(t('auth.required') || 'Authentication required');
       }
 
-      const query = { page: 1, pageSize: 10 };
-      const response = await apiRef.current.community.newsList(query, {
+      const response = await apiRef.current.news.newsList({
+        page: 1,
+        pageSize: 10
+      }, {
         signal: abortController?.signal
       });
 
@@ -47,22 +49,20 @@ export const NewsList = ({
         return;
       }
 
-       const newsItems = response.data.body.map(item => ({
-        id: item.newsId || `temp-${Date.now()}`,
+      const newsItems = response.data.body.map(item => ({
+        id: item.id || `temp-${Date.now()}`,
         title: item.title || t('news.untitled') || 'Untitled',
         text: item.text || t('news.noContent') || 'No text',
-        date: item.createdAt || new Date().toISOString(),
+        date: item.date || new Date().toISOString(),
         group: {
           id: item.communityId || 'unknown',
           name: groups.find(g => g.id === item.communityId)?.name || 'Unknown',
           avatar: item.photos?.[0] || null,
         },
-        imageUrl: item.photos?.[0] 
-          ? `data:image/jpeg;base64,${item.photos[0]}` // Добавляем префикс если нужно
-          : null,
+        imageUrl: item.photos?.[0] ? `data:image/jpeg;base64,${item.photos[0]}` : null,
         participants: item.participants?.length || 0,
-        location: item.location || null,
-        isFeatured: item.isFeatured || false,
+        pointId: item.pointId || null,
+        isFeatured: false,
       }));
 
       setNews(prev => 
@@ -86,7 +86,6 @@ export const NewsList = ({
       fetchNews(abortController);
     };
 
-    // Дебаунс запросов
     const debounceTimer = setTimeout(loadData, 500);
     
     return () => {

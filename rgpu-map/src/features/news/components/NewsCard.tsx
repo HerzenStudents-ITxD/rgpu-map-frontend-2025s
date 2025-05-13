@@ -40,7 +40,7 @@ export const NewsCard = ({
   const handleParticipate = useCallback(async () => {
     try {
       const api = new CommunityServiceApi();
-      await api.community.participateCreate({ newsId: item.id });
+      await api.news.participateCreate({ newsId: item.id });
       setError(null);
     } catch (err: any) {
       setError(err.message || t('news.error') || 'Ошибка участия');

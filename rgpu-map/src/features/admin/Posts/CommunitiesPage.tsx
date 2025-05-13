@@ -1,23 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Box, 
-  Button, 
-  TextField, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableRow, 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Typography, 
-  CircularProgress,
+  Box, Button, TextField, Table, TableBody, TableCell, TableHead, TableRow,
+  Dialog, DialogTitle, DialogContent, DialogActions, Typography, CircularProgress,
   IconButton
 } from '@mui/material';
 import { CommunityServiceApi } from '../../real_api/communityServiceApi';
-import { AvatarBox } from '../components/AvatarBox';
+import { AvatarBox } from '../../news/components/AvatarBox';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -25,7 +13,7 @@ interface Community {
   id: string;
   name: string;
   avatar?: string;
-  text?: string;
+  description?: string;
 }
 
 const CommunitiesPage = () => {
@@ -46,14 +34,18 @@ const CommunitiesPage = () => {
         id: c.community?.id || '',
         name: c.community?.name || '',
         avatar: c.community?.avatar || '',
-        text: c.community?.text || ''
+        description: c.community?.text || ''
       })) || []);
     } catch (err) {
-      setError('Ошибка загрузки сообществ');
+      setError('Ошибка загрузки сообществ: ' + (err as Error).message);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadCommunities();
+  }, []);
 
   const handleAvatarUpload = async (file: File) => {
     if (!selectedCommunity) return;
@@ -64,46 +56,83 @@ const CommunitiesPage = () => {
       
       reader.onloadend = async () => {
         const base64Image = reader.result as string;
+        const pureBase64 = base64Image.split(',')[1];
         
-        const operations = [{
-          op: "replace",
-          path: "/avatar",
-          value: base64Image
-        }];
-
         await api.community.editPartialUpdate(
-          operations,
+          [{
+            op: "replace",
+            path: "/avatar",
+            value: pureBase64
+          }],
           { communityId: selectedCommunity.id }
         );
 
-        setCommunities(prev => 
-          prev.map(c => 
-            c.id === selectedCommunity.id 
-              ? { ...c, avatar: base64Image } 
-              : c
-          )
-        );
-        setAvatarLoading(false);
+        await loadCommunities();
       };
-
+      
       reader.readAsDataURL(file);
     } catch (err) {
-      setError('Ошибка загрузки аватарки');
+      setError('Ошибка загрузки аватарки: ' + (err as Error).message);
+    } finally {
       setAvatarLoading(false);
     }
   };
 
+const handleSaveChanges = async () => {
+  if (!selectedCommunity) return;
+  
+  try {
+    setLoading(true);
+    setError(null);
+
+    const operations = [
+      {
+        op: "replace" as const,
+        path: "/name",
+        value: selectedCommunity.name
+      },
+      {
+        op: "replace" as const,
+        path: "/text",
+        value: selectedCommunity.description || ""
+      }
+    ];
+
+    await api.community.editPartialUpdate(
+      operations,
+      { communityId: selectedCommunity.id }
+    );
+
+    await loadCommunities();
+    setOpenEdit(false);
+    
+  } catch (err) {
+    setError(`Ошибка сохранения: ${(err as Error).message}`);
+    console.error("Full error details:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
   const validateImage = (file: File) => {
-    const maxSize = 2 * 1024 * 1024; // 2MB
+    const maxSize = 2 * 1024 * 1024;
     const allowedTypes = ['image/jpeg', 'image/png'];
     
-    if (file.size > maxSize) {
-      return 'Максимальный размер файла 2MB';
-    }
-    if (!allowedTypes.includes(file.type)) {
-      return 'Допустимы только JPEG и PNG';
-    }
+    if (file.size > maxSize) return 'Максимальный размер файла 2MB';
+    if (!allowedTypes.includes(file.type)) return 'Допустимы только JPEG и PNG';
     return null;
+  };
+
+  const handleDeleteCommunity = async (id: string) => {
+    try {
+      setLoading(true);
+      await api.community.softdeleteDelete({ communityId: id });
+      await loadCommunities();
+    } catch (err) {
+      setError('Ошибка удаления: ' + (err as Error).message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -127,13 +156,13 @@ const CommunitiesPage = () => {
             <TableRow key={community.id}>
               <TableCell>
                 <AvatarBox 
-                  imageUrl={community.avatar}
+                  imageUrl={community.avatar} 
                   name={community.name}
                   size={64}
                 />
               </TableCell>
               <TableCell>{community.name}</TableCell>
-              <TableCell>{community.text || '—'}</TableCell>
+              <TableCell>{community.description || '—'}</TableCell>
               <TableCell>
                 <IconButton onClick={() => {
                   setSelectedCommunity(community);
@@ -141,7 +170,7 @@ const CommunitiesPage = () => {
                 }}>
                   <EditIcon />
                 </IconButton>
-                <IconButton>
+                <IconButton onClick={() => handleDeleteCommunity(community.id)}>
                   <DeleteIcon color="error" />
                 </IconButton>
               </TableCell>
@@ -155,7 +184,6 @@ const CommunitiesPage = () => {
         <DialogContent dividers>
           {selectedCommunity && (
             <Box sx={{ mt: 2 }}>
-              {/* Поле загрузки аватарки */}
               <Box sx={{ mb: 3, textAlign: 'center' }}>
                 <input
                   accept="image/*"
@@ -165,13 +193,8 @@ const CommunitiesPage = () => {
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    
                     const error = validateImage(file);
-                    if (error) {
-                      setError(error);
-                      return;
-                    }
-                    
+                    if (error) return setError(error);
                     handleAvatarUpload(file);
                   }}
                 />
@@ -181,14 +204,9 @@ const CommunitiesPage = () => {
                     component="span"
                     disabled={avatarLoading}
                   >
-                    {avatarLoading ? (
-                      <CircularProgress size={24} />
-                    ) : (
-                      'Изменить аватар'
-                    )}
+                    {avatarLoading ? <CircularProgress size={24} /> : 'Изменить аватар'}
                   </Button>
                 </label>
-                
                 {selectedCommunity.avatar && (
                   <Box sx={{ mt: 2 }}>
                     <AvatarBox 
@@ -200,7 +218,6 @@ const CommunitiesPage = () => {
                 )}
               </Box>
 
-              {/* Остальные поля формы */}
               <TextField
                 fullWidth
                 label="Название"
@@ -217,10 +234,10 @@ const CommunitiesPage = () => {
                 multiline
                 rows={4}
                 label="Описание"
-                value={selectedCommunity.text || ''}
+                value={selectedCommunity.description || ''}
                 onChange={(e) => setSelectedCommunity({
                   ...selectedCommunity,
-                  text: e.target.value
+                  description: e.target.value
                 })}
               />
             </Box>
@@ -230,40 +247,10 @@ const CommunitiesPage = () => {
           <Button onClick={() => setOpenEdit(false)}>Отмена</Button>
           <Button 
             variant="contained" 
-            onClick={async () => {
-              if (!selectedCommunity) return;
-              try {
-                const operations = [];
-                
-                if (selectedCommunity.name) {
-                  operations.push({
-                    op: "replace",
-                    path: "/name",
-                    value: selectedCommunity.name
-                  });
-                }
-                
-                if (selectedCommunity.text !== undefined) {
-                  operations.push({
-                    op: "replace",
-                    path: "/text",
-                    value: selectedCommunity.text
-                  });
-                }
-
-                await api.community.editPartialUpdate(
-                  operations,
-                  { communityId: selectedCommunity.id }
-                );
-                
-                setOpenEdit(false);
-                loadCommunities();
-              } catch (err) {
-                setError('Ошибка сохранения');
-              }
-            }}
+            onClick={handleSaveChanges}
+            disabled={loading}
           >
-            Сохранить
+            {loading ? <CircularProgress size={24} /> : 'Сохранить'}
           </Button>
         </DialogActions>
       </Dialog>

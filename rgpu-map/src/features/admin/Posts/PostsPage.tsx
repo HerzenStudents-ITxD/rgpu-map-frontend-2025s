@@ -247,8 +247,8 @@ const PostsPage: React.FC<PostsPageProps> = ({
           <Button onClick={() => setOpenEdit(false)}>Cancel</Button>
           <Button 
             onClick={async () => {
-              if (selectedPost?.newsId) {
-                await editPost(selectedPost.newsId, {
+              if (selectedPost?.id) {
+                await editPost(selectedPost.id, {
                   communityId: selectedPost.communityId,
                   title: selectedPost.title,
                   text: selectedPost.text,
@@ -281,7 +281,7 @@ const PostsPage: React.FC<PostsPageProps> = ({
           </TableHead>
           <TableBody>
             {filteredPosts.map(post => (
-              <TableRow key={post.newsId}>
+              <TableRow key={post.id}>
                 <TableCell>{post.title || 'N/A'}</TableCell>
                 <TableCell>
                   {communities.find(c => c.id === post.communityId)?.name || 'N/A'}
@@ -296,7 +296,7 @@ const PostsPage: React.FC<PostsPageProps> = ({
                   </Button>
                   <Button 
                     color="error" 
-                    onClick={() => post.newsId && deletePost(post.newsId)}
+                    onClick={() => post.id && deletePost(post.id)}
                   >
                     Delete
                   </Button>

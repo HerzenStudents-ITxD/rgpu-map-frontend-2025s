@@ -39,14 +39,13 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
     text: '',
     groupId: '',
     pointId: '',
-    image: null as string | null,
+    images: [] as string[],
     isFeatured: false,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const api = new CommunityServiceApi();
 
-  // Валидация изображения
   const validateImage = (file: File): string | null => {
     const maxSize = 5 * 1024 * 1024; // 5MB
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
@@ -60,32 +59,51 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
     return null;
   };
 
-  // Конвертация файла в base64
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const error = validateImage(file);
-    if (error) {
-      setError(error);
-      return;
-    }
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     setLoading(true);
     try {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setForm({ ...form, image: reader.result as string });
-        setLoading(false);
-      };
-      reader.readAsDataURL(file);
+      const newImages: string[] = [];
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const error = validateImage(file);
+        if (error) {
+          setError(error);
+          continue;
+        }
+
+        const reader = new FileReader();
+        const promise = new Promise<string>((resolve) => {
+          reader.onloadend = () => {
+            const result = reader.result as string;
+            // Extract base64 part
+            const base64Data = result.split(',')[1] || result;
+            resolve(base64Data);
+          };
+          reader.readAsDataURL(file);
+        });
+
+        newImages.push(await promise);
+      }
+
+      setForm({ ...form, images: [...form.images, ...newImages] });
+      setError(null);
     } catch (err) {
       setError(t('news.uploadError') || 'Ошибка загрузки изображения');
+    } finally {
       setLoading(false);
     }
   };
 
-  // Отправка формы
+  const handleRemoveImage = (index: number) => {
+    const newImages = [...form.images];
+    newImages.splice(index, 1);
+    setForm({ ...form, images: newImages });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -100,12 +118,11 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
         communityId: form.groupId,
         title: form.title.trim(),
         text: form.text.trim(),
+        images: form.images.length > 0 ? form.images : null,
         pointId: form.pointId.trim() || null,
-        isFeatured: form.isFeatured,
-        images: form.image ? [form.image] : [],
       };
 
-      await api.community.createNewsCreate(requestData);
+      await api.news.createNewsCreate(requestData);
       onClose();
     } catch (err: any) {
       setError(err.message || t('news.error') || 'Ошибка создания новости');
@@ -117,7 +134,6 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
       <DialogTitle>{t('news.createPost')}</DialogTitle>
       <DialogContent dividers>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-          {/* Выбор сообщества */}
           <FormControl fullWidth sx={{ mb: 3 }}>
             <InputLabel>{t('news.community')} *</InputLabel>
             <Select
@@ -132,7 +148,6 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
             </Select>
           </FormControl>
 
-          {/* Поле заголовка */}
           <TextField
             fullWidth
             label={`${t('news.title')} *`}
@@ -142,7 +157,6 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
             required
           />
 
-          {/* Поле текста */}
           <TextField
             fullWidth
             multiline
@@ -154,7 +168,6 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
             required
           />
 
-          {/* Загрузка изображения */}
           <Box sx={{ mb: 3 }}>
             <Button
               variant="outlined"
@@ -171,25 +184,42 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
                 type="file"
                 hidden
                 accept="image/*"
+                multiple
                 onChange={handleImageUpload}
               />
             </Button>
-            {form.image && (
-              <Box sx={{ mt: 2, textAlign: 'center' }}>
-                <img
-                  src={form.image}
-                  alt="Preview"
-                  style={{ 
-                    maxWidth: '100%', 
-                    maxHeight: '200px',
-                    borderRadius: '8px'
-                  }}
-                />
-              </Box>
-            )}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 2 }}>
+              {form.images.map((image, index) => (
+                <Box key={index} sx={{ position: 'relative' }}>
+                  <img
+                    src={`data:image/jpeg;base64,${image}`}
+                    alt={`Preview ${index}`}
+                    style={{ 
+                      width: '100px',
+                      height: '100px',
+                      objectFit: 'cover',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <Button
+                    size="small"
+                    color="error"
+                    sx={{ 
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      minWidth: 'auto',
+                      p: 0.5
+                    }}
+                    onClick={() => handleRemoveImage(index)}
+                  >
+                    ×
+                  </Button>
+                </Box>
+              ))}
+            </Box>
           </Box>
 
-          {/* Чекбокс "Избранное" */}
           <FormControlLabel
             control={
               <Checkbox
@@ -200,7 +230,6 @@ export const CreateNewsForm: FC<CreateNewsFormProps> = ({
             label={t('news.featured')}
           />
 
-          {/* Отображение ошибок */}
           {error && (
             <Typography color="error" sx={{ mt: 2 }}>
               {error}
