@@ -21,24 +21,17 @@ import {
   Select,
   MenuItem,
   FormControlLabel,
-  Checkbox
+  Checkbox,
+  Tabs,
+  Tab
 } from '@mui/material';
 import { PointInfo } from '../../real_api/MapServiceApi';
 import { useAdminPoints } from './useAdminPoints';
 
 interface PointFormData {
-  name: {
-    ru: string;
-    en: string;
-  };
-  description: {
-    ru: string;
-    en: string;
-  };
-  fact: {
-    ru: string;
-    en: string;
-  };
+  name: Record<string, string>;
+  description: Record<string, string>;
+  fact: Record<string, string>;
   x: number;
   y: number;
   z: number;
@@ -46,16 +39,20 @@ interface PointFormData {
   isActive: boolean;
 }
 
+const languageTabs = ['ru', 'en', 'cn'] as const;
+type Language = typeof languageTabs[number];
+
 const PointsPage: React.FC = () => {
   const { points, loading, error, setError, createPoint, updatePoint, deletePoint } = useAdminPoints();
   const [search, setSearch] = useState('');
   const [openCreate, setOpenCreate] = useState(false);
   const [editPoint, setEditPoint] = useState<PointInfo | null>(null);
+  const [currentLang, setCurrentLang] = useState<Language>('ru');
 
   const [formData, setFormData] = useState<PointFormData>({
-    name: { ru: '', en: '' },
-    description: { ru: '', en: '' },
-    fact: { ru: '', en: '' },
+    name: { ru: '', en: '', cn: '' },
+    description: { ru: '', en: '', cn: '' },
+    fact: { ru: '', en: '', cn: '' },
     x: 0,
     y: 0,
     z: 0,
@@ -68,9 +65,14 @@ const PointsPage: React.FC = () => {
       value.toLowerCase().includes(search.toLowerCase())
   ));
 
-  const handleSubmit = useCallback(async () => {
+  const handleCloseDialog = () => {
+    setOpenCreate(false);
+    setEditPoint(null);
+    setError('');
+  };
 
-    if (!formData.name.ru && !formData.name.en) {
+  const handleSubmit = useCallback(async () => {
+    if (!Object.values(formData.name).some(v => v.trim())) {
       setError('Необходимо указать название хотя бы на одном языке');
       return;
     }
@@ -83,20 +85,23 @@ const PointsPage: React.FC = () => {
       isActive: formData.isActive
     };
     
-    if (editPoint) {
-      await updatePoint(editPoint.id!, data);
-    } else {
-      await createPoint(data);
+    try {
+      if (editPoint) {
+        await updatePoint(editPoint.id!, data);
+      } else {
+        await createPoint(data);
+      }
+      handleCloseDialog();
+    } catch (err) {
+      setError('Ошибка при сохранении точки');
     }
-    setOpenCreate(false);
-    setEditPoint(null);
   }, [formData, editPoint]);
 
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>Управление точками</Typography>
       
-      {error && <Alert severity="error">{error}</Alert>}
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
       <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
         <TextField
@@ -110,9 +115,9 @@ const PointsPage: React.FC = () => {
           variant="contained" 
           onClick={() => {
             setFormData({
-              name: { ru: '', en: '' },
-              description: { ru: '', en: '' },
-              fact: { ru: '', en: '' },
+              name: { ru: '', en: '', cn: '' },
+              description: { ru: '', en: '', cn: '' },
+              fact: { ru: '', en: '', cn: '' },
               x: 0,
               y: 0,
               z: 0,
@@ -133,8 +138,8 @@ const PointsPage: React.FC = () => {
           <TableHead>
             <TableRow>
               <TableCell>Название</TableCell>
-              <TableCell>Факт</TableCell>
               <TableCell>Координаты</TableCell>
+              <TableCell>Факт</TableCell>
               <TableCell>Активна</TableCell>
               <TableCell>Автор</TableCell>
               <TableCell>Дата создания</TableCell>
@@ -153,34 +158,29 @@ const PointsPage: React.FC = () => {
                   {point.createdAtUtc ? 
                     new Date(point.createdAtUtc).toLocaleDateString() : '-'}
                 </TableCell>
-                <TableCell>
-                  <Button onClick={() => {
-                    setEditPoint(point);
-                    setFormData({
-                      name: {
-                        ru: point.name?.ru || '', // Явное извлечение русской версии
-                        en: point.name?.en || ''  // Явное извлечение английской версии
-                      },
-                      description: {
-                        ru: point.description?.ru || '',
-                        en: point.description?.en || ''
-                      },
-                      fact: {
-                        ru: point.fact?.ru || '',
-                        en: point.fact?.en || ''
-                      },
-                      x: point.x || 0,
-                      y: point.y || 0,
-                      z: point.z || 0,
-                      icon: point.icon || 'default',
-                      isActive: point.isActive || true
-                    });
-                    setOpenCreate(true);
-                  }}>
+                <TableCell sx={{ display: 'flex', gap: 1 }}>
+                  <Button 
+                    variant="outlined"
+                    onClick={() => {
+                      setEditPoint(point);
+                      setFormData({
+                        name: point.name || { ru: '', en: '' },
+                        description: point.description || { ru: '', en: '' },
+                        fact: point.fact || { ru: '', en: '' },
+                        x: point.x || 0,
+                        y: point.y || 0,
+                        z: point.z || 0,
+                        icon: point.icon || 'default',
+                        isActive: point.isActive ?? true
+                      });
+                      setOpenCreate(true);
+                    }}
+                  >
                     Редактировать
                   </Button>
                   <Button 
-                    color="error" 
+                    variant="outlined" 
+                    color="error"
                     onClick={() => point.id && deletePoint(point.id)}
                   >
                     Удалить
@@ -192,124 +192,124 @@ const PointsPage: React.FC = () => {
         </Table>
       )}
 
-      <Dialog open={openCreate} onClose={() => setOpenCreate(false)} maxWidth="md" fullWidth>
+      <Dialog open={openCreate} onClose={handleCloseDialog} maxWidth="md" fullWidth>
         <DialogTitle>{editPoint ? 'Редактирование точки' : 'Новая точка'}</DialogTitle>
         <DialogContent>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+            <Tabs 
+              value={currentLang} 
+              onChange={(_, newValue) => setCurrentLang(newValue)}
+            >
+              <Tab label="Русский" value="ru" />
+              <Tab label="English" value="en" />
+              <Tab label="中文" value="cn" />
+            </Tabs>
+          </Box>
+
           <Box sx={{ mt: 2, display: 'grid', gap: 2, gridTemplateColumns: '1fr 1fr' }}>
             <TextField
-              label="Название (рус)"
-              value={formData.name.ru}
+              label="Название"
+              value={formData.name[currentLang] || ''}
               onChange={(e) => setFormData(prev => ({
                 ...prev,
-                name: { ...prev.name, ru: e.target.value }
+                name: { ...prev.name, [currentLang]: e.target.value }
               }))}
               fullWidth
             />
+
             <TextField
-              label="Название (англ)"
-              value={formData.name.en}
+              label="Факт"
+              value={formData.fact[currentLang] || ''}
               onChange={(e) => setFormData(prev => ({
                 ...prev,
-                name: { ...prev.name, en: e.target.value }
+                fact: { ...prev.fact, [currentLang]: e.target.value }
               }))}
               fullWidth
+              multiline
+              rows={3}
             />
-            
+
+            <TextField
+              label="Описание"
+              value={formData.description[currentLang] || ''}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                description: { ...prev.description, [currentLang]: e.target.value }
+              }))}
+              fullWidth
+              multiline
+              rows={3}
+            />
+          </Box>
+
+          <Box sx={{ mt: 3, display: 'grid', gap: 2, gridTemplateColumns: 'repeat(3, 1fr)' }}>
             <TextField
               label="X координата"
               type="number"
               value={formData.x}
-              onChange={(e) => setFormData(prev => ({ ...prev, x: parseFloat(e.target.value) }))}
+              onChange={(e) => setFormData(prev => ({ 
+                ...prev, 
+                x: parseFloat(e.target.value) || 0 
+              }))}
             />
             <TextField
               label="Y координата"
               type="number"
               value={formData.y}
-              onChange={(e) => setFormData(prev => ({ ...prev, y: parseFloat(e.target.value) }))}
+              onChange={(e) => setFormData(prev => ({ 
+                ...prev, 
+                y: parseFloat(e.target.value) || 0 
+              }))}
             />
             <TextField
               label="Z координата"
               type="number"
               value={formData.z}
-              onChange={(e) => setFormData(prev => ({ ...prev, z: parseFloat(e.target.value) }))}
+              onChange={(e) => setFormData(prev => ({ 
+                ...prev, 
+                z: parseFloat(e.target.value) || 0 
+              }))}
             />
-            
-            <FormControl fullWidth>
+          </Box>
+
+          <Box sx={{ mt: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
+            <FormControl sx={{ minWidth: 120 }}>
               <InputLabel>Иконка</InputLabel>
               <Select
                 value={formData.icon}
-                onChange={(e) => setFormData(prev => ({ ...prev, icon: e.target.value }))}
+                onChange={(e) => setFormData(prev => ({ 
+                  ...prev, 
+                  icon: e.target.value 
+                }))}
               >
-                <MenuItem value="empty">пустая</MenuItem>
+                <MenuItem value="default">По умолчанию</MenuItem>
                 <MenuItem value="exit">КПП</MenuItem>
                 <MenuItem value="landmark">Достопримечательность</MenuItem>
               </Select>
             </FormControl>
-            <TextField
-                label="Факт (рус)"
-                value={formData.fact.ru}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  fact: { ...prev.fact, ru: e.target.value }
-                }))}
-                fullWidth
-                multiline
-                rows={3}
-              />
-              <TextField
-                label="Факт (англ)"
-                value={formData.fact.en}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  fact: { ...prev.fact, en: e.target.value }
-                }))}
-                fullWidth
-                multiline
-                rows={3}
-              />
 
-              {/* Добавляем Description */}
-              <TextField
-                label="Описание (рус)"
-                value={formData.description.ru}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  description: { ...prev.description, ru: e.target.value }
-                }))}
-                fullWidth
-                multiline
-                rows={3}
-              />
-              <TextField
-                label="Описание (англ)"
-                value={formData.description.en}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  description: { ...prev.description, en: e.target.value }
-                }))}
-                fullWidth
-                multiline
-                rows={3}
-              />
-
-              {/* Добавляем IsActive */}
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={formData.isActive}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      isActive: e.target.checked
-                    }))}
-                  />
-                }
-                label="Активная точка"
-              />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    isActive: e.target.checked
+                  }))}
+                />
+              }
+              label="Активная точка"
+            />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenCreate(false)}>Отмена</Button>
-          <Button onClick={handleSubmit} variant="contained" color="primary">
+          <Button onClick={handleCloseDialog}>Отмена</Button>
+          <Button 
+            onClick={handleSubmit} 
+            variant="contained" 
+            color="primary"
+            disabled={!Object.values(formData.name).some(v => v.trim())}
+          >
             {editPoint ? 'Сохранить' : 'Создать'}
           </Button>
         </DialogActions>

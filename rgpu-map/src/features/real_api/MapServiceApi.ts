@@ -1141,9 +1141,9 @@ export class Api<
     /**
      * No description
      *
-     * @tags Route
+     * @tags Relations
      * @name BuildList
-     * @request GET:/Route/build
+     * @request GET:/Relations/build
      */
     buildList: (
       query?: {
@@ -1156,7 +1156,7 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<PointInfoListOperationResultResponse, any>({
-        path: `/Route/build`,
+        path: `/Relations/build`,
         method: "GET",
         query: query,
         format: "json",
@@ -1166,9 +1166,9 @@ export class Api<
     /**
      * No description
      *
-     * @tags Route
+     * @tags Relations
      * @name AvailableList
-     * @request GET:/Route/available
+     * @request GET:/Relations/available
      */
     availableList: (
       query?: {
@@ -1179,7 +1179,7 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<PointInfoListOperationResultResponse, any>({
-        path: `/Route/available`,
+        path: `/Relation/available`,
         method: "GET",
         query: query,
         format: "json",
@@ -1189,13 +1189,13 @@ export class Api<
     /**
      * No description
      *
-     * @tags Route
+     * @tags Relation
      * @name CreateCreate
-     * @request POST:/Route/create
+     * @request POST:/Relation/create
      */
     createCreate: (data: CreateRelationRequest, params: RequestParams = {}) =>
       this.request<GuidNullableOperationResultResponse, any>({
-        path: `/Route/create`,
+        path: `/Relation/create`,
         method: "POST",
         body: data,
         type: ContentType.Json,
@@ -1206,9 +1206,9 @@ export class Api<
     /**
      * No description
      *
-     * @tags Route
+     * @tags Relation
      * @name EditUpdate
-     * @request PUT:/Route/edit/{relationId}
+     * @request PUT:/Relation/edit/{relationId}
      */
     editUpdate: (
       relationId: string,
@@ -1216,7 +1216,7 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<BooleanOperationResultResponse, any>({
-        path: `/Route/edit/${relationId}`,
+        path: `/Relation/edit/${relationId}`,
         method: "PUT",
         body: data,
         type: ContentType.Json,
@@ -1227,13 +1227,13 @@ export class Api<
     /**
      * No description
      *
-     * @tags Route
-     * @name RouteDelete
-     * @request DELETE:/Route/{relationId}
+     * @tags Relation
+     * @name RelationsDelete
+     * @request DELETE:/Relation/{relationId}
      */
     routeDelete: (relationId: string, params: RequestParams = {}) =>
       this.request<BooleanOperationResultResponse, any>({
-        path: `/Route/${relationId}`,
+        path: `/Relation/${relationId}`,
         method: "DELETE",
         format: "json",
         ...params,
