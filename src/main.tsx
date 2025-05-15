@@ -137,7 +137,7 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 
 root.render(
   <React.StrictMode>
-    <Router basename="/technopark-proj">
+    <Router basename="/herzen-map">
       <App />
     </Router>
   </React.StrictMode>

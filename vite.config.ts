@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     tsconfigPaths()
   ],
-  base:'/technopark-proj/'
+  base:'/herzen-map/',
   resolve: {
     alias: {
       '@': '/src',
