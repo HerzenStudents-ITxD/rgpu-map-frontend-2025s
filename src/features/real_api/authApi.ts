@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:51702/';
+const BASE_URL = 'http://localhost:82/';
 
 // Response types
 interface LoginResult {
