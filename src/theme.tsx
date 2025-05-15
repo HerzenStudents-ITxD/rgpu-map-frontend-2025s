@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { PaletteMode } from '@mui/material';

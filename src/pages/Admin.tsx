@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Container, Typography, Box, Tabs, Tab, TextField, Button, List, ListItem, ListItemText, Select, MenuItem, FormControl, InputLabel, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';

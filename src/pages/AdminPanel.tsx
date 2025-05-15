@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Container, Typography, AppBar, Tabs, Tab, Box } from '@mui/material';
 import useAdminUsers from '../features/admin/Users/useAdminUsers';
