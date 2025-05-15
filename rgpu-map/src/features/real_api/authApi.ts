@@ -19,11 +19,15 @@ interface RefreshRequest {
 
 // Utility function to handle responses
 const handleResponse = async <T>(response: Response): Promise<T> => {
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Request failed');
+  if (!response.ok) {
+    const error = await response.json();
+    const errorMessage = error.message || 'Request failed';
+    if (response.status === 401) {
+      throw new Error('SESSION_EXPIRED');
     }
-    return response.json();
+    throw new Error(errorMessage);
+  }
+  return response.json();
 };
 
 // API Handlers
@@ -38,6 +42,9 @@ export const loginUser = async (credentials: LoginRequest): Promise<LoginResult>
         });
 
         const data = await handleResponse<LoginResult>(response);
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        localStorage.setItem('tokenExpiration', (Date.now() + data.expiresIn * 1000).toString());
         return data;
     } catch (error) {
         console.error('Error logging in:', error);
@@ -56,9 +63,13 @@ export const refreshToken = async (refreshData: RefreshRequest): Promise<LoginRe
         });
 
         const data = await handleResponse<LoginResult>(response);
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        localStorage.setItem('tokenExpiration', (Date.now() + data.expiresIn * 1000).toString());
         return data;
     } catch (error) {
         console.error('Error refreshing token:', error);
         throw error;
     }
 };
+

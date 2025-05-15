@@ -13,9 +13,14 @@ import PostsPage from '../features/admin/Posts/PostsPage';
 import FeedbackAdmin from '../features/admin/Feedback/FeedbackAdmin';
 import FeedbackTypesAdmin from '../features/admin/Feedback/FeedbackTypesAdmin';
 import PointsPage from '../features/admin/Points/PointsPage';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 
 const AdminPanel: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(0);
+  
   
   const {
     communities,

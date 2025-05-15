@@ -45,7 +45,7 @@ export interface CreatePointRequest {
   /** @format float */
   z: number;
   /** @minLength 1 */
-  icon: string;
+  icon: string | null;
   labelIds?: string[] | null;
   photos?: CreatePointPhotoRequest[] | null;
   typeIds?: string[] | null;
@@ -648,6 +648,7 @@ export class Api<
       this.request<BooleanOperationResultResponse, any>({
         path: `/Point/${pointId}`,
         method: "DELETE",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -664,6 +665,7 @@ export class Api<
         path: `/Point/create`,
         method: "POST",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -685,6 +687,7 @@ export class Api<
         path: `/Point/edit/${pointId}`,
         method: "PUT",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -721,6 +724,7 @@ export class Api<
         path: `/PointAssociation/create`,
         method: "POST",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -742,6 +746,7 @@ export class Api<
         path: `/PointAssociation/edit/${associationId}`,
         method: "PUT",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -761,6 +766,7 @@ export class Api<
       this.request<BooleanOperationResultResponse, any>({
         path: `/PointAssociation/${associationId}`,
         method: "DELETE",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -799,6 +805,7 @@ export class Api<
         path: `/PointLabel/create`,
         method: "POST",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -820,6 +827,7 @@ export class Api<
         path: `/PointLabel/edit/${labelId}`,
         method: "PUT",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -836,6 +844,7 @@ export class Api<
       this.request<BooleanOperationResultResponse, any>({
         path: `/PointLabel/${labelId}`,
         method: "DELETE",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -868,6 +877,7 @@ export class Api<
         path: `/PointPhoto/create`,
         method: "POST",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -889,6 +899,7 @@ export class Api<
         path: `/PointPhoto/edit/${photoId}`,
         method: "PUT",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -905,6 +916,7 @@ export class Api<
       this.request<BooleanOperationResultResponse, any>({
         path: `/PointPhoto/${photoId}`,
         method: "DELETE",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -943,6 +955,7 @@ export class Api<
         path: `/PointType/create`,
         method: "POST",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -964,6 +977,7 @@ export class Api<
         path: `/PointType/edit/${typeId}`,
         method: "PUT",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -980,6 +994,7 @@ export class Api<
       this.request<BooleanOperationResultResponse, any>({
         path: `/PointType/${typeId}`,
         method: "DELETE",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1015,6 +1030,7 @@ export class Api<
         path: `/PointTypeAssociation/create`,
         method: "POST",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -1035,6 +1051,7 @@ export class Api<
       this.request<BooleanOperationResultResponse, any>({
         path: `/PointTypeAssociation/edit/${associationId}`,
         method: "PUT",
+        secure: true,
         body: data,
         type: ContentType.Json,
         format: "json",
@@ -1055,6 +1072,7 @@ export class Api<
       this.request<BooleanOperationResultResponse, any>({
         path: `/PointTypeAssociation/${associationId}`,
         method: "DELETE",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1068,10 +1086,7 @@ export class Api<
      * @request GET:/PointTypeRectangularParallepipeds/list/{pointTypeId}
      */
     listDetail: (pointTypeId: string, params: RequestParams = {}) =>
-      this.request<
-        PointTypeRectangularParallepipedInfoListOperationResultResponse,
-        any
-      >({
+      this.request<PointTypeRectangularParallepipedInfoListOperationResultResponse, any>({
         path: `/PointTypeRectangularParallepipeds/list/${pointTypeId}`,
         method: "GET",
         format: "json",
@@ -1093,6 +1108,7 @@ export class Api<
         path: `/PointTypeRectangularParallepipeds/create`,
         method: "POST",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -1114,6 +1130,7 @@ export class Api<
         path: `/PointTypeRectangularParallepipeds/edit/${parallelepipedId}`,
         method: "PUT",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -1133,6 +1150,7 @@ export class Api<
       this.request<BooleanOperationResultResponse, any>({
         path: `/PointTypeRectangularParallepipeds/${parallelepipedId}`,
         method: "DELETE",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1199,6 +1217,7 @@ export class Api<
         method: "POST",
         body: data,
         type: ContentType.Json,
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1220,6 +1239,7 @@ export class Api<
         method: "PUT",
         body: data,
         type: ContentType.Json,
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1235,6 +1255,7 @@ export class Api<
       this.request<BooleanOperationResultResponse, any>({
         path: `/Relation/${relationId}`,
         method: "DELETE",
+        secure: true,
         format: "json",
         ...params,
       }),

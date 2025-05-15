@@ -35,7 +35,7 @@ interface PointFormData {
   x: number;
   y: number;
   z: number;
-  icon: string;
+  icon: string | null;
   isActive: boolean;
 }
 
@@ -56,7 +56,7 @@ const PointsPage: React.FC = () => {
     x: 0,
     y: 0,
     z: 0,
-    icon: 'default',
+    icon: null,
     isActive: true
   });
 
@@ -64,6 +64,34 @@ const PointsPage: React.FC = () => {
     Object.values(point.name || {}).some(value => 
       value.toLowerCase().includes(search.toLowerCase())
   ));
+
+const handleFileUpload = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      // Валидация типа и размера файла
+      if (!file.type.startsWith('image/')) {
+        setError('Можно загружать только изображения');
+        return;
+      }
+      
+      if (file.size > 2 * 1024 * 1024) {
+        setError('Максимальный размер файла - 2MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          icon: reader.result as string
+        }));
+      };
+      reader.readAsDataURL(file);
+    },
+    [setError]
+  );
 
   const handleCloseDialog = () => {
     setOpenCreate(false);
@@ -82,7 +110,10 @@ const PointsPage: React.FC = () => {
       x: Number(formData.x),
       y: Number(formData.y),
       z: Number(formData.z),
-      isActive: formData.isActive
+      isActive: formData.isActive,
+      icon: formData.icon?.startsWith('data:image') 
+        ? formData.icon.split(',')[1] // Отправляем только данные
+        : formData.icon
     };
     
     try {
@@ -272,35 +303,64 @@ const PointsPage: React.FC = () => {
             />
           </Box>
 
-          <Box sx={{ mt: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
-            <FormControl sx={{ minWidth: 120 }}>
-              <InputLabel>Иконка</InputLabel>
-              <Select
-                value={formData.icon}
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
-                  icon: e.target.value 
-                }))}
+           <Box sx={{ mt: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Button
+                variant="outlined"
+                component="label"
+                sx={{ minWidth: 120 }}
               >
-                <MenuItem value="default">По умолчанию</MenuItem>
-                <MenuItem value="exit">КПП</MenuItem>
-                <MenuItem value="landmark">Достопримечательность</MenuItem>
-              </Select>
-            </FormControl>
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    isActive: e.target.checked
-                  }))}
+                Загрузить иконку
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={handleFileUpload}
                 />
-              }
-              label="Активная точка"
-            />
-          </Box>
+              </Button>
+
+              {formData.icon && (
+                <Box sx={{ position: 'relative' }}>
+                  <img 
+                    src={formData.icon}
+                    alt="Preview" 
+                    style={{ 
+                      width: 50, 
+                      height: 50,
+                      objectFit: 'contain',
+                      borderRadius: 4 
+                    }}
+                  />
+                  <Button
+                    size="small"
+                    color="error"
+                    sx={{
+                      position: 'absolute',
+                      top: -8,
+                      right: -8,
+                      minWidth: 24,
+                      height: 24,
+                      borderRadius: '50%'
+                    }}
+                    onClick={() => setFormData(prev => ({ ...prev, icon: null }))}
+                  >
+                    ×
+                  </Button>
+                </Box>
+              )}
+
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      isActive: e.target.checked
+                    }))}
+                  />
+                }
+                label="Активная точка"
+              />
+            </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Отмена</Button>
