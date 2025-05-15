@@ -402,7 +402,7 @@ export enum OperationType {
   }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = "https://itvd.online:88";
+  public baseUrl: string = "http://localhost:51708";
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
