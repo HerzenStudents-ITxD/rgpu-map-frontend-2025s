@@ -13,11 +13,12 @@ interface TranslationResources {
     feedback: string;
     collectStats: string;
     collectStatsInfo: string;
+    collectStatsExplanation: string;
   };
   navbar: {
     home: string;
     news: string;
-    routes: string;
+    routebuilder: string;
     schedule: string;
     settings: string;
   };
@@ -74,6 +75,41 @@ interface TranslationResources {
     moderator: string;
     admin: string;
   };
+  login: {
+    title: string;
+    loginDataPlaceholder: string;
+    passwordPlaceholder: string;
+    button: string;
+    error: string;
+  };
+  save: string;
+  profile: {
+    name: string;
+    lastName: string;
+    email: string;
+    group: string;
+    faculty: string;
+    studyForm: string;
+    studyLevel: string;
+    studyYear: string;
+    subgroup: string;
+    editName: string;
+  };
+  feedback: {
+    selectSection: string;
+    section: string;
+    email: string;
+    emailPlaceholder: string;
+    photoLabel: string;
+    uploadButton: string;
+    describeIssue: string;
+    messagePlaceholder: string;
+    selectedFile: string;
+    other: string; // Новый ключ
+    wishes: string; // Новый ключ
+  };
+  cancel: string;
+  continue: string;
 }
 
 type SupportedLanguages = 'en' | 'ru' | 'cn';
@@ -91,11 +127,12 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         feedback: 'Feedback',
         collectStats: 'Collect Statistics',
         collectStatsInfo: 'Why collect statistics?',
+        collectStatsExplanation: 'Collecting statistics helps us analyze app usage to improve its functionality and user experience.',
       },
       navbar: {
         home: 'Home',
         news: 'News',
-        routes: 'Routes',
+        routebuilder: 'Routes',
         schedule: 'Schedule',
         settings: 'Settings',
       },
@@ -152,6 +189,41 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         moderator: 'Moderator',
         admin: 'Admin',
       },
+      login: {
+        title: 'Authorization',
+        loginDataPlaceholder: 'Enter login or email',
+        passwordPlaceholder: 'Enter password',
+        button: 'Login',
+        error: 'Invalid login or password',
+      },
+      save: 'Save',
+      profile: {
+        name: 'Name',
+        lastName: 'Last Name',
+        email: 'Email',
+        group: 'Group',
+        faculty: 'Faculty/Institute',
+        studyForm: 'Study Form',
+        studyLevel: 'Study Level',
+        studyYear: 'Study Year',
+        subgroup: 'Subgroup',
+        editName: 'Edit Name',
+      },
+      feedback: {
+        selectSection: 'Specify the section where the issue, question, or suggestion occurred',
+        section: 'Section',
+        email: 'Email',
+        emailPlaceholder: 'example@email.com',
+        photoLabel: 'Photo',
+        uploadButton: 'Upload',
+        describeIssue: 'Describe your issue, suggestion, or question in as much detail as possible',
+        messagePlaceholder: 'Your message',
+        selectedFile: 'Selected file',
+        other: 'Other', // Новый перевод
+        wishes: 'Wishes', // Новый перевод
+      },
+      cancel: 'Cancel',
+      continue: 'Continue',
     },
   },
   ru: {
@@ -166,11 +238,12 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         feedback: 'Обратная связь',
         collectStats: 'Сбор статистики',
         collectStatsInfo: 'Зачем собирать статистику?',
+        collectStatsExplanation: 'Сбор статистики помогает нам анализировать использование приложения, чтобы улучшать его функциональность и удобство для пользователей.',
       },
       navbar: {
         home: 'Главная',
         news: 'Новости',
-        routes: 'Маршруты',
+        routebuilder: 'Маршруты',
         schedule: 'Расписание',
         settings: 'Настройки',
       },
@@ -227,6 +300,41 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         moderator: 'Модератор',
         admin: 'Админ',
       },
+      login: {
+        title: 'Авторизация',
+        loginDataPlaceholder: 'Введите логин или email',
+        passwordPlaceholder: 'Введите пароль',
+        button: 'Войти',
+        error: 'Неверный логин или пароль',
+      },
+      save: 'Сохранить',
+      profile: {
+        name: 'Имя',
+        lastName: 'Фамилия',
+        email: 'Email',
+        group: 'Группа',
+        faculty: 'Факультет/институт',
+        studyForm: 'Форма обучения',
+        studyLevel: 'Ступень обучения',
+        studyYear: 'Год обучения',
+        subgroup: 'Подгруппа',
+        editName: 'Редактировать имя',
+      },
+      feedback: {
+        selectSection: 'Укажите раздел, в котором возникла проблема, вопрос или предложение',
+        section: 'Раздел',
+        email: 'Почта',
+        emailPlaceholder: 'example@email.com',
+        photoLabel: 'Фото',
+        uploadButton: 'Загрузить',
+        describeIssue: 'Опишите вашу проблему, предложение или вопрос как можно подробнее',
+        messagePlaceholder: 'Ваше сообщение',
+        selectedFile: 'Выбранный файл',
+        other: 'Другое', // Новый перевод
+        wishes: 'Пожелания', // Новый перевод
+      },
+      cancel: 'Отмена',
+      continue: 'Продолжить',
     },
   },
   cn: {
@@ -241,11 +349,12 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         feedback: '反馈',
         collectStats: '收集统计数据',
         collectStatsInfo: '为什么要收集统计数据？',
+        collectStatsExplanation: '收集统计数据有助于我们分析应用的使用情况，以改善其功能和用户体验。',
       },
       navbar: {
         home: '首页',
         news: '新闻',
-        routes: '路线',
+        routebuilder: '路线',
         schedule: '课程表',
         settings: '设置',
       },
@@ -302,6 +411,41 @@ const resources: Record<SupportedLanguages, { translation: TranslationResources 
         moderator: '版主',
         admin: '管理员',
       },
+      login: {
+        title: '授权',
+        loginDataPlaceholder: '输入登录名或电子邮件',
+        passwordPlaceholder: '输入密码',
+        button: '登录',
+        error: '登录名或密码无效',
+      },
+      save: '保存',
+      profile: {
+        name: '名字',
+        lastName: '姓',
+        email: '电子邮件',
+        group: '小组',
+        faculty: '学院/研究所',
+        studyForm: '学习形式',
+        studyLevel: '学习阶段',
+        studyYear: '学习年份',
+        subgroup: '小组',
+        editName: '编辑姓名',
+      },
+      feedback: {
+        selectSection: '指定出现问题、疑问或建议的部分',
+        section: '部分',
+        email: '电子邮件',
+        emailPlaceholder: 'example@email.com',
+        photoLabel: '照片',
+        uploadButton: '上传',
+        describeIssue: '尽可能详细地描述您的问题、建议或疑问',
+        messagePlaceholder: '您的消息',
+        selectedFile: '已选择的文件',
+        other: '其他', // Новый перевод
+        wishes: '愿望', // Новый перевод
+      },
+      cancel: '取消',
+      continue: '继续',
     },
   },
 };

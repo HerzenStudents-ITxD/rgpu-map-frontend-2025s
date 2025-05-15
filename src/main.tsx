@@ -1,108 +1,137 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, ReactNode } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter as Router, Routes, Route, useParams, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
 import RightBar from './components/RightBar';
-import Map from './UI/Map';
+
+import { MapPage } from './pages/MapPage';
 import Home from './pages/Home';
-import News from './pages/News';
+import { NewsPage } from './pages/NewsPage';
 import RoutesList from './pages/RoutesList';
 import RouteBuilder from './pages/RouteBuilder';
 import Schedule from './pages/Schedule';
 import Settings from './pages/Settings';
-import LanguageSelector from './modules/settings/LanguageSelector';
 import Profile from './pages/Profile';
 import Feedback from './pages/Feedback';
-import AdminPanel from './admin/AdminPanel';
+import LanguageSelectorPage from './pages/LanguageSelectorPage'; // Добавлен импорт
+import LoginPage from './pages/LoginPage'; // Добавлен импорт
+
 import { CustomThemeProvider } from './theme';
-import { usePoints } from './modules/map/usePoints';
-import { Point } from './types/points'; // Импортируем Point
+import { useMapStore } from './store/slices/mapSlice';
+
 import './i18n';
 import './index.css';
+
+import AgentsAdmin from './features/admin/Agents/AgentsAdmin';
+import CommunitiesAdmin from './features/admin/Communities/CommunitiesAdmin';
+import AdminPanel from './pages/AdminPanel';
+import PointsAdmin from './features/admin/Points/PointsPage';
+import UsersAdmin from './features/admin/Users/UsersAdmin';
+import FeedbackAdmin from './features/admin/Feedback/FeedbackAdmin';
+import FeedbackTypesAdmin from './features/admin/Feedback/FeedbackTypesAdmin';
+
+import PointDetails from './features/3dMap/components/PointDetails';
+import BuildingDetails from './features/3dMap/components/BuildingDetails';
 
 type View = 'home' | 'news' | 'routes' | 'route-builder' | 'schedule' | 'settings' | 'language' | 'profile' | 'feedback';
 
 const App: React.FC = () => {
-  const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
-  const [currentView, setCurrentView] = useState<View>('home');
-  const { points } = usePoints();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentView = searchParams.get('view') as View || 'home';
+  const { buildings, points, actions } = useMapStore();
+  const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
-  const { pointIndex } = useParams<{ pointIndex?: string }>();
 
   useEffect(() => {
-    if (pointIndex && points.length > 0) {
-      const index = parseInt(pointIndex, 10);
-      if (!isNaN(index) && index >= 0 && index < points.length) {
-        setSelectedPoint(points[index]);
-      } else {
-        setSelectedPoint(null);
-        navigate('/');
-      }
-    } else {
-      setSelectedPoint(null);
+    if (!id) {
+      actions.selectItem(null);
+      return;
     }
-  }, [pointIndex, points, navigate]);
 
-  const handlePointClick = (point: Point) => {
-    const index = points.findIndex((p) => p.point_id === point.point_id);
-    if (index !== -1) {
-      setSelectedPoint(point);
-      navigate(`/point/${index}`);
-    }
-  };
+    const itemId = parseInt(id, 10);
+    const item = [...buildings, ...points].find((item) => item.id === itemId);
+
+    actions.selectItem(item?.id || null);
+  }, [id, buildings, points, actions]);
 
   const handleViewChange = (view: View) => {
-    setCurrentView(view);
-  };
-
-  const renderView = () => {
-    switch (currentView) {
-      case 'home':
-        return <Home />;
-      case 'news':
-        return <News />;
-      case 'routes':
-        return <RoutesList />;
-      case 'route-builder':
-        return <RouteBuilder />;
-      case 'schedule':
-        return <Schedule />;
-      case 'settings':
-        return <Settings onViewChange={(view) => setCurrentView(view)} />;
-      case 'language':
-        return <LanguageSelector onBack={() => setCurrentView('settings')} />;
-      case 'profile':
-        return <Profile onBack={() => setCurrentView('settings')} />;
-      case 'feedback':
-        return <Feedback onBack={() => setCurrentView('settings')} />;
-      default:
-        return <Home />;
-    }
+    setSearchParams({ view });
   };
 
   return (
     <CustomThemeProvider>
       <Routes>
-        <Route path="/admin" element={<AdminPanel />} />
-        <Route path="*" element={
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-            <div style={{ flex: 1, position: 'relative' }}>
-              <TopBar />
-              <RightBar />
-              <Map onPointClick={handlePointClick} />
-              <Sidebar selectedPoint={selectedPoint}>
-                {renderView()}
-              </Sidebar>
-            </div>
-            <Navbar onViewChange={handleViewChange} currentView={currentView} />
-          </div>
+        {/* Страница выбора языка */}
+        <Route path="/language-selector" element={<LanguageSelectorPage />} />
+
+        {/* Страница логина */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Маршруты админ-панели */}
+        <Route path="/admin" element={<AdminPanel />}>
+          <Route index element={<Navigate to="points" replace />} />
+          <Route path="points" element={<PointsAdmin />} />
+          <Route path="users" element={<UsersAdmin />} />
+          <Route path="feedback" element={<FeedbackAdmin />} />
+          <Route path="feedback-types" element={<FeedbackTypesAdmin />} />
+          <Route path="communities" element={<CommunitiesAdmin />} />
+          <Route path="agents" element={<AgentsAdmin />} />
+        </Route>
+
+        <Route path="/point/:id" element={
+          <MainLayout 
+          onViewChange={handleViewChange} 
+          currentView={currentView}
+        >
+          <PointDetails />
+        </MainLayout>
         } />
+        
+        <Route path="/building/:id" element={
+          <MainLayout 
+          onViewChange={handleViewChange} 
+          currentView={currentView}
+        >
+          <BuildingDetails />
+        </MainLayout>
+        } />
+        
+        <Route path="/*" element={
+        <MainLayout 
+            onViewChange={handleViewChange}
+            currentView={currentView} children={undefined}          />
+        } />
+
       </Routes>
     </CustomThemeProvider>
   );
 };
+
+interface MainLayoutProps {
+  children: ReactNode;
+  onViewChange: (view: View) => void;
+  currentView: View;
+}
+
+const MainLayout = ({ 
+  onViewChange, 
+  currentView 
+}: MainLayoutProps) => (
+  <div className="main-layout">
+    <TopBar />
+    <RightBar />
+    <MapPage />
+    <Sidebar />
+    <Navbar 
+      onViewChange={onViewChange} 
+      currentView={currentView} 
+    />
+  </div>
+);
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
