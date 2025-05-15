@@ -1,4 +1,4 @@
-const BASE_URL = 'http://itvd.online:82/';
+const BASE_URL = 'https://itvd.online:82/';
 
 // Response types
 interface LoginResult {
