@@ -5,7 +5,7 @@ export const mockBuildings: Building[] = [
   {
     id: 1,
     name: 'Главный корпус',
-    model: '/models/main-campus.glb',
+    model: '/herzen-map/models/main-campus.glb',
     position: [0, 0, 0],
     metadata: {
       floors: 5,
