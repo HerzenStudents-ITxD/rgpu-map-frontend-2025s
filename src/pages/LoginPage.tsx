@@ -20,9 +20,7 @@ const LoginPage: React.FC = () => {
 
   const checkAdminRights = async (token: string, locale?: string): Promise<boolean> => {
     try {
-      const response = await rightsService.rights.getRights(
-        locale ? { locale } : undefined
-      );
+      const response = await rightsService.rights.getRights({ locale: 'ru' });
 
       // If the request was successful, the user has admin rights
       return true;
