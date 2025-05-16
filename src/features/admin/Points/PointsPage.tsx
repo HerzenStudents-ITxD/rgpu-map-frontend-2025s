@@ -115,6 +115,12 @@ const handleFileUpload = useCallback(
         ? formData.icon.split(',')[1] // Отправляем только данные
         : formData.icon
     };
+
+    if (data.icon && !/^[A-Za-z0-9+/]+={0,2}$/.test(data.icon)) {
+      setError('Некорректный формат изображения');
+      return;
+    }
+
     
     try {
       if (editPoint) {

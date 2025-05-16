@@ -25,16 +25,18 @@ export const useAdminUsers = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await usersService.user.findUsers({
+      const params = {
         isascendingsort: true,
-        fullnameincludesubstring: searchTerm,
+        fullnameincludesubstring: searchTerm || '', // Всегда передаем параметр
         isactive: isActive,
         ispending: false,
         includecurrentavatar: true,
         includecommunications: true,
         skipcount: skipCount,
         takecount: takeCount
-      });
+      };
+
+      const response = await usersService.user.findUsers(params);
       
       if (response.data?.body) {
         setUsers(response.data.body);

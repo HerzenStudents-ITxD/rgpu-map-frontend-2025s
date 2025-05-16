@@ -18,21 +18,23 @@ export const useAdminPoints = () => {
 
   const validateBase64 = (str: string) => {
     try {
-      return btoa(atob(str)) === str;
+      // Проверяем только чистый Base64 (без data:image/...)
+      return /^[A-Za-z0-9+/]+={0,2}$/.test(str) && btoa(atob(str)) === str;
     } catch {
       return false;
     }
   };
 
   const processIconData = (data: CreatePointRequest | EditPointRequest) => {
+    let icon = data.icon?.startsWith('data:image') 
+    ? data.icon.split(',')[1] 
+    : data.icon;
     if (data.icon && !validateBase64(data.icon)) {
       throw new Error('Некорректный формат Base64');
     }
         return {
       ...data,
-      icon: data.icon 
-        ? `data:image/png;base64,${data.icon}`
-        : null,
+      icon: icon || null,
       // Гарантируем наличие обязательных полей
       name: data.name || { ru: '', en: '' },
       x: data.x || 0,
@@ -58,18 +60,21 @@ export const useAdminPoints = () => {
 
 
   const createPoint = async (data: CreatePointRequest) => {
+    console.log('[DEBUG] Creating point with data:', data);
     setLoading(true);
     setError(null);
     try {
       const processedData = processIconData(data);
       const response = await mapApi.point.createCreate(processedData);
-      
+      console.log('[DEBUG] Processed data:', processedData);
+      console.log('[DEBUG] Create response:', response);
       if (response.data?.errors?.length) {
         throw new Error(response.data.errors.join(', '));
       }
       
       await loadPoints();
     } catch (e: unknown) {
+      console.error('[ERROR] Create failed:', e);
       setError(e instanceof Error ? e.message : 'Неизвестная ошибка');
     } finally {
       setLoading(false);

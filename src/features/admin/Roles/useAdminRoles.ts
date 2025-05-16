@@ -20,14 +20,14 @@ export const useAdminRoles = () => {
     skipCount: number = 0,
     takeCount: number = 10,
     includeDeactivated: boolean = false,
-    locale: string = 'en'
+    locale: string = 'ru'
   ) => {
     setLoading(true);
     setError(null);
     try {
       const response = await rightsService.roles.findRoles({
         includedeactivated: includeDeactivated,
-        locale,
+        locale: locale, // Используем параметр
         skipcount: skipCount,
         takecount: takeCount
       });

@@ -2,7 +2,6 @@
 // @ts-nocheck
 import React, { useState } from 'react';
 import { Container, Typography, AppBar, Tabs, Tab, Box } from '@mui/material';
-import useAdminUsers from '../features/admin/Users/useAdminUsers';
 import { useAdminRoles } from '../features/admin/Roles/useAdminRoles';
 import { useAdminCommunities } from '../features/admin/Communities/useAdminCommunities';
 import { useAdminAgents } from '../features/admin/Agents/useAdminAgents';
