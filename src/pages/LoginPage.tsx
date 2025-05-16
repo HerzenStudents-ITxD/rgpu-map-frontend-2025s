@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { useThemeContext } from '../theme';
 import { loginUser } from '../features/real_api/authApi';
 import { setTokens, getAccessToken } from '../utils/tokenService';
-import { RightsServiceApi } from '../features/real_api/rightsServiceApi';
 
 const LoginPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -15,31 +14,39 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
 
-  // Initialize the RightsServiceApi
-  const rightsService = new RightsServiceApi();
+  const getBaseUrl = () => {
+    return window.location.hostname === 'localhost'
+      ? "http://localhost:85"
+      : 'https://itvd.online/herzen-map/api/map';
+  };
 
-  const checkAdminRights = async (token: string, locale: string = 'ru'): Promise<boolean> => {
+  const checkAdminRights = async (token: string, locale?: string): Promise<boolean> => {
     try {
-      const apiUrl = window.location.hostname === 'localhost'
-        ? `http://localhost:81/Rights/get?locale=${locale}`
-        : `/herzen-map/api/rights/Rights/get?locale=${locale}`;
+      const baseUrl = getBaseUrl();
+      const url = new URL(`${baseUrl}/Rights/get`);
+      if (locale) {
+        url.searchParams.append('locale', locale);
+      }
 
-      const response = await fetch(apiUrl, {
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Token': token,
+          'Token': token, // Используем 'Token'
           'Content-Type': 'application/json',
         },
       });
 
       if (!response.ok) {
-        if (response.status === 403) return false;
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (response.status === 403) {
+          return false; // Пользователь не администратор
+        }
+        throw new Error(`Failed to check admin rights: HTTP status ${response.status}`);
       }
-      return true;
+
+      return true; // Пользователь администратор
     } catch (err) {
       console.error('Error checking admin rights:', err);
-      return false;
+      return false; // В случае любой ошибки считаем, что пользователь не администратор
     }
   };
 
