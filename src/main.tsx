@@ -64,7 +64,7 @@ const App: React.FC = () => {
 
   return (
     <CustomThemeProvider>
-      <Routes basename="/herzen-map">
+      <Routes>
         {/* Страница выбора языка */}
         <Route path="/language-selector" element={<LanguageSelectorPage />} />
 
