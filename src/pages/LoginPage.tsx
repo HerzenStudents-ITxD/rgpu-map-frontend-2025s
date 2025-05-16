@@ -18,12 +18,13 @@ const LoginPage: React.FC = () => {
   // Initialize the RightsServiceApi
   const rightsService = new RightsServiceApi();
 
-  const checkAdminRights = async (token: string): Promise<boolean> => {
+  const checkAdminRights = async (token: string, locale: string = 'ru'): Promise<boolean> => {
     try {
-      // Используем относительный путь, так как baseUrl уже содержит /api/rights/
-      const response = await fetch(`${window.location.hostname === 'localhost' 
-        ? 'http://localhost:81/Rights/get?locale=ru' 
-        : '/herzen-map/api/rights/Rights/get?locale=ru'}`, {
+      const apiUrl = window.location.hostname === 'localhost'
+        ? `http://localhost:81/Rights/get?locale=${locale}`
+        : `/herzen-map/api/rights/Rights/get?locale=${locale}`;
+
+      const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Token': token,
