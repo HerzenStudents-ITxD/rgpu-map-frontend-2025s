@@ -18,18 +18,27 @@ const LoginPage: React.FC = () => {
   // Initialize the RightsServiceApi
   const rightsService = new RightsServiceApi();
 
-  const checkAdminRights = async (token: string, locale?: string): Promise<boolean> => {
+  const checkAdminRights = async (token: string): Promise<boolean> => {
     try {
-      const response = await rightsService.rights.getRights({ locale: 'ru' });
+      // Используем относительный путь, так как baseUrl уже содержит /api/rights/
+      const response = await fetch(`${window.location.hostname === 'localhost' 
+        ? 'http://localhost:81/Rights/get?locale=ru' 
+        : '/herzen-map/api/rights/Rights/get?locale=ru'}`, {
+        method: 'GET',
+        headers: {
+          'Token': token,
+          'Content-Type': 'application/json',
+        },
+      });
 
-      // If the request was successful, the user has admin rights
-      return true;
-    } catch (err: any) {
-      console.error('Error checking admin rights:', err);
-      if (err.message.includes('403')) {
-        return false; // User doesn't have admin rights
+      if (!response.ok) {
+        if (response.status === 403) return false;
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      return false; // In case of any other error, assume not admin
+      return true;
+    } catch (err) {
+      console.error('Error checking admin rights:', err);
+      return false;
     }
   };
 
