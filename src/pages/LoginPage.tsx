@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useThemeContext } from '../theme';
 import { loginUser } from '../features/real_api/authApi';
 import { setTokens, getAccessToken } from '../utils/tokenService';
-import { RightsServiceApi } from './rightsServiceApi';
+import { RightsServiceApi } from '../features/real_api/rightsServiceApi';
 
 const LoginPage: React.FC = () => {
   const { t, i18n } = useTranslation();
