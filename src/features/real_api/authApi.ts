@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NODE_ENV === 'development' 
+const BASE_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:82/' 
   : 'https://itvd.online/herzen-map/api/auth/';
 

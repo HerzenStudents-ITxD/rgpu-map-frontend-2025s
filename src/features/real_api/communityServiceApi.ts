@@ -184,12 +184,8 @@ export enum ContentType {
   Text = "text/plain",
 }
 
-const BASE_URL = process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:82/' 
-  : 'https://itvd.online/api/auth/';
-
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = process.env.NODE_ENV === 'development' 
+  public baseUrl: string = window.location.hostname === 'localhost'
     ? "http://localhost:83"
     : 'https://itvd.online/herzen-map/api/community/';
   private securityData: SecurityDataType | null = null;

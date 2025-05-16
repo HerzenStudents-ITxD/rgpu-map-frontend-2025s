@@ -402,7 +402,7 @@ export enum OperationType {
   }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = process.env.NODE_ENV === 'development' 
+  public baseUrl: string = window.location.hostname === 'localhost'
     ? "http://localhost:88"
     : 'https://itvd.online/herzen-map/api/user/';
   private securityData: SecurityDataType | null = null;

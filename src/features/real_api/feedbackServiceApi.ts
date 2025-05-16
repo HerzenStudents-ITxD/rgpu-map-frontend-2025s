@@ -201,7 +201,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = process.env.NODE_ENV === 'development' 
+  public baseUrl: string = window.location.hostname === 'localhost'
     ? "http://localhost:84"
     : 'https://itvd.online/herzen-map/api/feedback/';
   private securityData: SecurityDataType | null = null;
