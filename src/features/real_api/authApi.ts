@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:82/';
+const BASE_URL = 'https://itvd.online/api/auth/';
 
 // Response types
 interface LoginResult {
