@@ -14,39 +14,27 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
 
-  const getBaseUrl = () => {
-    return window.location.hostname === 'localhost'
-      ? "http://localhost:85"
-      : 'https://itvd.online/herzen-map/api/map';
-  };
-
-  const checkAdminRights = async (token: string, locale?: string): Promise<boolean> => {
+  const checkAdminRights = async (token: string, locale: string = 'ru'): Promise<boolean> => {
     try {
-      const baseUrl = getBaseUrl();
-      const url = new URL(`${baseUrl}/Rights/get`);
-      if (locale) {
-        url.searchParams.append('locale', locale);
-      }
+      const apiUrl = window.location.hostname === 'localhost'
+        ? `http://localhost:81/Rights/get?locale=${locale}`
+        : `/herzen-map/api/rights/Rights/get?locale=${locale}`;
 
-      const response = await fetch(url, {
-        method: 'GET',
+      const response = await fetch(apiUrl, {
         headers: {
-          'Token': token, // Используем 'Token'
+          'Token': token,
           'Content-Type': 'application/json',
         },
       });
 
       if (!response.ok) {
-        if (response.status === 403) {
-          return false; // Пользователь не администратор
-        }
+        if (response.status === 403) return false;
         throw new Error(`Failed to check admin rights: HTTP status ${response.status}`);
       }
-
-      return true; // Пользователь администратор
+      return true;
     } catch (err) {
       console.error('Error checking admin rights:', err);
-      return false; // В случае любой ошибки считаем, что пользователь не администратор
+      return false;
     }
   };
 
