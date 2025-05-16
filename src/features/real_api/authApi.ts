@@ -1,4 +1,6 @@
-const BASE_URL = 'https://itvd.online/api/auth/';
+const BASE_URL = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:82/' 
+  : 'https://itvd.online/herzen-map/api/auth/';
 
 // Response types
 interface LoginResult {

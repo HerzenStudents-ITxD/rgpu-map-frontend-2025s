@@ -376,7 +376,9 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = "http://localhost:85";
+  public baseUrl: string = process.env.NODE_ENV === 'development' 
+    ? "http://localhost:85"
+    : 'https://itvd.online/herzen-map/api/map/';
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
