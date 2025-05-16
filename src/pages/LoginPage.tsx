@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useThemeContext } from '../theme';
 import { loginUser } from '../features/real_api/authApi';
 import { setTokens, getAccessToken } from '../utils/tokenService';
+import { RightsServiceApi } from './rightsServiceApi';
 
 const LoginPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -14,32 +15,23 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
 
+  // Initialize the RightsServiceApi
+  const rightsService = new RightsServiceApi();
+
   const checkAdminRights = async (token: string, locale?: string): Promise<boolean> => {
     try {
-      const url = new URL('http://localhost:81/Rights/get');
-      if (locale) {
-        url.searchParams.append('locale', locale);
-      }
+      const response = await rightsService.rights.getRights(
+        locale ? { locale } : undefined
+      );
 
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Token': token, // Используем 'Token'
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 403) {
-          return false; // Пользователь не администратор
-        }
-        throw new Error(`Failed to check admin rights: HTTP status ${response.status}`);
-      }
-
-      return true; // Пользователь администратор
-    } catch (err) {
+      // If the request was successful, the user has admin rights
+      return true;
+    } catch (err: any) {
       console.error('Error checking admin rights:', err);
-      return false; // В случае любой ошибки считаем, что пользователь не администратор
+      if (err.message.includes('403')) {
+        return false; // User doesn't have admin rights
+      }
+      return false; // In case of any other error, assume not admin
     }
   };
 
