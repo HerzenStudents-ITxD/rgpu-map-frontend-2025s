@@ -33,10 +33,11 @@ export const NewsList = ({
       
 
       const response = await apiRef.current.news.newsList({
-        page: 1,
-        pageSize: 10
+      page: 1,
+      pageSize: 10
       }, {
-        signal: abortController?.signal
+      signal: abortController?.signal,
+      headers: getAccessToken() ? { Token: getAccessToken() } : {} 
       });
 
       if (!isMounted.current) return;
