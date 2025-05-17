@@ -14,6 +14,7 @@ import PostsPage from '../features/admin/Posts/PostsPage';
 import FeedbackAdmin from '../features/admin/Feedback/FeedbackAdmin';
 import FeedbackTypesAdmin from '../features/admin/Feedback/FeedbackTypesAdmin';
 import PointsPage from '../features/admin/Points/PointsPage';
+import RelationsPage from '../features/admin/Relations/RelationsPage';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -75,6 +76,7 @@ const AdminPanel: React.FC = () => {
           <Tab label="Feedback" />
           <Tab label="Feedback Types" />
           <Tab label="Points" />
+          <Tab label="Relations" />
         </Tabs>
       </AppBar>
       <Box sx={{ mt: 2 }}>
@@ -112,6 +114,7 @@ const AdminPanel: React.FC = () => {
         {activeTab === 5 && <FeedbackAdmin />}
         {activeTab === 6 && <FeedbackTypesAdmin />}
         {activeTab === 7 && <PointsPage />}
+        {activeTab === 8 && <RelationsPage />}
       </Box>
     </Container>
   );

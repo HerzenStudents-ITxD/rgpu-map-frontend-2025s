@@ -30,10 +30,7 @@ export const NewsList = ({
     try {
       setLoading(true);
       setError(null);
-      
-      if (!getAccessToken()) {
-        throw new Error(t('auth.required') || 'Authentication required');
-      }
+    
 
       const response = await apiRef.current.news.newsList({
         page: 1,

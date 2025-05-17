@@ -22,6 +22,7 @@ import {
   MenuItem,
   FormControlLabel,
   Checkbox,
+  Tooltip,
   Tabs,
   Tab
 } from '@mui/material';
@@ -186,7 +187,17 @@ const handleFileUpload = useCallback(
           <TableBody>
             {filteredPoints.map(point => (
               <TableRow key={point.id}>
-                <TableCell>{point.name?.ru || point.name?.en || 'Без названия'}</TableCell>
+                <TableCell>
+                  <Tooltip
+                    title={
+                      `ID: ${point.id}\n`
+                    }
+                    arrow
+                    placement="top-start"
+                  >
+                    <span>{point.name?.ru || point.name?.en || 'Без названия'}</span>
+                  </Tooltip>
+                </TableCell>
                 <TableCell>{`X: ${point.x}, Y: ${point.y}, Z: ${point.z}`}</TableCell>
                 <TableCell>{point.fact?.ru || point.fact?.en || '-'}</TableCell>
                 <TableCell>{point.isActive ? 'Да' : 'Нет'}</TableCell>

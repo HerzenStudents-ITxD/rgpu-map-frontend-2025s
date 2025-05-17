@@ -16,9 +16,12 @@ export const useAdminPoints = () => {
   const [loading, setLoading] = useState(false); // Флаг загрузки
   const [error, setError] = useState<string | null>(null); // Ошибки операций
 
-  const validateBase64 = (str: string) => {
+  const validateBase64 = (str: string | null): boolean => {
     try {
-      // Проверяем только чистый Base64 (без data:image/...)
+      // Если значение отсутствует или пустая строка - считаем валидным
+      if (!str) return true;
+      
+      // Проверяем чистый Base64 (без data:image/...)
       return /^[A-Za-z0-9+/]+={0,2}$/.test(str) && btoa(atob(str)) === str;
     } catch {
       return false;
@@ -26,16 +29,27 @@ export const useAdminPoints = () => {
   };
 
   const processIconData = (data: CreatePointRequest | EditPointRequest) => {
-    let icon = data.icon?.startsWith('data:image') 
-    ? data.icon.split(',')[1] 
-    : data.icon;
-    if (data.icon && !validateBase64(data.icon)) {
-      throw new Error('Некорректный формат Base64');
+    let icon: string | null = data.icon ?? null;
+
+    // Преобразование 'default' в null
+    if (icon === 'default') icon = null;
+
+    // Валидация только для существующих иконок
+    if (icon) {
+      if (icon.startsWith('data:image')) {
+        const [, base64] = icon.split(',');
+        if (base64 && !validateBase64(base64)) {
+          throw new Error('Некорректный формат изображения');
+        }
+        icon = base64 || null;
+      } else if (!validateBase64(icon)) {
+        throw new Error('Некорректный формат изображения');
+      }
     }
-        return {
+
+    return {
       ...data,
-      icon: icon || null,
-      // Гарантируем наличие обязательных полей
+      icon,
       name: data.name || { ru: '', en: '' },
       x: data.x || 0,
       y: data.y || 0,
