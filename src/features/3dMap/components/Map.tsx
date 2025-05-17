@@ -17,15 +17,15 @@ interface MapProps {
 }
 
 const UniversityModel = () => {
-  const { scene } = useGLTF('/models/main-campus.glb') as GLTF;
+  const { scene } = useGLTF(`${import.meta.env.BASE_URL}models/main-campus.glb`) as GLTF;
   return (
     <group>
-    <primitive 
-      object={scene} 
-      position={[0, 0, 0]}
-      castShadow // Важно!
-      receiveShadow // Важно!
-    />
+      <primitive 
+        object={scene} 
+        position={[0, 0, 0]}
+        castShadow
+        receiveShadow
+      />
     </group>
   );
 };
