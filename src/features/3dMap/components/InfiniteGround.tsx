@@ -22,7 +22,7 @@ const InfiniteGround = () => {
       rotation={[-Math.PI / 2, 0, 0]}
       receiveShadow
     >
-      <planeGeometry args={[200, 200]} />
+      <planeGeometry args={[1000, 1000]} />
       <meshStandardMaterial 
         color="#e5e5e5"
         metalness={0}

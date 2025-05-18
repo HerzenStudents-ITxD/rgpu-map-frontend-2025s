@@ -11,24 +11,11 @@ import { Point3D } from './Point3D';
 import { useMapStore } from './mapSlice';
 import InfiniteGround from './InfiniteGround';
 
+
 interface MapProps {
   onBuildingClick?: (buildingId: number) => void;
   onPointClick?: (buildingId: string) => void;
 }
-
-const UniversityModel = () => {
-  const { scene } = useGLTF(`${import.meta.env.BASE_URL}models/main-campus.glb`) as GLTF;
-  return (
-    <group>
-      <primitive 
-        object={scene} 
-        position={[0, 0, 0]}
-        castShadow
-        receiveShadow
-      />
-    </group>
-  );
-};
 
 
 
@@ -88,7 +75,6 @@ export const Map = ({ onBuildingClick, onPointClick}: MapProps) => {
       ))}
 
       <OrbitControls enableZoom={true} />
-      <UniversityModel />
     </Canvas>
   );
 };

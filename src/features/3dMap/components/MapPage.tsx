@@ -13,7 +13,9 @@ export const MapPage = () => {
 
   useEffect(() => {
     // Загрузка зданий из моков
-    mockBuildings.forEach(actions.addBuilding);
+    if (useMapStore.getState().buildings.length === 0) {
+      mockBuildings.forEach(actions.addBuilding);
+    }
     
     // Загрузка точек с сервера
     const loadPoints = async () => {

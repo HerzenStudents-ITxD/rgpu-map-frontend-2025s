@@ -13,6 +13,7 @@ export const Model = ({ building, onClick }: BuildingProps) => {
 
   return (
     <primitive 
+      scale={10}
       object={scene} 
       position={building.position}
       onClick={onClick}

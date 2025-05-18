@@ -25,7 +25,7 @@ export const mockBuildings: Building[] = [
   },
     {
     id: 11,
-    name: 'Главный корпус',
+    name: '1 этаж, 3 корпус',
     model: '/herzen-map/models/3CampusCasing1F.glb',
     position: [0, 0, 0],
     metadata: {
@@ -35,7 +35,7 @@ export const mockBuildings: Building[] = [
   },
     {
     id: 12,
-    name: 'Главный корпус',
+    name: '2 этаж, 3 корпус',
     model: '/herzen-map/models/3CampusCasing2F.glb',
     position: [0, 0, 0],
     metadata: {
@@ -45,7 +45,7 @@ export const mockBuildings: Building[] = [
   },
     {
     id: 13,
-    name: 'Главный корпус',
+    name: '3 этаж, 3 корпус',
     model: '/herzen-map/models/3CampusCasing3F.glb',
     position: [0, 0, 0],
     metadata: {
@@ -55,7 +55,7 @@ export const mockBuildings: Building[] = [
   },
     {
     id: 14,
-    name: 'Главный корпус',
+    name: '4 этаж, 3 корпус',
     model: '/herzen-map/models/3CampusCasing4F.glb',
     position: [0, 0, 0],
     metadata: {
