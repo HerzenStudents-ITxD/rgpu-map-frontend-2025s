@@ -5,7 +5,7 @@ import { Building } from '../api/types';
 
 interface BuildingProps {
   building: Building;
-  onClick?: () => void;
+  onClick?: (id: number) => void;
 }
 
 export const Model = ({ building, onClick }: BuildingProps) => {

@@ -1,19 +1,19 @@
 // src/features/3dMap/components/Map.tsx
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Model } from './Building';
-import { useBuildings, useMapActions } from '../../../store/slices/mapSlice';
+import { useBuildings, useMapActions } from './mapSlice';
 import { useGLTF } from '@react-three/drei';
-import { Outlines} from '@react-three/drei';
 import type { GLTF } from 'three-stdlib';
 import * as THREE from 'three';
 import { useNavigate } from 'react-router-dom';
-import { MapPoint3D } from '../api/types';
-
+import { Point3D } from './Point3D';
+import { useMapStore } from './mapSlice';
+import InfiniteGround from './InfiniteGround';
 
 interface MapProps {
   onBuildingClick?: (buildingId: number) => void;
-  onPointClick?: (buildingId: number) => void;
+  onPointClick?: (buildingId: string) => void;
 }
 
 const UniversityModel = () => {
@@ -32,17 +32,25 @@ const UniversityModel = () => {
 
 
 
-export const Map = ({ onBuildingClick }: MapProps) => {
+export const Map = ({ onBuildingClick, onPointClick}: MapProps) => {
   const buildings = useBuildings();
+  const points = useMapStore(state => state.points);
   const { selectItem  } = useMapActions();
   const navigate = useNavigate();
+
+  const handlePointClick = (id: string) => {
+    selectItem(id);
+    onPointClick?.(id);
+  };
 
   const handleBuildingClick = (id: number) => {
     selectItem(id); // Правильный вызов
     onBuildingClick?.(id);
   };
+  
   return (
-    <Canvas shadows ={{ type: THREE.PCFSoftShadowMap }}>
+    <Canvas shadows ={{ type: THREE.PCFSoftShadowMap }}>\
+    <InfiniteGround />
     <ambientLight intensity={0.5} />
     <directionalLight
         castShadow
@@ -65,12 +73,19 @@ export const Map = ({ onBuildingClick }: MapProps) => {
 
       {buildings.map((building) => (
         <Model
-          key={building.id}
+          key={`building-${building.id}`} // Добавляем префикс типа
           building={building}
           onClick={() => handleBuildingClick(building.id)}
         />
       ))}
-      
+
+      {points.map(point => (
+        <Point3D
+          key={`point-${point.id}`}
+          point={point}
+          onClick={() => handlePointClick(point.id)}
+        />
+      ))}
 
       <OrbitControls enableZoom={true} />
       <UniversityModel />

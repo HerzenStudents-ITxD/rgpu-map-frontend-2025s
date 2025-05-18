@@ -3,7 +3,7 @@ import { MapPoint3D } from './types';
 
 export const mock3DPoints: MapPoint3D[] = [
   {
-    id: 1,
+    id: "Главный вход",
     name: "Главный вход",
     type: "point",
     position: [10.5, 0, 8.2],
@@ -11,22 +11,20 @@ export const mock3DPoints: MapPoint3D[] = [
     metadata: {
       isInteractive: true,
       description: "Центральный вход в университетский комплекс",
-      type_lvl: 1
     }
   },
   {
-    id: 2,
+    id: "Студенческое кафе",
     name: "Студенческое кафе",
     type: "point",
     position: [-5.3, 0, 15.7],
     metadata: {
       isInteractive: true,
       description: "Кафетерий с зоной отдыха",
-      type_lvl: 2
     }
   },
   {
-    id: 3,
+    id: "Научная библиотека",
     name: "Научная библиотека",
     type: "point",
     position: [20.1, 0, -3.8],
@@ -34,18 +32,16 @@ export const mock3DPoints: MapPoint3D[] = [
     metadata: {
       isInteractive: true,
       description: "Основное книгохранилище с читальными залами",
-      type_lvl: 3
     }
   },
   {
-    id: 4,
+    id: "Спортивный комплекс",
     name: "Спортивный комплекс",
     type: "point",
     position: [-15.2, 0, 12.4],
     metadata: {
       isInteractive: true,
       description: "Закрытый стадион и тренажерные залы",
-      type_lvl: 2
     }
   }
 ];

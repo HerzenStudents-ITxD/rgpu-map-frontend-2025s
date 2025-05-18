@@ -8,20 +8,12 @@ import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
 import RightBar from './components/RightBar';
 
-import { MapPage } from './pages/MapPage';
-import Home from './pages/Home';
-import { NewsPage } from './pages/NewsPage';
-import RoutesList from './pages/RoutesList';
-import RouteBuilder from './pages/RouteBuilder';
-import Schedule from './pages/Schedule';
-import Settings from './pages/Settings';
-import Profile from './pages/Profile';
-import Feedback from './pages/Feedback';
+import { MapPage } from './features/3dMap/components/MapPage';
 import LanguageSelectorPage from './pages/LanguageSelectorPage'; // Добавлен импорт
 import LoginPage from './pages/LoginPage'; // Добавлен импорт
 
 import { CustomThemeProvider } from './theme';
-import { useMapStore } from './store/slices/mapSlice';
+import { useMapStore } from './features/3dMap/components/mapSlice';
 
 import './i18n';
 import './index.css';

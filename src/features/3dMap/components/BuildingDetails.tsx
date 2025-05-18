@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useBuildings } from '../../../store/slices/mapSlice';
+import { useBuildings } from './mapSlice';
 
 const BuildingDetails = () => {
   const { id } = useParams();

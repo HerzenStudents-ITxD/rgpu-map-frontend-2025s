@@ -65,8 +65,8 @@ const LoginPage: React.FC = () => {
   };
 
   const backgroundImage = themeMode === 'light' 
-    ? 'url(/png/light-pattern.png)' 
-    : 'url(/png/dark-pattern.png)';
+    ? 'url(/herzen-map/png/light-pattern.png)' 
+    : 'url(/herzen-map/png/dark-pattern.png)';
 
   return (
     <Box
