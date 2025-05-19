@@ -1,6 +1,6 @@
 import { Sphere } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
-import type { MapPoint3D } from '../api/types';
+import type { MapPoint3D } from '../../api/types';
 
 interface Point3DProps {
   point: MapPoint3D;

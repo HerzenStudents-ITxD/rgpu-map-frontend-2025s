@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useMapStore } from './mapSlice';
+import { useMapStore } from '../Map/mapSlice';
 
 const PointDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +26,7 @@ const { points } = useMapStore();
       )}
       
       {point.metadata.fact && (
-        <p>Интересный факт: {point.metadata.fact}</p>
+        <p>{point.metadata.fact}</p>
       )}
 
       {point.metadata.labels?.length && (

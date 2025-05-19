@@ -16,8 +16,8 @@ import Settings from '../pages/Settings';
 import Profile from '../pages/Profile';
 import Feedback from '../pages/Feedback';
 import LanguageSelector from '../modules/settings/LanguageSelector';
-import PointDetails from '../features/3dMap/components/PointDetails';
-import BuildingDetails from '../features/3dMap/components/BuildingDetails';
+import PointDetails from '../features/3dMap/components/Point/PointDetails';
+import BuildingDetails from '../features/3dMap/components/Building/BuildingDetails';
 
 type View = 'home' | 'news' | 'routes' | 'route-builder' | 'schedule' | 'settings' | 'profile' | 'feedback' | 'language';
 

@@ -1,6 +1,6 @@
 // src/store/slices/mapSlice.ts
 import { create } from 'zustand';
-import type { Building, MapPoint3D } from '../api/types';
+import type { Building, MapPoint3D } from '../../api/types';
 
 interface MapState {
   buildings: Building[];

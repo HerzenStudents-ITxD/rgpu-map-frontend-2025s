@@ -15,7 +15,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import PlaceIcon from '@mui/icons-material/Place';
 import RouteIcon from '@mui/icons-material/Route';
-import { useMapStore } from '../mapSlice';
+import { useMapStore } from '../Map/mapSlice';
 import { MapService } from '../../api/mapService';
 import { MapPoint3D } from '../../api/types';
 import './RouteBuilder.css';

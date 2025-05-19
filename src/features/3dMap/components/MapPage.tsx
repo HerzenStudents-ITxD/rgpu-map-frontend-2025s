@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { Map } from './Map';
-import { useMapStore } from './mapSlice';
+import { Map } from './Map/Map';
+import { useMapStore } from './Map/mapSlice';
 import { mockBuildings } from '../api/mockBuildings';
 import { useNavigate } from 'react-router-dom';
 import { MapService } from '../api/mapService'; // Добавляем импорт сервиса
@@ -62,7 +62,13 @@ export const MapPage = () => {
   };
 
   return (
-    <div className="map-container">
+    <div style={{ 
+      width: '100vw',
+      height: '100vh',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      overflow: 'hidden'}}>
       <Map 
         onBuildingClick={(id) => handleObjectClick(id, 'building')}
         onPointClick={(id) => handleObjectClick(id, 'point')}

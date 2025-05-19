@@ -1,5 +1,5 @@
 import { Line } from '@react-three/drei';
-import { useMapStore } from '../mapSlice';
+import { useMapStore } from '../Map/mapSlice';
 
 const RouteVisualizer = () => {
   const route = useMapStore(state => state.route);

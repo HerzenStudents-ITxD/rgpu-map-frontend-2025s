@@ -1,14 +1,16 @@
 // src/features/3dMap/components/Map.tsx
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { Model } from './Building';
+import { Model } from '../Building/Building';
 import { useBuildings, useMapActions } from './mapSlice';
 import * as THREE from 'three';
 import { useNavigate } from 'react-router-dom';
-import { Point3D } from './Point3D';
+import { Point3D } from '../Point/Point3D';
 import { useMapStore } from './mapSlice';
-import InfiniteGround from './InfiniteGround';
-import RouteVisualizer from './RouteBuilder/RouteVisualizer';
+import InfiniteGround from '../InfiniteGround';
+import RouteVisualizer from '../RouteBuilder/RouteVisualizer';
+
+
 
 interface MapProps {
   onBuildingClick?: (buildingId: number) => void;
@@ -71,7 +73,7 @@ export const Map = ({ onBuildingClick, onPointClick}: MapProps) => {
         />
       ))}
 
-      <OrbitControls enableZoom={true} />
+      <OrbitControls enableZoom={true} minDistance={5} maxDistance={75} />
     </Canvas>
   );
 };

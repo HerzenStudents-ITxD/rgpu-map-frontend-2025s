@@ -1,7 +1,7 @@
 // src/features/3dMap/components/Building.tsx
 import { useGLTF } from '@react-three/drei';
 import type { GLTF } from 'three-stdlib';
-import { Building } from '../api/types';
+import { Building } from '../../api/types';
 
 interface BuildingProps {
   building: Building;

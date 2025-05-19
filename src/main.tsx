@@ -13,7 +13,7 @@ import LanguageSelectorPage from './pages/LanguageSelectorPage'; // Добавл
 import LoginPage from './pages/LoginPage'; // Добавлен импорт
 
 import { CustomThemeProvider } from './theme';
-import { useMapStore } from './features/3dMap/components/mapSlice';
+import { useMapStore } from './features/3dMap/components/Map/mapSlice';
 
 import './i18n';
 import './index.css';
@@ -26,8 +26,8 @@ import UsersAdmin from './features/admin/Users/UsersAdmin';
 import FeedbackAdmin from './features/admin/Feedback/FeedbackAdmin';
 import FeedbackTypesAdmin from './features/admin/Feedback/FeedbackTypesAdmin';
 
-import PointDetails from './features/3dMap/components/PointDetails';
-import BuildingDetails from './features/3dMap/components/BuildingDetails';
+import PointDetails from './features/3dMap/components/Point/PointDetails';
+import BuildingDetails from './features/3dMap/components/Building/BuildingDetails';
 
 type View = 'home' | 'news' | 'routes' | 'route-builder' | 'schedule' | 'settings' | 'language' | 'profile' | 'feedback';
 
@@ -115,7 +115,7 @@ const MainLayout = ({
 }: MainLayoutProps) => (
   <div className="main-layout">
     <TopBar />
-    <RightBar />
+    {/* <RightBar /> */}
     <MapPage />
     <Sidebar />
     <Navbar 
