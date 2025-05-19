@@ -10,7 +10,7 @@ import './Sidebar.css';
 import Home from '../pages/Home';
 import { NewsPage } from '../pages/NewsPage';
 import RoutesList from '../pages/RoutesList';
-import RouteBuilder from '../pages/RouteBuilder';
+import { RouteBuilder } from '../features/3dMap/components/RouteBuilder/RouteBuilder';
 import Schedule from '../pages/Schedule';
 import Settings from '../pages/Settings';
 import Profile from '../pages/Profile';

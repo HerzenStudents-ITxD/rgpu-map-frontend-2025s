@@ -1161,9 +1161,9 @@ export class Api<
     /**
      * No description
      *
-     * @tags Relations
+     * @tags Relation
      * @name BuildList
-     * @request GET:/Relations/build
+     * @request GET:/Relation/build
      */
     buildList: (
       query?: {
@@ -1176,7 +1176,7 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<PointInfoListOperationResultResponse, any>({
-        path: `/Relations/build`,
+        path: `/Relation/build`,
         method: "GET",
         query: query,
         format: "json",
@@ -1186,9 +1186,9 @@ export class Api<
     /**
      * No description
      *
-     * @tags Relations
+     * @tags Relation
      * @name AvailableList
-     * @request GET:/Relations/available
+     * @request GET:/Relation/available
      */
     availableList: (
       query?: {
@@ -1250,7 +1250,7 @@ export class Api<
      * No description
      *
      * @tags Relation
-     * @name RelationsDelete
+     * @name RelationDelete
      * @request DELETE:/Relation/{relationId}
      */
     routeDelete: (relationId: string, params: RequestParams = {}) =>

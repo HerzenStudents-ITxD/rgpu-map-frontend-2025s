@@ -8,15 +8,12 @@ import { useNavigate } from 'react-router-dom';
 import { Point3D } from './Point3D';
 import { useMapStore } from './mapSlice';
 import InfiniteGround from './InfiniteGround';
-
-
+import RouteVisualizer from './RouteBuilder/RouteVisualizer';
 
 interface MapProps {
   onBuildingClick?: (buildingId: number) => void;
   onPointClick?: (buildingId: string) => void;
 }
-
-
 
 export const Map = ({ onBuildingClick, onPointClick}: MapProps) => {
   const buildings = useBuildings();
@@ -35,8 +32,9 @@ export const Map = ({ onBuildingClick, onPointClick}: MapProps) => {
   };
   
   return (
-    <Canvas shadows ={{ type: THREE.PCFSoftShadowMap }}>\
+    <Canvas shadows ={{ type: THREE.PCFSoftShadowMap }}>
     <InfiniteGround />
+    <RouteVisualizer />
     <ambientLight intensity={0.5} />
     <directionalLight
         castShadow
