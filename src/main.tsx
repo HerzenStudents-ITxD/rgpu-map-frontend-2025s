@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
-import TopBar from './components/TopBar';
+import TopBar from './features/3dMap/components/Bars/TopBar';
 import RightBar from './components/RightBar';
 
 import { MapPage } from './features/3dMap/components/MapPage';

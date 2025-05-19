@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import { useNavigate } from 'react-router-dom';
 import { Point3D } from '../Point/Point3D';
 import { useMapStore } from './mapSlice';
-import InfiniteGround from '../InfiniteGround';
+import InfiniteGround from '../Common/InfiniteGround';
 import RouteVisualizer from '../RouteBuilder/RouteVisualizer';
 
 

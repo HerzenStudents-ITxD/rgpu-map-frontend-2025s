@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Box, TextField, IconButton, Autocomplete, ListItem, ListItemText } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
-import { useMapStore } from '../features/3dMap/components/Map/mapSlice'; // Укажите правильный путь
-import { MapPoint3D } from '../features/3dMap/api/types'; // Укажите правильный путь
+import { useMapStore } from '../Map/mapSlice'; // Укажите правильный путь
+import { MapPoint3D } from '../../api/types'; // Укажите правильный путь
 import { useNavigate } from 'react-router-dom';
 
 const TopBar: React.FC = () => {
