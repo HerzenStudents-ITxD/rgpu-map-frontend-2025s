@@ -10,22 +10,22 @@ interface Point3DProps {
 export const Point3D = ({ point, onClick }: Point3DProps) => {
   const { camera } = useThree();
   
-  const handleClick = () => {
-    onClick?.(point.id); // Передаём GUID
-  };
-
   return (
     <Sphere
       position={point.position}
-      scale={1}
-      onClick={handleClick}
+      scale={2}
+      onClick={(e: any) => {
+        e.stopPropagation(); // Предотвращаем всплытие
+        onClick?.(point.id);
+      }}
       onPointerOver={() => (document.body.style.cursor = 'pointer')}
       onPointerOut={() => (document.body.style.cursor = 'auto')}
     >
       <meshStandardMaterial 
         transparent 
-        opacity={0.8}
+        opacity={0.3}
       />
     </Sphere>
+    
   );
 };

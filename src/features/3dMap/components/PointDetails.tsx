@@ -6,7 +6,7 @@ const PointDetails = () => {
 const { points } = useMapStore();
 
   // Поиск по строковому ID без преобразования
-  const point = id ? points[id] : undefined;
+  const point = points.find(p => p.id === id);
 
   if (!point) {
     return <div className="point-details">Точка не найдена</div>;

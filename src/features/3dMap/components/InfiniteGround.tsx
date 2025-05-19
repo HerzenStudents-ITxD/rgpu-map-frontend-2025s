@@ -11,7 +11,7 @@ const InfiniteGround = () => {
     // Обновляем позицию плоскости вслед за камерой
     meshRef.current.position.set(
       Math.floor(camera.position.x),
-      -0.1, // Фиксированная позиция по Y (ниже всех объектов)
+      -1.1, // Фиксированная позиция по Y (ниже всех объектов)
       Math.floor(camera.position.z)
     );
   });
@@ -24,7 +24,7 @@ const InfiniteGround = () => {
     >
       <planeGeometry args={[1000, 1000]} />
       <meshStandardMaterial 
-        color="#e5e5e5"
+        color="#ebffe0"
         metalness={0}
         roughness={0.8}
       />

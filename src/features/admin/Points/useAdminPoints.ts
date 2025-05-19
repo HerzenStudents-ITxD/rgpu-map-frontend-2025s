@@ -97,9 +97,10 @@ export const useAdminPoints = () => {
 
   const updatePoint = async (pointId: string, data: EditPointRequest) => {
     setLoading(true);
+    setError(null);
     try {
-      const response = await mapApi.point.editUpdate(pointId, data);
-
+      const processedData = processIconData(data);
+      const response = await mapApi.point.editUpdate(pointId, processedData);
 
       if (response.data?.errors?.length) {
         throw new Error(response.data.errors.join(', '));

@@ -16,7 +16,9 @@ export const Model = ({ building, onClick }: BuildingProps) => {
       scale={10}
       object={scene} 
       position={building.position}
-      onClick={onClick}
+      onClick={(e: any) => {
+        e.stopPropagation(); // Предотвращаем всплытие
+        onClick?.(building.id);}}
       userData={{ interactive: building.metadata.isInteractive }}
     />
   );

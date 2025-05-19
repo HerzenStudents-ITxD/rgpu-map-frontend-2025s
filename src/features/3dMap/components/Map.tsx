@@ -3,13 +3,12 @@ import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Model } from './Building';
 import { useBuildings, useMapActions } from './mapSlice';
-import { useGLTF } from '@react-three/drei';
-import type { GLTF } from 'three-stdlib';
 import * as THREE from 'three';
 import { useNavigate } from 'react-router-dom';
 import { Point3D } from './Point3D';
 import { useMapStore } from './mapSlice';
 import InfiniteGround from './InfiniteGround';
+
 
 
 interface MapProps {
