@@ -93,7 +93,7 @@ export const RouteBuilder: React.FC = () => {
 
       <List>
         {/* Поле поиска начальной точки */}
-        <ListItem sx={{ mb: 2 }}>
+        <ListItem >
           <Box width="100%">
             <TextField
               fullWidth
